@@ -1,4 +1,12 @@
-## 0.1.0 (date)
+## Next version (Unreleased)
+
+FEATURES:
+
+IMPROVEMENTS:
+
+BUG FIXES:
+
+## 0.1.0 (May 22, 2017)
 
 FEATURES:
 
