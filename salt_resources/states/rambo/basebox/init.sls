@@ -1,0 +1,23 @@
+setup_basebox:
+  pkg.installed:
+    - pkgs:
+      - libreadline6-dev
+      - libbz2-dev
+      - libssl-dev
+      - libsqlite3-dev
+      - libncursesw5-dev
+      - libffi-dev
+      - libdb-dev
+      - libexpat1-dev
+      - zlib1g-dev
+      - liblzma-dev
+      - libgdbm-dev
+      - libffi-dev
+      - libmpdec-dev
+      - libjpeg62-turbo-dev
+      - libfreetype6-dev 
+      - libpq-dev
+      - python-dev
+      - build-essential 
+      - python-virtualenv
+      - emacs

@@ -1,0 +1,48 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.provider :digital_ocean do |provider, config|
+    # set unique vm name
+    config.vm.hostname = VM_NAME
+    provider.token = ENV["DIGITALOCEAN_TOKEN"]
+    provider.image = "debian-8-x64"
+    provider.region = "nyc1"
+    if VM_SIZE == "512mb"
+      provider.size = "512mb"
+    elsif VM_SIZE == "1024mb"
+      provider.size = "1gb"
+    elsif VM_SIZE == "2048mb"
+      provider.size = "2gb"
+    end
+  end
+  config.ssh.username = "vagrant"
+  config.ssh.private_key_path = ENV["DIGITALOCEAN_PRIVATE_KEY_PATH"]
+  config.ssh.forward_agent = FORWARD_SSH
+  config.vm.box = "digital_ocean"
+  config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+  if COPY_DIR_WITH_RSYNC
+    config.vm.synced_folder ".",
+      "/vagrant",
+      type: "rsync"
+  else
+    config.vm.synced_folder ".",
+      "/vagrant",
+      type: "rsync",
+      disabled: true
+  end
+  if PROVISION_WITH_SALT
+    config.vm.provision :salt do |salt|
+      salt.bootstrap_options = "-P"
+      salt.verbose = true
+    end
+    config.vm.provision "shell",
+      path: "vagrant_resources/provisioners/provisioner_digitalocean.sh",
+      keep_color: true
+  end
+  if PROVISION_WITH_CMD
+    config.vm.provision "shell",
+      inline: PROVISION_CMD,
+      keep_color: true
+  end
+end

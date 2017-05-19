@@ -1,0 +1,8 @@
+[program:{{ grains['project'] }}]
+command= /home/{{ grains['deescalated_user'] }}/{{ grains['project'] }}/bin/uwsgi -H /home/{{ grains['deescalated_user'] }}/{{ grains['project'] }} --socket {{ grains['project'] }}.sock --wsgi-file wsgi.py --chmod-socket=666
+directory=/home/{{ grains['deescalated_user'] }}/{{ grains['project'] }}
+autostart=true
+autorestart=true
+startretries=3
+stderr_logfile=/var/log/{{ grains['project'] }}.err.log
+stdout_logfile=/var/log/{{ grains['project'] }}.out.log

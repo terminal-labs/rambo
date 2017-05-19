@@ -1,0 +1,60 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.provider :lxc do |lxc|
+    lxc.backingstore = "loop"
+    if VM_SIZE == "512mb"
+      lxc.customize "cgroup.memory.limit_in_bytes",
+        "512M"
+      lxc.backingstore_option "--fssize",
+        "20G"
+    elsif VM_SIZE == "1024mb"
+      lxc.customize "cgroup.memory.limit_in_bytes",
+        "1024M"
+      lxc.backingstore_option "--fssize",
+        "30G"
+    elsif VM_SIZE == "2048mb"
+      lxc.customize "cgroup.memory.limit_in_bytes",
+        "2048M"
+      lxc.backingstore_option "--fssize",
+        "40G"
+    end
+  end
+  config.ssh.username = "vagrant"
+  config.ssh.forward_agent = FORWARD_SSH
+  config.vm.network :forwarded_port,
+    :guest => 5000,
+    :host => 5000,
+    auto_correct: true
+  config.vm.network :forwarded_port,
+    :guest => 80,
+    :host => 8080,
+    auto_correct: true
+  config.vm.box = "tl_debian_jessie_64bit_lxc"
+  config.vm.box_url = "https://s3-us-west-1.amazonaws.com/terminal-labs-vagrant-boxes/tl_debian_jessie_64bit_lxc.box"
+  if COPY_DIR_WITH_RSYNC == true
+    config.vm.synced_folder ".",
+      "/vagrant",
+      type: "rsync"
+  else
+    config.vm.synced_folder ".",
+      "/vagrant",
+      type: "rsync",
+      disabled: true
+  end
+  if PROVISION_WITH_SALT
+    config.vm.provision :salt do |salt|
+      salt.bootstrap_options = "-P"
+      salt.verbose = true
+    end
+    config.vm.provision "shell",
+      path: "vagrant_resources/provisioners/provisioner_lxc.sh",
+      keep_color: true
+  end
+  if PROVISION_WITH_CMD
+    config.vm.provision "shell",
+      inline: PROVISION_CMD,
+      keep_color: true
+  end
+end

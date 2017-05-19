@@ -1,0 +1,20 @@
+syntax: glob
+
+## patterns
+*.orig
+*.tgz
+*.swp
+*.swo
+*~
+*.DS_Store*
+*.vagrant*
+*.pem
+*.pub
+
+## paths
+env.sh
+digitalocean.env.sh
+aws.env.sh
+srv/salt/ssh_keys/**
+.tmp/**
+keys/**

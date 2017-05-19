@@ -1,0 +1,55 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+opts = GetoptLong.new(
+  [ '--target', GetoptLong::OPTIONAL_ARGUMENT ]
+)
+
+cli_target_opt=''
+opts.each do |opt, arg|
+  case opt
+    when '--target'
+      cli_target_opt=arg
+  end
+end
+
+target=''
+if (!ENV["TARGET"] and cli_target_opt=='')
+  if read_provider_file() == false
+    target = 'virtualbox'
+    write_provider_file(target)
+  else
+    target = read_provider_file()
+  end
+elsif ENV["TARGET"] == "virtualbox" or cli_target_opt == "virtualbox"
+  target='virtualbox'
+  write_provider_file(target)
+elsif ENV["TARGET"] == "aws" or cli_target_opt == "aws"
+  target='aws'
+  write_provider_file(target)
+elsif ENV["TARGET"] == "digitalocean" or cli_target_opt == "digitalocean"
+  target='digitalocean'
+  write_provider_file(target)
+elsif ENV["TARGET"] == "lxc" or cli_target_opt == "lxc"
+  target='lxc'
+  write_provider_file(target)
+end
+ 
+if target == 'virtualbox'
+  load File.expand_path("vagrant_resources/vagrant/Vagrantfile.virtualbox")
+elsif target == "aws"
+  load File.expand_path("vagrant_resources/vagrant/Vagrantfile.aws")
+elsif target == "digitalocean"
+  load File.expand_path("vagrant_resources/vagrant/Vagrantfile.digitalocean")
+elsif target == "lxc"
+  load File.expand_path("vagrant_resources/vagrant/Vagrantfile.lxc")
+end
+
+# clean up files on the host after the guest is destroyed
+Vagrant.configure("2") do |config|
+  config.trigger.after :destroy do
+    #Vagrant.destroy
+    #run "rm -Rf .vagrant/"
+    #run "rm -Rf tmp/"
+  end
+end

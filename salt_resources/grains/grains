@@ -1,0 +1,18 @@
+roles:
+  - project
+  - dev
+deescalated_user: webserver
+project: website
+pip_req_path: requirements.txt
+dvcs: git
+# repository: ssh://git@bitbucket.org/group/repo
+# fingerprint: [put fingerprint here of the form 00:01:02...]
+# artifact_server_address: 123.45.67.89
+# artifact_server_fingerprint: [put fingerprint here of the form 00:01:02...]
+# artifact_files: path/to/artifacts/*
+# artifact_drop_path: served_files/media
+# artifact_db: default.sql
+# artifact_db_path: path/to/db_artifact
+# postgres_password: [pwd here]
+# secret_key: [key here]
+# nevercache_key: [key here]

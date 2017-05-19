@@ -1,0 +1,16 @@
+file_client: local
+
+failhard: True
+
+file_roots:
+  base:
+    - /vagrant/salt_resources/states/
+
+grains:
+  roles:
+    - project
+    - dev
+  user: vagrant
+  group: vagrant
+
+# postgres.bins_dir: '/usr/lib/postgresql/9.6/bin/' # location of the postgres bin's path to the relevant minion for this module

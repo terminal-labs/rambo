@@ -1,0 +1,7 @@
+Host bitbucket bitbucket.org
+    HostName bitbucket.org
+    IdentityFile /root/.ssh/master_bitbucket_deployment_key
+
+Host artifacts {{ grains['artifact_server_ip'] }}
+    HostName {{ grains['artifact_server_ip'] }}
+    IdentityFile /root/.ssh/master_artifacts_server_deployment_key
