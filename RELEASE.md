@@ -10,10 +10,8 @@ targetted at Rambo core members who have the ability to cut a release.
 
 1. Commit those changes and also tag the release with the version:
 
-    ```
-    $ git tag vX.Y.Z
-    $ git push --tags
-    ```
+        $ git tag vX.Y.Z
+        $ git push --tags
 
 1. Update `version.txt` to the next version and append `.dev` and add
   a new blank entry in the CHANGELOG, commit, and push.
