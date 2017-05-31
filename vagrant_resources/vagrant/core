@@ -24,8 +24,8 @@ if (!ENV["TARGET"] and cli_target_opt=='')
 elsif ENV["TARGET"] == "virtualbox" or cli_target_opt == "virtualbox"
   target='virtualbox'
   write_provider_file(target)
-elsif ENV["TARGET"] == "aws" or cli_target_opt == "aws"
-  target='aws'
+elsif ENV["TARGET"] == "ec2" or cli_target_opt == "ec2"
+  target='ec2'
   write_provider_file(target)
 elsif ENV["TARGET"] == "digitalocean" or cli_target_opt == "digitalocean"
   target='digitalocean'
@@ -37,8 +37,8 @@ end
  
 if target == 'virtualbox'
   load File.expand_path("vagrant_resources/vagrant/Vagrantfile.virtualbox")
-elsif target == "aws"
-  load File.expand_path("vagrant_resources/vagrant/Vagrantfile.aws")
+elsif target == "ec2"
+  load File.expand_path("vagrant_resources/vagrant/Vagrantfile.aws-ec2")
 elsif target == "digitalocean"
   load File.expand_path("vagrant_resources/vagrant/Vagrantfile.digitalocean")
 elsif target == "lxc"
