@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
     provider.availability_zone = "us-west-1c"
     provider.region = "us-west-1"
     provider.ami = "ami-a5d621e1"
-    provider.instance_type = "t2.medium"
+    provider.instance_type = "t2.micro"
 
     provider.block_device_mapping = [{
       "DeviceName" => "/dev/xvda",
