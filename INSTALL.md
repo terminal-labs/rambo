@@ -3,16 +3,16 @@
 ## Setup
 
 ### Hardware Recommendations
-For running vms locally in virtualbox
+For running vms locally in VirtualBox
 
-* reasonably fast cpu with 2 or more cores and vt-x (I used a Intel i7-3612QM 2.1GHz, 4 core chip)
+* Reasonably fast cpu with 2 or more cores and VT-x (I used a Intel i7-3612QM 2.1GHz, 4 core chip)
 * 8gb ram (or more)
 * 16gb free drive space  (or more)
 
-For running containers in lxc locally or spawning machine in aws/digitalocean you can get away with comparatively slow computer and you don't need vt-x. In fact, the lxc/aws/digitalocean providers can be managed from a raspberry pi. See: https://www.raspberrypi.org/
+For running containers in lxc locally or spawning machine in aws/digitalocean you can get away with comparatively slow computer and you don't need VT-x. In fact, the LXC/EC2/DigitalOcean providers can be managed from a Raspberry Pi. See: https://www.raspberrypi.org/
 
 ### Summary of Setup:
-You need to install some programs into your host, then you will need to install some vagrant plugins. You also need to setup full accounts (or login into existing accounts) at digital ocean and aws.
+You need to install some programs into your host, then you will need to install some Vagrant plugins. You also need to setup full accounts (or login into existing accounts) at DigitalOcean and AWS.
 
 ### Supported OS:
 [Ubuntu 16.04 or newer](https://www.ubuntu.com/download/desktop)
@@ -27,7 +27,7 @@ You first need to install some dependencies via app: run
 sudo apt install -y build-essential linux-headers-$(uname -r) lxc lxc-templates cgroup-lite redir xclip
 ```
 
-Then install these deb packages
+Then install your correct Deb packages:
 
 [Vagrant 1.9 or newer](http://www.vagrantup.com/)
 
@@ -36,23 +36,23 @@ Then install these deb packages
 
 
 ### Dependencies (Mac):
-for osx installing 2 dmg files should be all you need
+For OS X installing 2 dmg files should be all you need
 
 [Vagrant 1.9 or newer](http://www.vagrantup.com/)
 
 [VirtualBox 5.1 or newer](https://www.virtualbox.org/)
 
 ### Install Vagrant plugins: ###
-cd into the rambo repo and run:
+cd into the `rambo` repo and run:
 
 ```
 #!bash
 bash setup.sh
 ```
 
-## **Working with Virtualbox Provider:**
+## **Working with VirtualBox Provider:**
 
-assuming that you installed the dependencies you should be able to run 
+Assuming that you installed the dependencies you should be able to run 
 
 `vagrant up`
 
@@ -60,16 +60,16 @@ or the more verbose command
 
 `vagrant --target=virtualbox up`
 
-## **Working with AWS Provider:**
+## **Working with AWS EC2 Provider:**
 
 ### Create Account
 
-After you installed the dependencies on your host computer you now need to create an account at aws.
-This repo will create real resources on aws so you need to provide aws with valid payment and remember you might rack up a bill if you run a whole bunch of machines. You have been warned.
+After you installed the dependencies on your host computer you now need to create an account at AWS.
+This repo will create real resources on AWS so you need to provide AWS with valid payment and remember you might rack up a bill if you run a whole bunch of machines. You have been warned.
 
 ### Create SSH Keys
 
-Next you need to create a ssh key pair for aws. 
+Next you need to create a ssh key pair for AWS.
 
 Run:
 ```
@@ -91,7 +91,7 @@ http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
 **NOTE: You need the aws.pem file and the aws.pem.pub file. The aws.pem file needs permissions set to 600 and The aws.pem.pub file needs permissions set to 644**
 
 Be careful not to commit this file to the repo. We setup this repo to ignore all files ending in `.pem`. But, you could theoretically still commit the pem file (by forcing a commit for example). 
-Store this pem file in a safe place with restricted access. Anyone who has this file can log into your machines on digital ocean and run arbitrary commands on them.
+Store this pem file in a safe place with restricted access. Anyone who has this file can log into your machines on AWS and run arbitrary commands on them.
 
 ### Create Security Group
 
@@ -117,9 +117,9 @@ Add these inbound rules to the security group
 
 ### Create API Token
 
-Next you need to manually create a API access token on aws 
+Next you need to manually create an API access token on AWS.
 
-Go to the "IAM Dashboard", then go to "users", now click on the user who will be creating the aws ec2 instances. Click on the "Security Credectials" tab, click the "create access key" button.
+Go to the "IAM Dashboard", then go to "users", now click on the user who will be creating the AWS EC2 instances. Click on the "Security Credectials" tab, click the "create access key" button.
 
 You MUST get both the **Access key ID** and the **Secret access key**.
 
@@ -139,17 +139,17 @@ export AWS_KEYPAIR_NAME="aws"
 export AWS_SSH_PRIVKEY="auth/keys/aws.pem"
 ```
 
-put your aws access key token in the line:
-export AWS_ACCESS_KEY_ID=<YOUR AWS KEY ID>
+Put your aws access key token in the line:
+`export AWS_ACCESS_KEY_ID=<YOUR AWS KEY ID>`
 
-put your aws secret acces key token in the line:
-export AWS_SECRET_ACCESS_KEY=<YOUR AWS ACCESS KEY>
+Put your aws secret acces key token in the line:
+`export AWS_SECRET_ACCESS_KEY=<YOUR AWS ACCESS KEY>`
 
-put the **name** of your aws ssh private key in the line:
-export AWS_KEYPAIR_NAME="aws"
+Put the **name** of your aws ssh private key in the line:
+`export AWS_KEYPAIR_NAME="aws"`
 
-put the **path** to your aws ssh private key in the line:
-export AWS_SSH_PRIVKEY="auth/keys/aws.pem"
+Put the **path** to your aws ssh private key in the line:
+`export AWS_SSH_PRIVKEY="auth/keys/aws.pem"`
 
 After editing, your aws.env.sh file will look similar to this:
 
@@ -163,32 +163,32 @@ export AWS_KEYPAIR_NAME="aws"
 export AWS_SSH_PRIVKEY="auth/keys/aws.pem"
 ```
 
-Note: the public key must be in the same dir as the private key and the public key must share the same base name as the private key (just append ".pub" on the public key file's name)
+Note: the public key must be in the same dir as the private key and the public key must share the same base name as the private key (just append ".pub" on the public key file's name).
 
 Now you need to source the aws.env.sh file. cd into the repo and run:
 
 `source aws.env.sh`
 
-### Launching Your AWS Instance
+### Launching Your AWS EC2 Instance
 Finally, run:
 
 ```
 #!bash
-vagrant --target=aws up
+vagrant --target=ec2 up
 vagrant ssh
 ```
 
-## **Working With Digitalocean Provider:**
+## **Working With DigitalOcean Provider:**
 
 ### Create Account
 
 After you installed the dependencies on your host computer you now need to create an account at digitalocean. 
 
-This repo will create real resources on digitalocean so you need to provide digitalocean with valid payment and remember you might rack up a bill if you run a whole bunch of machines. You have been warned.
+This repo will create real resources on DigitalOcean so you need to provide DigitalOcean with valid payment and remember you might rack up a bill if you run a whole bunch of machines. You have been warned.
 
 ### Create SSH Keys
 
-Next you need to create a ssh key pair for digitalocean. 
+Next you need to create a ssh key pair for DigitalOcean.
 
 Run:
 ```
@@ -203,7 +203,7 @@ Now go to [https://cloud.digitalocean.com/settings/security](https://cloud.digit
 
 **Create a new key and name the key "Vagrant". The key MUST be named "Vagrant".** Copy the contents of digitalocean.pem.pub into the new key field.
 
-Here are instructions on how to setup ssh keys with digitalocean:
+Here are instructions on how to setup ssh keys with DigitalOcean:
 
 [https://www.digitalocean.com/community/tutorials/how-to-use-ssh-keys-with-digitalocean-droplets](https://www.digitalocean.com/community/tutorials/how-to-use-ssh-keys-with-digitalocean-droplets)
 
@@ -214,13 +214,13 @@ Store this pem file in a safe place with restricted access. Anyone who has this 
 
 ### Create API Token
 
-Next you need to manually create a API access token on digitalocean.com 
+Next you need to manually create an API access token on digitalocean.com 
 
 Go to: 
 
 [https://cloud.digitalocean.com/settings/api/](https://cloud.digitalocean.com/settings/api/)
 
-**NOTE: digitalocean will only show you this key ONCE.**
+**NOTE: DigitalOcean will only show you this key ONCE.**
 
 Store this token in a safe place with restricted access. Anyone who has this token can create, edit, or destroy resources on digital ocean, they could rack up a huge bill for you or shut down all your vms. 
 
@@ -236,11 +236,11 @@ export DIGITALOCEAN_TOKEN=<YOUR DIGITALOCEAN API TOKEN>
 export DIGITALOCEAN_PRIVATE_KEY_PATH="auth/keys/digitalocean.pem"
 ```
 
-put your Digitalocean API token in the line:
-export DIGITALOCEAN_TOKEN=<YOUR DIGITALOCEAN API TOKEN>
+Put your DigitalOcean API token in the line:
+`export DIGITALOCEAN_TOKEN=<YOUR DIGITALOCEAN API TOKEN>`
 
-put the **path** to your Digitalocean ssh private key in the line:
-export DIGITALOCEAN_PRIVATE_KEY_PATH=<PATH TO YOUR PRIVATE KEY>
+Put the **path** to your Digitalocean ssh private key in the line:
+`export DIGITALOCEAN_PRIVATE_KEY_PATH=<PATH TO YOUR PRIVATE KEY>`
 
 After editing, your digitalocean.env.sh file will look similar to this:
 

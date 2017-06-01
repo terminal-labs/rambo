@@ -46,7 +46,7 @@ Vagrant.configure("2") do |config|
       salt.verbose = true
     end
     config.vm.provision "shell",
-      path: "vagrant_resources/provisioners/provisioner_aws.sh",
+      path: "vagrant_resources/provisioners/provisioner_aws-ec2.sh",
       keep_color: true
   end
   if PROVISION_WITH_CMD

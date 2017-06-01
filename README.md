@@ -19,35 +19,35 @@ By default Rambo offers a basic provisioning, but you can customize this. See **
 ## Basic Usage
 Once some simple installation and configuration steps are complete you can run one of these commands to get your vm:
 
-for virtualbox run
+for VirtualBox run
 ```
 #!bash
 $ vagrant --target=virtualbox up
 $ vagrant ssh
 ```
 
-for digitalocean run
-```
-#!bash
-$ vagrant --target=digitalocean up
-$ vagrant ssh
-```
-
-for aws run
-```
-#!bash
-$ vagrant --target=aws up
-$ vagrant ssh
-```
-
-for lxc run
+for LXC run
 ```
 #!bash
 $ vagrant --target=lxc up
 $ vagrant ssh
 ```
 
-Note: lxc is only supported on ubuntu 16. The other 3 providers also work on Mac. No testing has been done on Windows.
+for DigitalOcean run
+```
+#!bash
+$ vagrant --target=digitalocean up
+$ vagrant ssh
+```
+
+for AWS EC2 run
+```
+#!bash
+$ vagrant --target=ec2 up
+$ vagrant ssh
+```
+
+Note on Host Platform Support: LXC is only supported on Ubuntu 16. The other 3 providers also work on Mac. No testing has been done on Windows.
 
 ## Advanced Usage
 
