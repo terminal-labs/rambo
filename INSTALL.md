@@ -29,18 +29,20 @@ sudo apt install -y build-essential linux-headers-$(uname -r) lxc lxc-templates 
 
 Then install these deb packages
 
-[Vagrant 1.9 or newer](http://www.vagrantup.com/)
+[Vagrant 1.9.2 or newer](http://www.vagrantup.com/)
 
 [VirtualBox 5.1 or newer](https://www.virtualbox.org/)
 
-
+Note: Vagrant and VirtualBox update frequently, and sometimes with breaking changes.
 
 ### Dependencies (Mac):
 for osx installing 2 dmg files should be all you need
 
-[Vagrant 1.9 or newer](http://www.vagrantup.com/)
+[Vagrant 1.9.2 or newer](http://www.vagrantup.com/)
 
 [VirtualBox 5.1 or newer](https://www.virtualbox.org/)
+
+Note: Vagrant and VirtualBox update frequently, and sometimes with breaking changes.
 
 ### Install Vagrant plugins: ###
 cd into the rambo repo and run:
