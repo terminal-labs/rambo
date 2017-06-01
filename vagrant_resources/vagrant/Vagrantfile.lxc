@@ -2,22 +2,22 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.provider :lxc do |lxc|
-    lxc.backingstore = "loop"
+  config.vm.provider :lxc do |provider|
+    provider.backingstore = "loop"
     if VM_SIZE == "512mb"
-      lxc.customize "cgroup.memory.limit_in_bytes",
+      provider.customize "cgroup.memory.limit_in_bytes",
         "512M"
-      lxc.backingstore_option "--fssize",
+      provider.backingstore_option "--fssize",
         "20G"
     elsif VM_SIZE == "1024mb"
-      lxc.customize "cgroup.memory.limit_in_bytes",
+      provider.customize "cgroup.memory.limit_in_bytes",
         "1024M"
-      lxc.backingstore_option "--fssize",
+      provider.backingstore_option "--fssize",
         "30G"
     elsif VM_SIZE == "2048mb"
-      lxc.customize "cgroup.memory.limit_in_bytes",
+      provider.customize "cgroup.memory.limit_in_bytes",
         "2048M"
-      lxc.backingstore_option "--fssize",
+      provider.backingstore_option "--fssize",
         "40G"
     end
   end
