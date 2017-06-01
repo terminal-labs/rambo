@@ -3,7 +3,7 @@
 #
 # This file is meant to contain vars that are most likely to be changed
 # when configuring Rambo. Further logic is loaded with vagrant/core, and
-# then a Vagrantfile for a specific provider (e.g. Vagrantfile.aws-ec2).
+# then a Vagrantfile for a specific provider (e.g. Vagrantfile.ec2).
 
 require 'getoptlong'
 
