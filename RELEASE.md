@@ -6,7 +6,7 @@ targetted at Rambo core members who have the ability to cut a release.
 
 1. Update `version.txt` to the version you want to release.
 
-1. Update `CHANGELOG.md` to have a header with the release version and date.
+1. Update [CHANGELOG.md](https://bitbucket.org/terminal_labs/rambo/src/master/CHANGELOG.md) to have a header with the release version and date.
 
 1. Commit those changes and also tag the release with the version:
 
