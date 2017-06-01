@@ -5,46 +5,38 @@ opts = GetoptLong.new(
   [ '--target', GetoptLong::OPTIONAL_ARGUMENT ]
 )
 
-cli_target_opt=''
+cli_target_opt = false
 opts.each do |opt, arg|
   case opt
     when '--target'
-      cli_target_opt=arg
+      cli_target_opt = arg
   end
 end
 
-target=''
-if (!ENV["TARGET"] and cli_target_opt=='')
-  if read_provider_file() == false
-    target = 'virtualbox'
-    write_provider_file(target)
-  else
-    target = read_provider_file()
-  end
-elsif ENV["TARGET"] == "virtualbox" or cli_target_opt == "virtualbox"
-  target='virtualbox'
+providers = ['virtualbox',
+             'lxc',
+             'ec2',
+             'digitalocean'
+            ]
+
+# Set target based on cli args. Defaults to empty string.
+target = if ENV["TARGET"]
+           ENV["TARGET"]
+         elsif cli_target_opt
+           cli_target_opt
+         elsif read_provider_file()
+           read_provider_file()
+         else
+           'virtualbox'
+         end
+
+if (providers.include? target)
   write_provider_file(target)
-elsif ENV["TARGET"] == "ec2" or cli_target_opt == "ec2"
-  target='ec2'
-  write_provider_file(target)
-elsif ENV["TARGET"] == "digitalocean" or cli_target_opt == "digitalocean"
-  target='digitalocean'
-  write_provider_file(target)
-elsif ENV["TARGET"] == "lxc" or cli_target_opt == "lxc"
-  target='lxc'
-  write_provider_file(target)
+  load File.expand_path("vagrant_resources/vagrant/Vagrantfile." + target)
+else # Bad arg - we don't have this provider.
+  abort("ABORTED - Target not in providers list. Did you have a typo?")
 end
  
-if target == 'virtualbox'
-  load File.expand_path("vagrant_resources/vagrant/Vagrantfile.virtualbox")
-elsif target == "ec2"
-  load File.expand_path("vagrant_resources/vagrant/Vagrantfile.aws-ec2")
-elsif target == "digitalocean"
-  load File.expand_path("vagrant_resources/vagrant/Vagrantfile.digitalocean")
-elsif target == "lxc"
-  load File.expand_path("vagrant_resources/vagrant/Vagrantfile.lxc")
-end
-
 # clean up files on the host after the guest is destroyed
 Vagrant.configure("2") do |config|
   config.trigger.after :destroy do
