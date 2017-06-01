@@ -94,5 +94,8 @@ Rambo has a few Salt States available that are commented out that you can 'turn 
 
 You can add your custom Salt States right into the Salt code and they should be automatically picked up and used. If you want to add provisioning with any other tool, you will need to modify the Vagrantfiles found in `vagrant_resources/vagrant/` to add that provisioning.
 
+## Contributing
+We heartily welcome any contirubtions to this project, whether in the form of commenting on or posting an issue, or development. If you would like to submit a pull request, you might first want to look at our development guidlines for this project in RULES.md
+
 ## Special Thanks
 Thanks go out to the Vagrant community and HashiCorp. Vagrant is a great tool it has helped us a lot over the years.
