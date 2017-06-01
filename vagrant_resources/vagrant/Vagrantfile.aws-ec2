@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.provider :ec2 do |provider|
+  config.vm.provider :aws do |provider|
     # set unique vm name
     provider.tags = {
       "Name" => "rambo-" + random_tag()
