@@ -1,7 +1,7 @@
 # README
 
 ## Installation
-To get up and running fast, see: [INSTALL.md](https://bitbucket.org/terminal_labs/rambo/src/master/INSTALL.md)
+To get up and running fast, see: [INSTALL.md](https://github.com/terminal-labs/rambo/blob/master/INSTALL.md)
 
 ## What Is This Repository For?
 This repo is for provisioning and configuration of virtual machines (and containers) in a simple and predictable way. Just run one command and your vms is up, code is deployed and your app is running, on any supported platform.
@@ -95,7 +95,7 @@ Rambo has a few Salt States available that are commented out that you can 'turn 
 You can add your custom Salt States right into the Salt code and they should be automatically picked up and used. If you want to add provisioning with any other tool, you will need to modify the Vagrantfiles found in `vagrant_resources/vagrant/` to add that provisioning.
 
 ## Contributing
-We heartily welcome any contirubtions to this project, whether in the form of commenting on or posting an issue, or development. If you would like to submit a pull request, you might first want to look at our development guidlines for this project in [RULES.md](https://bitbucket.org/terminal_labs/rambo/src/master/RULES.md)
+We heartily welcome any contirubtions to this project, whether in the form of commenting on or posting an issue, or development. If you would like to submit a pull request, you might first want to look at our development guidlines for this project in [RULES.md](https://github.com/terminal-labs/rambo/blob/master/RULES.md)
 
 ## Special Thanks
 Thanks go out to the Vagrant community and HashiCorp. Vagrant is a great tool it has helped us a lot over the years.
