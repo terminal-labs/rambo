@@ -1,0 +1,3 @@
+FROM tlatsas/debian-vagrant
+CMD ["/usr/sbin/sshd", "-D", "-e"]
+EXPOSE 22

@@ -1,0 +1,39 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+btrfs_volume = 'vagrant_resources/host_vms/auxiliary_disks/docker_host_btrfs_volume.vdi'
+
+Vagrant.configure("2") do |config|
+  config.vm.provider :virtualbox do |provider, override|
+    provider.name = "docker_host"
+    override.vm.box = "ubuntu/xenial64"
+    provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
+    provider.customize ['modifyvm', :id, '--nictype2', 'virtio']
+    provider.memory = 2048
+    unless File.exist?(btrfs_volume)
+      provider.customize ['createhd', '--filename', btrfs_volume, '--size', 120 * 1024]
+    end
+    provider.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', btrfs_volume]
+  end
+
+  config.vm.define  "docker_host"
+
+  config.vm.provision "shell", inline:
+  "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -"
+
+  config.vm.provision "shell", inline:
+  'add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"'
+
+  config.vm.provision "shell", inline:
+  "apt-get update"
+
+  config.vm.provision "shell", inline:
+  "apt-get install -y docker-ce"
+
+  config.vm.provision "shell", inline:
+  "usermod -a -G docker ubuntu"
+
+  config.vm.provision "shell", inline:
+  "ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill"
+
+end
