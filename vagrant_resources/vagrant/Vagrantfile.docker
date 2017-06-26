@@ -18,4 +18,28 @@ Vagrant.configure("2") do |config|
       d.vagrant_vagrantfile = "vagrant_resources/host_vms/docker_host"
     end
   end
+  if COPY_DIR_WITH_RSYNC == true
+    config.vm.synced_folder ".",
+      "/vagrant",
+      type: "rsync"
+  else
+    config.vm.synced_folder ".",
+      "/vagrant",
+      type: "rsync",
+      disabled: true
+  end
+  if PROVISION_WITH_SALT
+    config.vm.provision :salt do |salt|
+      salt.bootstrap_options = "-P"
+      salt.verbose = true
+    end
+    config.vm.provision "shell",
+      path: "vagrant_resources/provisioners/provisioner_lxc.sh",
+      keep_color: true
+  end
+  if PROVISION_WITH_CMD
+    config.vm.provision "shell",
+      inline: PROVISION_CMD,
+      keep_color: true
+  end
 end
