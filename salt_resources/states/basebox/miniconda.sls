@@ -3,7 +3,7 @@
 
 download_miniconda_installer:
   cmd.run:
-    - name: wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O /home/vagrant/miniconda.sh
+    - name: wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /home/vagrant/miniconda.sh
     - unless: test -f {{ miniconda_path }}/conda
 
 ensure_miniconda_is_installed:
