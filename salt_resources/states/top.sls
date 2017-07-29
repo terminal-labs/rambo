@@ -9,6 +9,9 @@ base:
     # - hg
     # - hg.ssh
     # - hg.repo
+    # - git
+    # - git.ssh
+    # - git.repo
     # - artifacts               {# requires {{ grains['dvcs'] }}.repo #}
     # - nginx                   {# requires {{ grains['dvcs'] }}.repo #}
     # - venv                    {# requires {{ grains['dvcs'] }}.repo, python #}
