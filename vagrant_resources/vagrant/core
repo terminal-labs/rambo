@@ -15,6 +15,7 @@ end
 
 providers = ['virtualbox',
              'lxc',
+             'docker',
              'ec2',
              'digitalocean'
             ]
@@ -36,7 +37,7 @@ if (providers.include? target)
 else # Bad arg - we don't have this provider.
   abort("ABORTED - Target not in providers list. Did you have a typo?")
 end
- 
+
 # clean up files on the host after the guest is destroyed
 Vagrant.configure("2") do |config|
   config.trigger.after :destroy do

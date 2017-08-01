@@ -1,0 +1,12 @@
+FROM nishidayuya/docker-vagrant-debian
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get -y install ca-certificates
+RUN apt update
+RUN apt -y upgrade
+RUN apt -y install locales
+RUN apt -y install locales-all
+RUN apt -y install openssl
+RUN apt -y install python
+CMD ["/usr/sbin/sshd", "-D", "-e"]
+EXPOSE 22

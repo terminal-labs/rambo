@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+btrfs_volume = 'vagrant_resources/host_vms/auxiliary_disks/docker_host_btrfs_volume.vdi'
+
+Vagrant.configure("2") do |config|
+  config.vm.provider :virtualbox do |provider, override|
+    provider.name = "docker_host"
+    override.vm.box = "ubuntu/xenial64"
+    provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
+    provider.customize ['modifyvm', :id, '--nictype2', 'virtio']
+    provider.memory = 2048
+    provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
+    unless File.exist?(btrfs_volume)
+      provider.customize ['createhd', '--filename', btrfs_volume, '--size', 120 * 1024]
+    end
+    provider.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', btrfs_volume]
+  end
+
+  config.vm.define  "docker_host"
+
+  $script = <<-eos
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+  add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  apt-get update
+  apt-get install -y docker-ce
+  usermod -a -G docker ubuntu
+  ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill
+  eos
+
+  config.vm.provision "shell", inline: $script
+end
