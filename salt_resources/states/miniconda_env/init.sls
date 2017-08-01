@@ -4,6 +4,6 @@
 creat_miniconda_env:
   cmd.run:
     - name: conda create -y --name miniconda_env pip
-    - runas: vagrant
+    - runas: {{ grains['deescalated_user'] }}
     - env:
       - PATH: {{ [current_path, miniconda_path]|join(':') }}
