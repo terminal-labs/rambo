@@ -12,6 +12,8 @@ Vagrant.configure("2") do |config|
     elsif VM_SIZE == "2048mb"
       provider.memory = 2048
     end
+    provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
+    provider.customize ['modifyvm', :id, '--nictype2', 'virtio'] 
   end
   config.ssh.username = "vagrant"
   config.ssh.forward_agent = FORWARD_SSH
