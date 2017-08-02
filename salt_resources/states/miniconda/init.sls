@@ -11,12 +11,18 @@ ensure_miniconda_is_installed:
   cmd.run:
     - name: bash /home/{{ grains['deescalated_user'] }}/miniconda.sh -b -p /usr/local/bin/miniconda
     - unless: test -f {{ miniconda_path }}/conda
-    - runas: {{ grains['deescalated_user'] }}
 
-{% if not salt['file.search']('/home/{{ grains['deescalated_user'] }}/.bashrc', 'export PATH={{ miniconda_path }}:$PATH') %}
 add_conda_to_bashrc:
   file.append:
       - name: /home/{{ grains['deescalated_user'] }}/.bashrc
       - text: export PATH={{ miniconda_path }}:$PATH
       - runas: {{ grains['deescalated_user'] }}
-{% endif %}
+      - require:
+        - sls: users
+
+creat_miniconda_env:
+  cmd.run:
+    - name: conda create -y --name miniconda_env pip
+    - runas: {{ grains['deescalated_user'] }}
+    - env:
+      - PATH: {{ [current_path, miniconda_path]|join(':') }}
