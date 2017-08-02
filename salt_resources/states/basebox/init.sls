@@ -15,9 +15,11 @@ setup_basebox:
       - libffi-dev
       - libmpdec-dev
       - libjpeg62-turbo-dev
-      - libfreetype6-dev 
+      - libfreetype6-dev
       - libpq-dev
       - python-dev
-      - build-essential 
+      - build-essential
       - python-virtualenv
+      - wget
+      - curl
       - emacs
