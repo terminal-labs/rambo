@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
   config.vm.define  "docker_host"
 
   # Configure Docker in intermediate Ubuntu host
-  $config_docker = <<-EOS
+  $config_docker_host = <<-EOS
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     apt-get update
@@ -30,6 +30,6 @@ Vagrant.configure("2") do |config|
   EOS
 
   config.vm.provision "shell",
-    inline: $config_docker,
+    inline: $config_docker_host,
     keep_color: true
 end
