@@ -13,11 +13,11 @@ opts.each do |opt, arg|
   end
 end
 
-providers = ['virtualbox',
-             'lxc',
+providers = ['digitalocean',
              'docker',
              'ec2',
-             'digitalocean'
+             'lxc',
+             'virtualbox'
             ]
 
 # Set target based on cli args. Defaults to empty string.
