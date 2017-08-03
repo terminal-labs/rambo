@@ -1,3 +1,11 @@
+## Next version (Unreleased)
+
+FEATURES:
+
+IMPROVEMENTS:
+
+BUG FIXES:
+
 ## 0.2.0 (August 3, 2017)
 
 FEATURES:

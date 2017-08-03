@@ -13,5 +13,7 @@ targetted at Rambo core members who have the ability to cut a release.
         $ git tag X.Y.Z
         $ git push --tags
 
+1. Release this version on [GitHub](https://github.com/terminal-labs/rambo/releases).
+
 1. Update `version.txt` to the next version and append `.dev` and add
-  a new blank entry in the CHANGELOG, commit, and push.
+  [a new blank](https://github.com/terminal-labs/rambo/blob/c955146f3b8e88bb24dddc3755b3b8751a970b1a/CHANGELOG.md) entry in the CHANGELOG, commit, and push.
