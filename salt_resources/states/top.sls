@@ -17,7 +17,7 @@ base:
     # - venv                    {# requires {{ grains['dvcs'] }}.repo, python #}
     # - venv.pip_requirements   {# requires venv #}
     # - miniconda               {# requires users #}
-    # - miniconda_env.pip_requirements   {# requires miniconda_env #}
+    # - miniconda.pip_requirements   {# requires miniconda_env #}
     # - postgresql              {# requires {{ grains['dvcs'] }}.repo #}
     # - conf
     # - django
