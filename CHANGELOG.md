@@ -4,6 +4,8 @@ FEATURES:
 
 IMPROVEMENTS:
 
+  - Added default fingerprints for BitBucket and GithHub.
+  
 BUG FIXES:
 
 ## 0.2.0 (August 3, 2017)
