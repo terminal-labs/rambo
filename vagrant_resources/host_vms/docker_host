@@ -19,14 +19,17 @@ Vagrant.configure("2") do |config|
 
   config.vm.define  "docker_host"
 
-  $script = <<-eos
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-  add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  apt-get update
-  apt-get install -y docker-ce
-  usermod -a -G docker ubuntu
-  ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill
-  eos
+  # Configure Docker in intermediate Ubuntu host
+  $config_docker_host = <<-EOS
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    apt-get update
+    apt-get install -y docker-ce
+    usermod -a -G docker ubuntu
+    ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill
+  EOS
 
-  config.vm.provision "shell", inline: $script
+  config.vm.provision "shell",
+    inline: $config_docker_host,
+    keep_color: true
 end
