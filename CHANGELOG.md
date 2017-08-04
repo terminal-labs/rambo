@@ -6,6 +6,8 @@ IMPROVEMENTS:
 
 BUG FIXES:
 
+  - Now requiring artifacts grains before trying to load a database.
+
 ## 0.2.0 (August 3, 2017)
 
 FEATURES:
