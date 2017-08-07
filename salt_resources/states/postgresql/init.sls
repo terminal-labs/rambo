@@ -48,7 +48,6 @@ load_db:
   cmd.run:
     - require:
       - sls: {{ grains['dvcs'] }}.repo
-      - sls: artifacts
     - name: |
         echo "*:*:{{ grains['project'] }}:django:{{ grains['postgres_password'] }}" > $HOME/.pgpass
         chmod 0600 $HOME/.pgpass
