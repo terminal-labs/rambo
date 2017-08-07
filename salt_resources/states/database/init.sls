@@ -1,7 +1,7 @@
 set_db_from local:
   file.managed:
-    {% if salt['file.file_exists' ]('/database/' + grains['db_name']) %}
-    - source: salt://database/{{ grains['db_name'] }}
+    {% if salt['file.file_exists' ]('/database/dump' + grains['db_dump']) %}
+    - source: salt://database/dump/{{ grains['db_dump'] }}
     {% else %} # Create empty db
     - contents: ""
     {% endif %}
