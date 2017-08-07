@@ -15,7 +15,9 @@ ensure_miniconda_is_installed:
 add_conda_to_bashrc:
   file.append:
       - name: /home/{{ grains['deescalated_user'] }}/.bashrc
-      - text: export PATH={{ miniconda_path }}:$PATH
+      - text:
+        - export PATH={{ miniconda_path }}:$PATH
+        - source activate miniconda_env
       - runas: {{ grains['deescalated_user'] }}
       - require:
         - sls: users
