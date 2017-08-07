@@ -17,9 +17,9 @@ repo_host: github.com
 # artifact_server_fingerprint: [put fingerprint here of the form 00:01:02...]
 # artifact_files: path/to/artifacts/*
 # artifact_drop_path: served_files/media
-# artifact_db: default.sql
 # artifact_db_path: path/to/db_artifact
 
+# db_dump: default.sql
 # postgres_password: [pwd here]
 # secret_key: [key here]
 # nevercache_key: [key here]

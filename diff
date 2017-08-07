@@ -1,0 +1,16 @@
+diff --git a/salt_resources/states/postgresql/init.sls b/salt_resources/states/postgresql/init.sls
+index 1c260a8..f81854a 100644
+--- a/salt_resources/states/postgresql/init.sls
++++ b/salt_resources/states/postgresql/init.sls
+@@ -48,9 +48,10 @@ load_db:
+   cmd.run:
+     - require:
+       - sls: {{ grains['dvcs'] }}.repo
++      - sls: artifacts
+     - name: |
+         echo "*:*:{{ grains['project'] }}:django:{{ grains['postgres_password'] }}" > $HOME/.pgpass
+         chmod 0600 $HOME/.pgpass
+-        psql -U django {{ grains['project'] }} < default.sql
++        psql -U django {{ grains['project'] }} < {{ grains['artifact_db'] }}
+     - cwd: /home/{{ grains['deescalated_user'] }}/{{ grains['project'] }}/
+     - runas: {{ grains['deescalated_user'] }}
