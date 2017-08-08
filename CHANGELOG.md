@@ -4,6 +4,8 @@ FEATURES:
 
 IMPROVEMENTS:
 
+  - Added default fingerprints for BitBucket and GithHub.
+  
 BUG FIXES:
 
   - Now requiring artifacts grains before trying to load a database.
