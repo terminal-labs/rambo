@@ -11,6 +11,8 @@ syntax: glob
 *.pem
 *.pub
 *.log
+*.#*
+*#
 
 ## paths
 env.sh

@@ -12,7 +12,8 @@ base:
     # - git
     # - git.ssh
     # - git.repo
-    # - artifacts               {# requires {{ grains['dvcs'] }}.repo #}
+    # - database                {# required_in postgres #}
+    # - artifacts               {# requires {{ grains['dvcs'] }}.repo, required_in postgres #}
     # - nginx                   {# requires {{ grains['dvcs'] }}.repo #}
     # - venv                    {# requires {{ grains['dvcs'] }}.repo, python #}
     # - venv.pip_requirements   {# requires venv #}

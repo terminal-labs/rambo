@@ -48,10 +48,9 @@ load_db:
   cmd.run:
     - require:
       - sls: {{ grains['dvcs'] }}.repo
-      - sls: artifacts
     - name: |
         echo "*:*:{{ grains['project'] }}:django:{{ grains['postgres_password'] }}" > $HOME/.pgpass
         chmod 0600 $HOME/.pgpass
-        psql -U django {{ grains['project'] }} < {{ grains['artifact_db'] }}
+        psql -U django {{ grains['project'] }} < {{ grains['db_dump'] }}
     - cwd: /home/{{ grains['deescalated_user'] }}/{{ grains['project'] }}/
     - runas: {{ grains['deescalated_user'] }}

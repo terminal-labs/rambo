@@ -16,13 +16,17 @@ download_media:
 
 download_db_dump:
   cmd.run:
+    - name: sftp -r ftp@{{ grains['artifact_server_address'] }}:{{ grains['artifact_db_path'] }}/{{ grains['db_dump'] }}
+    - cwd: /home/{{ grains['deescalated_user'] }}/{{ grains['project'] }}
     - require:
       - sls: {{ grains['dvcs'] }}.repo
-    - name: sftp -r ftp@{{ grains['artifact_server_address'] }}:{{ grains['artifact_db_path'] }}/{{ grains['artifact_db'] }}
-    - cwd: /home/{{ grains['deescalated_user'] }}/{{ grains['project'] }}
+    - require_in:
+        cmd: load_db
 
-/home/{{ grains['deescalated_user'] }}/{{ grains['project'] }}/{{ grains['artifact_db'] }}:
+/home/{{ grains['deescalated_user'] }}/{{ grains['project'] }}/{{ grains['db_dump'] }}:
   file.managed:
     - replace: False
     - user: {{ grains['deescalated_user'] }}
     - group: {{ grains['deescalated_user'] }}
+    - require:
+        cmd: download_db_dump
