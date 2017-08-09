@@ -2,6 +2,7 @@
 
 FEATURES:
 
+  - Added a Salt state for Hadoop Ambari.
 
 IMPROVEMENTS:
 
