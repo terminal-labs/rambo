@@ -8,6 +8,7 @@ IMPROVEMENTS:
   
 BUG FIXES:
 
+  - Fixed misnamed reference to Miniconda state.
   - Now requiring artifacts grains before trying to load a database.
 
 ## 0.2.0 (August 3, 2017)
