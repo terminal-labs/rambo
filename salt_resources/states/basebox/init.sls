@@ -1,6 +1,7 @@
 setup_basebox:
   pkg.installed:
     - pkgs:
+      - build-essential
       - libreadline6-dev
       - libbz2-dev
       - libssl-dev
@@ -17,9 +18,10 @@ setup_basebox:
       - libjpeg62-turbo-dev
       - libfreetype6-dev
       - libpq-dev
-      - python-dev
-      - build-essential
-      - python-virtualenv
+      - rsync
+      - p7zip
+      - zip
+      - unzip
       - wget
       - curl
       - emacs

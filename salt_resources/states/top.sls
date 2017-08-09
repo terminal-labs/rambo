@@ -17,13 +17,15 @@ base:
     # - nginx                   {# requires {{ grains['dvcs'] }}.repo #}
     # - venv                    {# requires {{ grains['dvcs'] }}.repo, python #}
     # - venv.pip_requirements   {# requires venv #}
-    # - conda                   {# requires users #}
-    # - conda.anaconda          {# requires conda #}
+    - conda                   {# requires users #}
+    - conda.anaconda          {# requires conda #}
     # - conda.pip_requirements  {# requires conda #}
     # - postgresql              {# requires {{ grains['dvcs'] }}.repo #}
     # - conf
     # - django
     # - supervisord
+    - hadoop
+    - hadoop.ambari
   'roles:prod':
     - match: grain
     - deploy_keys

@@ -1,7 +1,7 @@
 roles:
   - project
   - dev
-deescalated_user: webserver
+deescalated_user: vagrant
 project: website
 pip_req_path: requirements.txt
 
