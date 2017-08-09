@@ -9,6 +9,8 @@ require 'getoptlong'
 
 load "vagrant_resources/modules.rb" # for random_tag
 
+Vagrant.require_version ">= 1.9.7"
+
 opts = GetoptLong.new(
   # Native Vagrant options
   [ '--force', '-f', GetoptLong::NO_ARGUMENT ],

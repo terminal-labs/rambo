@@ -1,3 +1,15 @@
+## 0.2.2 (TBD)
+
+FEATURES:
+
+
+IMPROVEMENTS:
+
+  - Now enforcing Vagrant >=1.9.7
+
+BUG FIXES:
+
+
 ## 0.2.1 (August 9, 2017)
 
 FEATURES:

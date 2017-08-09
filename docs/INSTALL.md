@@ -18,6 +18,15 @@ You need to install some programs into your host, then you will need to install 
 [OSX](http://www.apple.com/mac-mini/)
 
 ## Dependencies:
+
+Download and install your Vagrant and VirtualBox.
+
+- [Vagrant](http://www.vagrantup.com/)
+
+- [VirtualBox 5.1 or newer](https://www.virtualbox.org/)
+
+Note: Vagrant and VirtualBox update frequently, and sometimes with breaking changes. Additionally there are host OS specific dependencies below.
+
 ### Dependencies (Ubuntu):
 You first need to install some dependencies for your host OS. For Ubuntu based systems, run:
 
@@ -26,22 +35,9 @@ You first need to install some dependencies for your host OS. For Ubuntu based s
 sudo apt install -y build-essential linux-headers-$(uname -r) lxc lxc-templates cgroup-lite redir xclip
 ```
 
-Then install your correct Deb packages:
-
-[Vagrant 1.9.7 or newer](http://www.vagrantup.com/)
-
-[VirtualBox 5.1 or newer](https://www.virtualbox.org/)
-
-Note: Vagrant and VirtualBox update frequently, and sometimes with breaking changes.
-
 ### Dependencies (Mac):
-For OS X installing 2 dmg files should be all you need
 
-[Vagrant 1.9.7 or newer](http://www.vagrantup.com/)
-
-[VirtualBox 5.1 or newer](https://www.virtualbox.org/)
-
-Note: Vagrant and VirtualBox update frequently, and sometimes with breaking changes.
+There are no additional dependencies for Mac, however, LXC cannot be used as a provider at this time.
 
 #### Install Vagrant plugins:
 cd into the `rambo` repo and run:
