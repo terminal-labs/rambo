@@ -3,7 +3,7 @@
 #  file.directory:
 #    - user: {{ grains['deescalated_user'] }}
 #    - group: {{ grains['deescalated_user'] }}
-#    - mode: 755 
+#    - mode: 755
 #    - makedirs: True
 #    - name: /home/{{ grains['deescalated_user'] }}/.localpython
 
@@ -11,7 +11,7 @@
 #  file.directory:
 #    - user: {{ grains['deescalated_user'] }}
 #    - group: {{ grains['deescalated_user'] }}
-#    - mode: 755 
+#    - mode: 755
 #    - makedirs: True
 #    - name: /home/{{ grains['deescalated_user'] }}/.python2.7_src
 
@@ -35,6 +35,12 @@
 #        make
 #        make install
 
-pip:
+python_packages:
   pkg.installed:
-    - name: python-pip
+    - pkgs:
+      - python-dev
+      - python-pip
+      - python-setuptools
+      - python-virtualenv
+      - python3
+      - python3-pip
