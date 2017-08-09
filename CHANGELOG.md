@@ -1,4 +1,4 @@
-## 0.2.1 (Unreleased)
+## 0.2.1 (August 9, 2017)
 
 FEATURES:
 
@@ -18,8 +18,10 @@ BUG FIXES:
   - Fixed misnamed reference to Miniconda state.
   - Now requiring artifacts grains before trying to load a database.
   - Deduping state IDs for adding fingerprints for git and hg.
+  - Specifying fingerprint hash type since that's now required by a Salt update.
   - Deduping state IDs for installing pip requirements with conda and venv.
   - Removing unused salt state directory.
+  - Bumped required vagrant version.
 
 ## 0.2.0 (August 3, 2017)
 

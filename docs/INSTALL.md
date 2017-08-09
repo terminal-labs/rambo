@@ -55,10 +55,10 @@ bash setup.sh
 
 Rambo supports various providers, and aims to let you switch between them as easily as possible. Nevertheless, some providers do have particular considerations, such as setting up keys and paymentfor cloud services, or specific dependencies for the host OS. This is a list of Rambo's supported providers, with links to specific documentation pages for each.
 
-- [AWS EC2](https://github.com/terminal-labs/rambo/blob/master/docs/provider/aws-ec2.md)
-- [DigitalOcean](https://github.com/terminal-labs/rambo/blob/master/docs/provider/digitalocean.md)
-- [Docker](https://github.com/terminal-labs/rambo/blob/master/docs/provider/docker.md)
-- [LXC](https://github.com/terminal-labs/rambo/blob/master/docs/provider/lxc.md)
+- [AWS EC2](https://github.com/terminal-labs/rambo/blob/master/docs/providers/aws-ec2.md)
+- [DigitalOcean](https://github.com/terminal-labs/rambo/blob/master/docs/providers/digitalocean.md)
+- [Docker](https://github.com/terminal-labs/rambo/blob/master/docs/providers/docker.md)
+- [LXC](https://github.com/terminal-labs/rambo/blob/master/docs/providers/lxc.md)
 - [VirtualBox](https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md#virtualbox-provider)
 
 ## VirtualBox Provider:
