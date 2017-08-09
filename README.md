@@ -26,10 +26,10 @@ $ vagrant --target=virtualbox up
 $ vagrant ssh
 ```
 
-for LXC run
+for AWS EC2 run
 ```
 #!bash
-$ vagrant --target=lxc up
+$ vagrant --target=ec2 up
 $ vagrant ssh
 ```
 
@@ -40,10 +40,17 @@ $ vagrant --target=digitalocean up
 $ vagrant ssh
 ```
 
-for AWS EC2 run
+for Docker run
 ```
 #!bash
-$ vagrant --target=ec2 up
+$ vagrant --target=docker up
+$ vagrant ssh
+```
+
+for LXC run
+```
+#!bash
+$ vagrant --target=lxc up
 $ vagrant ssh
 ```
 
