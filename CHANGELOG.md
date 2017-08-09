@@ -1,15 +1,25 @@
-## Next version (Unreleased)
+## 0.2.1 (Unreleased)
 
 FEATURES:
+
+  - Now activating conda environment upon `vagrant ssh`.
+  - Added Salt State for Anaconda.
+  - Added Salt State for loading a database dump from a local store, and
+    allowing using this or the artifacts state.
 
 IMPROVEMENTS:
 
   - Added default fingerprints for BitBucket and GithHub.
-  
+  - Renamed miniconda state to conda.
+  - Added documentation for Docker provider.
+
 BUG FIXES:
 
   - Fixed misnamed reference to Miniconda state.
   - Now requiring artifacts grains before trying to load a database.
+  - Deduping state IDs for adding fingerprints for git and hg.
+  - Deduping state IDs for installing pip requirements with conda and venv.
+  - Removing unused salt state directory.
 
 ## 0.2.0 (August 3, 2017)
 

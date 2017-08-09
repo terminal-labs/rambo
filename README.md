@@ -1,7 +1,7 @@
 # README
 
 ## Installation
-To get up and running fast, see: [INSTALL.md](https://github.com/terminal-labs/rambo/blob/master/INSTALL.md)
+To get up and running fast, see: [INSTALL.md](https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md)
 
 ## What Is This Repository For?
 This repo is for provisioning and configuration of virtual machines (and containers) in a simple and predictable way. Just run one command and your vms is up, code is deployed and your app is running, on any supported platform.
