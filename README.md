@@ -53,7 +53,7 @@ Note on Host Platform Support: LXC is only supported on Ubuntu 16. The other 3 p
 
 ### SSH Alias: Key Sharing and Emacs
 
-Rambo defaults to using a priveleged user (e.g. `vagrant`, `root`) to provision the machine when it's spawned, but also to create a non-priveleged or deescalated user. This user is for development and for specific production server tasks that do not require root priviliges. Vagrant defaults to only shares keys with the rooted user, so, you may need to share your keys deliberately with the deescalated user if your working there manually (such as during development.) Assuming Rambo is configuring a deescalated user called `webserver`, here's how.
+Rambo defaults to using a priveleged user (e.g. `vagrant`, `root`) to provision the machine when it's spawned, but also to create a non-priveleged or deescalated user. This user is for development and for specific production server tasks that do not require root priviliges. Vagrant defaults to only sharing keys with the rooted user, so, you may need to share your keys deliberately with the deescalated user if your working there manually (such as during development.) Assuming Rambo is configuring a deescalated user called `webserver`, here's how.
 
 After logging in with `vagrant ssh`,
 
