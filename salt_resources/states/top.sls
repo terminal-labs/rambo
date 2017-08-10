@@ -24,7 +24,7 @@ base:
     # - conf
     # - django
     # - supervisord
-    - hadoop.ambari
+    # - hadoop.ambari
   'roles:prod':
     - match: grain
     - deploy_keys
