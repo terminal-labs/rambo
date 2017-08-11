@@ -58,7 +58,7 @@ PROVISION_CMD = SET_HOSTNAME + "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --lo
 
 # Add website branch var if applicable.
 if ENV["WEBSITE_BRANCH"]
-  PROVISION_CMD = "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval Key Val --log-level info; " + PROVISION_CMD
+  PROVISION_CMD = "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH " + ENV["WEBSITE_BRANCH"] + " --log-level info; " + PROVISION_CMD
 end
 
 #load the rest of the vagrant ruby code
