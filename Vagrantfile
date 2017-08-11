@@ -50,10 +50,15 @@ PROVISION_WITH_SALT = true
 
 PROVISION_WITH_CMD = true
 
+## Construct commands to have Salt provision the machine.# Pass var to allow Salt to set the hostname to the VM_NAME.
+SET_HOSTNAME = "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval hostname " + VM_NAME + " --log-level info; "
+
+# Set hostname + run highstate.
+PROVISION_CMD = SET_HOSTNAME + "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-level info"
+
+# Add website branch var if applicable.
 if ENV["WEBSITE_BRANCH"]
-  PROVISION_CMD = "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH " + ENV["WEBSITE_BRANCH"] + " --log-level info"
-else
-  PROVISION_CMD = "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-level info"
+  PROVISION_CMD = "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval Key Val --log-level info; " + PROVISION_CMD
 end
 
 #load the rest of the vagrant ruby code
