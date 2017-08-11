@@ -4,6 +4,7 @@ base:
     - clean
     - basebox
     - basebox.symlink
+    - network
     - users
     - python
     # - hg
