@@ -1,9 +1,10 @@
 def random_tag
   host = `hostname`.strip # Get the hostname from the shell and removing trailing \n
+  working_dir = File.basename(Dir.pwd)
   Dir.mkdir('.tmp') unless File.exists?('.tmp')
   random_tag_filename = '.tmp/random_tag'
   if !File.file?(random_tag_filename)
-    tag = host + '-' + SecureRandom.urlsafe_base64(4)
+    tag = host + '-' + working_dir + '-' + SecureRandom.urlsafe_base64(4)
     File.write(random_tag_filename, tag)
   else
     tag = File.read(random_tag_filename)
