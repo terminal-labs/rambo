@@ -3,6 +3,7 @@
         "digitalocean",
         "docker",
         "ec2",
+        "lightsail",
         "lxc",
         "virtualbox"
     ],

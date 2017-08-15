@@ -1,0 +1,45 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.provider :lightsail do |provider, override|
+    # set unique vm name
+    provider.tags = {
+      "Name" => "rambo-" + random_tag()
+    }
+
+    provider.access_key_id = ENV["AWS_ACCESS_KEY_ID"]
+    provider.secret_access_key = ENV["AWS_SECRET_ACCESS_KEY"]
+    #provider.keypair_name ="aws.pem"
+    provider.region = "us-west-2"
+  end
+
+  config.ssh.username = "vagrant"
+  config.ssh.private_key_path = ENV["AWS_SSH_PRIVKEY"]
+  config.ssh.forward_agent = true
+
+  config.vm.box = "lightsail"
+  config.vm.box_url = "https://github.com/thejandroman/vagrant-lightsail/raw/master/box/lightsail.box"
+  config.vm.synced_folder ".", "/vagrant", type: "rsync"
+
+  if PROVISION_WITH_SALT
+    config.vm.provision :salt do |salt|
+      salt.bootstrap_options = "-P"
+      salt.verbose = true
+    end
+    $pre_salt = <<-EOS
+      mv /etc/salt/minion{,-dist}
+      cp /vagrant/salt_resources/minions/minion.ec2 /etc/salt/minion
+      cp /vagrant/salt_resources/grains/grains /etc/salt/grains
+    EOS
+
+    config.vm.provision "shell",
+      inline: $pre_salt,
+      keep_color: true
+  end
+  if PROVISION_WITH_CMD
+    config.vm.provision "shell",
+      inline: PROVISION_CMD,
+      keep_color: true
+  end
+end

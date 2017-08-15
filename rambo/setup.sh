@@ -4,6 +4,7 @@ if [ -d $DIR/auth/env_scripts/digitalocean.env.sh.dist ]; then cp $DIR/auth/env_
 if [ -d $DIR/auth/env_scripts/aws.env.sh.dist ]; then cp $DIR/auth/env_scripts/aws.env.sh.dist aws.env.sh; fi
 
 vagrant plugin install vagrant-aws
+vagrant plugin install vagrant-lightsail
 vagrant plugin install vagrant-digitalocean
 vagrant plugin install vagrant-lxc
 vagrant plugin install vagrant-triggers
