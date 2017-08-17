@@ -25,6 +25,7 @@ base:
     # - conf
     # - django
     # - supervisord
+    # - hadoop
     # - hadoop.ambari
   'roles:prod':
     - match: grain
