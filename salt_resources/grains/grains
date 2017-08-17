@@ -2,6 +2,7 @@ roles:
   - project
   - dev
 deescalated_user: vagrant
+# domain: [domain.tld]
 project: website
 pip_req_path: requirements.txt
 
@@ -23,3 +24,4 @@ repo_host: github.com
 # postgres_password: [pwd here]
 # secret_key: [key here]
 # nevercache_key: [key here]
+# cluster_nodes: # Value is dict like {'hostname1': 'ipaddr1', ...}

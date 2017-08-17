@@ -5,6 +5,7 @@ base:
     - basebox
     - basebox.symlink
     - network
+    - network.cluster
     - users
     - python
     # - hg
