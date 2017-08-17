@@ -3,13 +3,17 @@
 FEATURES:
 
   - Added a Salt state for Hadoop Ambari.
+  - Added basic network modifications for clustering.
+  - Setting the hostname to the VM_NAME.
 
 IMPROVEMENTS:
 
-  - Now enforcing Vagrant >=1.9.7
+  - Now enforcing Vagrant >=1.9.7.
+  - VM_NAME now contains host's hostname, and rambo's working dir, and a unique hex id.
 
 BUG FIXES:
 
+  - Fix ability to set repository branch and then execute highstate.
 
 ## 0.2.1 (August 9, 2017)
 
