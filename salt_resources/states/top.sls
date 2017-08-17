@@ -5,6 +5,7 @@ base:
     - basebox
     - basebox.symlink
     - network
+    - network.cluster
     - users
     - python
     # - hg
@@ -25,7 +26,6 @@ base:
     # - conf
     # - django
     # - supervisord
-    # - hadoop
     # - hadoop.ambari
   'roles:prod':
     - match: grain
