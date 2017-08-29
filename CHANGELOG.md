@@ -2,6 +2,7 @@
 
 FEATURES:
 
+  - Added support for multiple users on DigitalOcean.
   - Added a Salt state for Hadoop Ambari.
   - Added basic network modifications for clustering.
   - Setting the hostname to the VM_NAME.
