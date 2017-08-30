@@ -10,6 +10,7 @@ IMPROVEMENTS:
 
   - Now enforcing Vagrant >=1.9.7.
   - VM_NAME now contains host's hostname, and rambo's working dir, and a unique hex id.
+  - Now deletes broken symlinks found that would otherwise break Rambo during the rsync process.
 
 BUG FIXES:
 
