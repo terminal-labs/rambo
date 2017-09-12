@@ -6,7 +6,7 @@ To get up and running fast, see: [INSTALL.md](https://github.com/terminal-labs/r
 ## What Is This Repository For?
 This repo is for provisioning and configuration of virtual machines (and containers) in a simple and predictable way. Just run one command and your vms is up, code is deployed and your app is running, on any supported platform.
 
-At this time the repo allows you to create a debian 8 Jessie VM on multiple providers (AWS EC2, Digitalocean, Virtualbox, lxc) The base machine configuration is a debian 8 Jessie 64bit os with 1024mb ram, and 30GB drive.
+At this time the repo allows you to create a debian 8 Jessie VM on multiple providers (AWS EC2, DigitalOcean, Virtualbox, LXC) The base machine configuration is a debian 8 Jessie 64bit os with 1024mb ram, and 30GB drive.
 
 One of the goals of this project is be able to run a simple command (`vagrant up` with some extra custom commands) and have a new vm be created on your provider of choice. Once the vms is initialized saltstack is used to deploy code to your machine and saltstack is also used to otherwize configure the machine. The saltstack machine configuration code (states) will run the same regardless of which provider is actually running the machine.
 

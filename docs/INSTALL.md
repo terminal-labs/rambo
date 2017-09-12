@@ -7,7 +7,7 @@ For running vms locally in VirtualBox
 * 8gb ram (or more)
 * 16gb free drive space  (or more)
 
-For running containers in lxc locally or spawning machine in aws/digitalocean you can get away with comparatively slow computer and you don't need VT-x. In fact, the LXC/EC2/DigitalOcean providers can be managed from a Raspberry Pi. See: https://www.raspberrypi.org/
+For running containers in LXC locally or spawning machine in AWS EC2/DigitalOcean you can get away with comparatively slow computer and you don't need VT-x. In fact, the LXC/EC2/DigitalOcean providers can be managed from a Raspberry Pi. See: https://www.raspberrypi.org/
 
 ## Summary of Setup:
 You need to install some programs into your host, then you will need to install some Vagrant plugins. You also need to setup full accounts (or login into existing accounts) at DigitalOcean and AWS.
@@ -21,9 +21,11 @@ You need to install some programs into your host, then you will need to install 
 
 Download and install your Vagrant and VirtualBox.
 
+- [VirtualBox 5.1 or newer](https://www.virtualbox.org/)
+
 - [Vagrant](http://www.vagrantup.com/)
 
-- [VirtualBox 5.1 or newer](https://www.virtualbox.org/)
+- [Vagrant Plugins](https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md#install-vagrant-plugins)
 
 Note: Vagrant and VirtualBox update frequently, and sometimes with breaking changes. Additionally there are host OS specific dependencies below.
 
@@ -39,7 +41,7 @@ sudo apt install -y build-essential linux-headers-$(uname -r) lxc lxc-templates 
 
 There are no additional dependencies for Mac, however, LXC cannot be used as a provider at this time.
 
-#### Install Vagrant plugins:
+### Install Vagrant Plugins:
 cd into the `rambo` repo and run:
 
 ```
