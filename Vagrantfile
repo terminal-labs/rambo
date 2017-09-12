@@ -38,6 +38,12 @@ opts = GetoptLong.new(
   [ '--target', GetoptLong::OPTIONAL_ARGUMENT ],
 )
 
+orphan_links = `find . -xtype l`.split(/\n+/)
+for link in orphan_links
+  puts "Deleting broken symlink #{link}"
+  File.delete(link)
+end
+
 VM_NAME = "rambo-" + random_tag()
 
 VM_SIZE = "1024mb"
