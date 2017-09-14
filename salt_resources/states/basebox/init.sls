@@ -1,3 +1,5 @@
+{% set os = salt['grains.get']('os') %}
+
 setup_basebox:
   pkg.installed:
     - pkgs:
@@ -15,7 +17,6 @@ setup_basebox:
       - libgdbm-dev
       - libffi-dev
       - libmpdec-dev
-      - libjpeg62-turbo-dev
       - libfreetype6-dev
       - libpq-dev
       - rsync
@@ -25,3 +26,17 @@ setup_basebox:
       - wget
       - curl
       - emacs
+
+{% if os == 'Ubuntu' %}
+setup_ubuntu_basebox_deps:
+  pkg.installed:
+    - pkgs:
+      - libjpeg-turbo8-dev
+{% endif %}
+
+{% if os == 'Debian' %}
+setup_debian_basebox_deps:
+  pkg.installed:
+    - pkgs:
+      - libjpeg62-turbo-dev
+{% endif %}
