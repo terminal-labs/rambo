@@ -19,6 +19,5 @@ flymd*
 env.sh
 digitalocean.env.sh
 aws.env.sh
-srv/salt/ssh_keys/**
 .tmp/**
-keys/**
+auth/keys/**
