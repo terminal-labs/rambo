@@ -11,7 +11,6 @@ Next you need to create a ssh key pair for AWS.
 
 Run:
 ```
-#!bash
 mkdir -p auth/keys
 cd auth/keys
 ssh-keygen -t rsa -N '' -f "aws.pem"
@@ -39,7 +38,6 @@ Name the new security group **salted_server**.
 
 Add these inbound rules to the security group
 ```
-#!bash
 "HTTP", TCP, 80, anywhere
 
 "SSH", TCP, 22, anywhere
