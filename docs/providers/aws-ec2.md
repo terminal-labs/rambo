@@ -109,7 +109,6 @@ Now you need to source the aws.env.sh file. cd into the repo and run:
 Finally, run:
 
 ```
-#!bash
 vagrant --target=ec2 up
 vagrant ssh
 ```
