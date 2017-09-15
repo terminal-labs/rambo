@@ -21,35 +21,30 @@ Once some simple installation and configuration steps are complete you can run o
 
 for VirtualBox run
 ```
-#!bash
 $ vagrant --target=virtualbox up
 $ vagrant ssh
 ```
 
 for AWS EC2 run
 ```
-#!bash
 $ vagrant --target=ec2 up
 $ vagrant ssh
 ```
 
 for DigitalOcean run
 ```
-#!bash
 $ vagrant --target=digitalocean up
 $ vagrant ssh
 ```
 
 for Docker run
 ```
-#!bash
 $ vagrant --target=docker up
 $ vagrant ssh
 ```
 
 for LXC run
 ```
-#!bash
 $ vagrant --target=lxc up
 $ vagrant ssh
 ```
@@ -65,8 +60,6 @@ Rambo defaults to using a priveleged user (e.g. `vagrant`, `root`) to provision 
 After logging in with `vagrant ssh`,
 
 ```
-#!bash
-
 cd /home/webserver
 sudo setfacl -m webserver:x $(dirname "$SSH_AUTH_SOCK")
 sudo setfacl -m webserver:rwx "$SSH_AUTH_SOCK"
@@ -83,8 +76,6 @@ Emacs users will like to add a last line for `script /dev/null` to allow emacscl
 To create this alias, append this to your .bashrc file:
 
 ```
-#!bash
-
 alias vssh="vagrant ssh -- -t 'cd /home/webserver;\
     sudo setfacl -m webserver:x \$(dirname \"\$SSH_AUTH_SOCK\");\
     sudo setfacl -m webserver:rwx \"\$SSH_AUTH_SOCK\";\
