@@ -5,7 +5,6 @@
 Assuming that you installed the dependencies and that you are running Ubuntu16.04+ as your host you should be able to run
 
 ```
-#!bash
 vagrant --target=docker up
 vagrant ssh
 ```
