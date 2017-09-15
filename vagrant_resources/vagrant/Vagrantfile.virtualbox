@@ -114,6 +114,15 @@ Vagrant.configure("2") do |config|
       type: "rsync",
       disabled: true
   end
+  if VM_HOST == "debian-8"
+    config.vm.provision "shell",
+      inline: "wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/apt-sources/master/debian-8/official/sources.list",
+      keep_color: true
+  elsif VM_HOST == "ubuntu-16"
+    config.vm.provision "shell",
+      inline: "wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/apt-sources/master/ubuntu-1604/official/sources.list",
+      keep_color: true
+  end
   if PROVISION_WITH_SALT
     config.vm.provision :salt do |salt|
       salt.bootstrap_options = "-P"
