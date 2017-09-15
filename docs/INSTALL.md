@@ -33,7 +33,6 @@ Note: Vagrant and VirtualBox update frequently, and sometimes with breaking chan
 You first need to install some dependencies for your host OS. For Ubuntu based systems, run:
 
 ```
-#!bash
 sudo apt install -y build-essential linux-headers-$(uname -r) lxc lxc-templates cgroup-lite redir xclip
 ```
 
@@ -45,7 +44,6 @@ There are no additional dependencies for Mac, however, LXC cannot be used as a p
 cd into the `rambo` repo and run:
 
 ```
-#!bash
 bash setup.sh
 ```
 
