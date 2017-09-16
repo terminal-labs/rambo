@@ -50,6 +50,8 @@ Add these inbound rules to the security group
 
 "Custom TCP Rule", TCP, 4506, anywhere
 
+"Custom TCP Rule", TCP, 5000, anywhere
+
 "Custom TCP Rule", TCP, 8080, anywhere
 
 "Custom TCP Rule", TCP, 8888, anywhere
