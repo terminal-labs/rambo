@@ -11,9 +11,12 @@ base:
     # - hg
     # - hg.ssh
     # - hg.repo
-    # - git
-    # - git.ssh
-    # - git.repo
+    - git
+    - git.ssh
+    #- git.repo
+    - lastpass                  {# requires git.ssh #}
+    - lastpass.login            {# requires lastpass #}
+    - lastpass.digitalocean     {# requires lastpass.login #}
     # - database                {# required_in postgres #}
     # - artifacts               {# requires {{ grains['dvcs'] }}.repo, required_in postgres #}
     # - nginx                   {# requires {{ grains['dvcs'] }}.repo #}
