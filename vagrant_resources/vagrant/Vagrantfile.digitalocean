@@ -7,7 +7,11 @@ Vagrant.configure("2") do |config|
     config.vm.hostname = VM_NAME
     provider.token = ENV["DIGITALOCEAN_TOKEN"]
     provider.ssh_key_name = File.basename(ENV["DIGITALOCEAN_PRIVATE_KEY_PATH"], ".*")
-    provider.image = "debian-8-x64"
+    if VM_HOST == "debian-8"
+      provider.image = "debian-8-x64"
+    elsif VM_HOST == "ubuntu-16"
+      provider.image = "ubuntu-16-04-x64"
+    end
     provider.region = "nyc1"
     if VM_SIZE == "512mb"
       provider.size = "512mb"
