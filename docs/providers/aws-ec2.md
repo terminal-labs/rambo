@@ -11,7 +11,6 @@ Next you need to create a ssh key pair for AWS.
 
 Run:
 ```
-#!bash
 mkdir -p auth/keys
 cd auth/keys
 ssh-keygen -t rsa -N '' -f "aws.pem"
@@ -39,18 +38,23 @@ Name the new security group **salted_server**.
 
 Add these inbound rules to the security group
 ```
-#!bash
-"HTTP", TCP, 80, anywhere
+"All ICMP - IPv4", ICMP, 0 - 65535, anywhere
 
 "SSH", TCP, 22, anywhere
 
-"Custom TCP Rule", TCP, 4506, anywhere
-
-"Custom TCP Rule", TCP, 4505, anywhere
+"HTTP", TCP, 80, anywhere
 
 "HTTPS", TCP, 443, anywhere
 
-"All ICMP - IPv4", ICMP, 0 - 65535, anywhere
+"Custom TCP Rule", TCP, 4505, anywhere
+
+"Custom TCP Rule", TCP, 4506, anywhere
+
+"Custom TCP Rule", TCP, 5000, anywhere
+
+"Custom TCP Rule", TCP, 8080, anywhere
+
+"Custom TCP Rule", TCP, 8888, anywhere
 ```
 
 ## Create API Token
@@ -111,7 +115,6 @@ Now you need to source the aws.env.sh file. cd into the repo and run:
 Finally, run:
 
 ```
-#!bash
 vagrant --target=ec2 up
 vagrant ssh
 ```

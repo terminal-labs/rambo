@@ -12,7 +12,6 @@ Next you need to create a ssh key pair for DigitalOcean.
 
 Run*:
 ```
-#!bash
 mkdir -p auth/keys
 cd auth/keys
 ssh-keygen -t rsa -N '' -f "digitalocean.pem"
@@ -87,7 +86,6 @@ Now you need to source the `digitalocean.env.sh` file. cd into the repo and run:
 Finally, run:
 
 ```
-#!bash
 vagrant --target=digitalocean up
 vagrant ssh
 ```

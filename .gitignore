@@ -11,9 +11,9 @@ syntax: glob
 *.pem
 *.pub
 *.log
+*.pyc
 *.#*
 *#
-flymd*
 
 ## paths
 env.sh
@@ -22,3 +22,4 @@ aws.env.sh
 srv/salt/ssh_keys/**
 .tmp/**
 keys/**
+

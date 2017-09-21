@@ -31,25 +31,25 @@ Vagrant.configure("2") do |config|
   if VM_HOST == "debian-8"
     if VM_SIZE == "512mb"
       config.vm.box = "tl-debian-jessie-64bit-20gb"
-      config.vm.box_url = "https://s3-us-west-1.amazonaws.com/terminal-labs-vagrant-boxes/tl-debian-jessie-64bit-20gb.box"
+      config.vm.box_url = "terminal-labs-vagrant-boxes/tl-debian-jessie-64bit-20gb.box"
     elsif VM_SIZE == "1024mb"
       config.vm.box = "tl-debian-jessie-64bit-30gb"
-      config.vm.box_url = "https://s3-us-west-1.amazonaws.com/terminal-labs-vagrant-boxes/tl-debian-jessie-64bit-30gb.box"
+      config.vm.box_url = "terminal-labs-vagrant-boxes/tl-debian-jessie-64bit-30gb.box"
     elsif VM_SIZE == "2048mb"
       config.vm.box = "tl-debian-jessie-64bit-40gb"
-      config.vm.box_url = "https://s3-us-west-1.amazonaws.com/terminal-labs-vagrant-boxes/tl-debian-jessie-64bit-40gb.box"
+      config.vm.box_url = "terminal-labs-vagrant-boxes/tl-debian-jessie-64bit-40gb.box"
     end
   end
   if VM_HOST == "ubuntu-16"
     if VM_SIZE == "512mb"
       config.vm.box = "tl-ubuntu-1604-64bit-20gb"
-      config.vm.box_url = "https://s3-us-west-1.amazonaws.com/terminal-labs-vagrant-boxes/tl-ubuntu-1604-64bit-20gb.box"
+      config.vm.box_url = "terminal-labs-vagrant-boxes/tl-ubuntu-1604-64bit-20gb.box"
     elsif VM_SIZE == "1024mb"
       config.vm.box = "tl-ubuntu-1604-64bit-30gb"
-      config.vm.box_url = "https://s3-us-west-1.amazonaws.com/terminal-labs-vagrant-boxes/tl-ubuntu-1604-64bit-30gb.box"
+      config.vm.box_url = "terminal-labs-vagrant-boxes/tl-ubuntu-1604-64bit-30gb.box"
     elsif VM_SIZE == "2048mb"
       config.vm.box = "tl-ubuntu-1604-64bit-40gb"
-      config.vm.box_url = "https://s3-us-west-1.amazonaws.com/terminal-labs-vagrant-boxes/tl-ubuntu-1604-64bit-40gb.box"
+      config.vm.box_url = "terminal-labs-vagrant-boxes/tl-ubuntu-1604-64bit-40gb.box"
     end
   end
   if COPY_DIR_WITH_RSYNC == true
