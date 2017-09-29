@@ -1,13 +1,14 @@
 import os
 import time
-
 from threading import Thread
 
+import click
 from bash import bash
 
 from rambo.utils import get_user_home, dir_exists, dir_create, dir_delete, file_copy, file_delete, file_rename
 from rambo.scripts import install_script, install_lastpass
 
+# Progressively read a file as it's being written to by another function, i.e. Vagrant.
 def follow_log_file(log_file_path, exit_triggers):
     file_obj = open(log_file_path, 'r')
     while 1:
@@ -17,74 +18,51 @@ def follow_log_file(log_file_path, exit_triggers):
             time.sleep(0.1)
             file_obj.seek(where)
         else:
+            click.echo(line.strip()) # Strip trailing eol.
             if any(string in line for string in exit_triggers):
                 break
-            print(line)
 
-def clone_rambo_repo_thread():
-    bash('git clone --progress git@github.com:terminal-labs/rambo.git .rambo 2> .rambo-clone-log')
 
 def vagrant_up_thread():
-    dir_create('.rambo/.logs')
-    bash('cd .rambo; vagrant up > .logs/vagrant-up-log')
-
-def clone_rambo_repo():
-    open('.rambo-clone-log','w')
-    thread = Thread(target = clone_rambo_repo_thread)
-    thread.start()
-    follow_log_file('.rambo-clone-log', ['Checking connectivity','fatal: destination path'])
+    dir_create('.tmp/logs')
+    bash('vagrant up > .tmp/logs/vagrant-up-log')
 
 def vagrant_up():
-    dir_create(get_user_home() + '/.rambo-common')
-    if not dir_exists('.rambo'):
-        clone_rambo_repo()
-    dir_create('.rambo/.logs')
-    open('.rambo/.logs/vagrant-up-log','w')
-    thread = Thread(target = vagrant_up_thread)
+    if not dir_exists('.tmp'):
+        dir_create('.tmp')
+    dir_create('.tmp/logs')
+    open('.tmp/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
+    thread = Thread(target = vagrant_up_thread) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
-    follow_log_file('.rambo/.logs/vagrant-up-log', ['default: Total run time:'])
+    # TODO concat and cycle logs.
+    follow_log_file('.tmp/logs/vagrant-up-log', ['default: Total run time:'])
+    click.echo('Up complete.')
 
 def vagrant_ssh():
-    os.system('cd .rambo; vagrant ssh')
+    os.system('vagrant ssh')
 
-def vagrant_destroy():
-    dir_create('.rambo/.logs')
-    file_rename('.rambo/Vagrantfile', '.rambo/.Vagrantfile.old')
-    file_copy('.rambo/vagrant_resources/base_vagrantfiles/Vagrantfile.virtualbox.basic', '.rambo/Vagrantfile')
-    bash('cd .rambo; vagrant destroy --force > .logs/vagrant-destroy-log')
-    file_delete('.rambo/Vagrantfile')
-    file_rename('.rambo/.Vagrantfile.old', '.rambo/Vagrantfile')
-    dir_delete('.rambo/.vagrant')
-    dir_delete('.rambo/.logs')
-    dir_delete('.rambo/.tmp')
-    dir_delete('.rambo')
-
-def setup_rambo_thread():
-    dir_create(get_user_home() + '/.rambo-common')
-    with open(get_user_home() + '/.rambo-common/install.sh', 'w') as file_obj:
-        file_obj.write(install_script)
-    bash('cd ' + get_user_home() + '/.rambo-common; sudo bash install.sh > install-log')
-    with open(get_user_home() + '/.rambo-common/install-log', 'a') as file_obj:
-        file_obj.write('done installing deps that need root')
-
-def setup_rambo():
-    dir_create(get_user_home() + '/.rambo-common')
-    open(get_user_home() + '/.rambo-common/install-log','w')
-    thread = Thread(target = setup_rambo_thread)
-    thread.start()
-    follow_log_file(get_user_home() + '/.rambo-common/install-log', ['done installing deps that need root'])
+def vagrant_destroy(): # TODO add an --all flag to delete the whole .tmp dir. Default leaves logs.
+    dir_create('.tmp/logs')
+     # TODO concat and cycle logs.
+    bash('vagrant destroy --force > .tmp/logs/vagrant-destroy-log')
+    follow_log_file('.tmp/logs/vagrant-destroy-log', ['Vagrant done with destroy.'])
+    file_delete('.tmp/provider')
+    file_delete('.tmp/random_tag')
+    dir_delete('.vagrant')
+    click.echo('Temporary files removed')
+    click.echo('Destroy complete.')
 
 def setup_lastpass_thread():
-    dir_create(get_user_home() + '/.rambo-common')
-    with open(get_user_home() + '/.rambo-common/install-lastpass.sh', 'w') as file_obj:
+    dir_create(get_user_home() + '/.tmp-common')
+    with open(get_user_home() + '/.tmp-common/install-lastpass.sh', 'w') as file_obj:
         file_obj.write(install_lastpass)
-    bash('cd ' + get_user_home() + '/.rambo-common; bash install-lastpass.sh > install-lastpass-log')
-    with open(get_user_home() + '/.rambo-common/install-lastpass-log', 'a') as file_obj:
+    bash('cd ' + get_user_home() + '/.tmp-common; bash install-lastpass.sh > install-lastpass-log')
+    with open(get_user_home() + '/.tmp-common/install-lastpass-log', 'a') as file_obj:
         file_obj.write('done installing lastpass')
 
 def setup_lastpass():
-    dir_create(get_user_home() + '/.rambo-common')
-    open(get_user_home() + '/.rambo-common/install-lastpass-log','w')
+    dir_create(get_user_home() + '/.tmp-common')
+    open(get_user_home() + '/.tmp-common/install-lastpass-log','w')
     thread = Thread(target = setup_lastpass_thread)
     thread.start()
-    follow_log_file(get_user_home() + '/.rambo-common/install-lastpass-log', ['one installing lastpass'])
+    follow_log_file(get_user_home() + '/.tmp-common/install-lastpass-log', ['one installing lastpass'])
