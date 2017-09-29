@@ -3,7 +3,7 @@ import sys
 import click
 from bash import bash
 
-from rambo.app import setup_rambo, setup_lastpass, vagrant_up, vagrant_ssh, vagrant_destroy
+from rambo.app import setup_lastpass, vagrant_up, vagrant_ssh, vagrant_destroy
 
 tool_name = 'rambo'
 
@@ -24,10 +24,10 @@ context_settings = {'ignore_unknown_options':True, 'allow_extra_args':True}
 @cli.command(name=cmd, context_settings=context_settings)
 @click.pass_context
 def gen(ctx):
-    print("warning -- you entered a command " + tool_name  + " does not understand. passing raw commands to vagrant backend")
-    print('you ran "', ' '.join(list(sys.argv)),'"')
-    print('vagrant backend says:')
-    print(bash('cd .rambo; vagrant ' + sys.argv[1]).stdout)
+    click.echo("warning -- you entered a command " + tool_name  + " does not understand. passing raw commands to vagrant backend")
+    click.echo('you ran "', ' '.join(list(sys.argv)),'"')
+    click.echo('vagrant backend says:')
+    click.echo(bash('vagrant ' + sys.argv[1]).stdout)
 
 @cli.command()
 @click.pass_context
@@ -46,8 +46,8 @@ def destroy(ctx):
 
 @cli.command()
 @click.pass_context
-def setup(ctx):
-    setup_rambo()
+def setup(ctx): # threaded setup commands
+    # setup_rambo()
     setup_lastpass()
 
 def main():

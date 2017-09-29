@@ -14,7 +14,10 @@ def dir_delete(path):
     rmtree(path)
 
 def file_delete(path):
-    os.remove(path)
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
 
 def file_copy(src, dst):
     copyfile(src, dst)

@@ -1,17 +1,17 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-opts = GetoptLong.new(
-  [ '--target', GetoptLong::OPTIONAL_ARGUMENT ]
-)
+# opts = GetoptLong.new(
+#   [ '--target', GetoptLong::OPTIONAL_ARGUMENT ]
+# )
 
 cli_target_opt = false
-opts.each do |opt, arg|
-  case opt
-    when '--target'
-      cli_target_opt = arg
-  end
-end
+# opts.each do |opt, arg|
+#   case opt
+#     when '--target'
+#       cli_target_opt = arg
+#   end
+# end
 
 providers = ['digitalocean',
              'docker',
@@ -41,8 +41,6 @@ end
 # clean up files on the host after the guest is destroyed
 Vagrant.configure("2") do |config|
   config.trigger.after :destroy do
-    #Vagrant.destroy
-    #run "rm -Rf .vagrant/"
-    #run "rm -Rf tmp/"
+    puts "Vagrant done with destroy."
   end
 end
