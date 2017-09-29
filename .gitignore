@@ -14,6 +14,7 @@ syntax: glob
 *.pyc
 *.#*
 *#
+*.egg-info
 
 ## paths
 env.sh
