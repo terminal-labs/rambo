@@ -9,8 +9,8 @@ providers = ['digitalocean',
             ]
 
 # Set target based on cli args. Defaults to empty string.
-target = if ENV["TARGET"]
-           ENV["TARGET"]
+target = if ENV["RAMBO_PROVIDER"]
+           ENV["RAMBO_PROVIDER"]
          elsif read_provider_file()
            read_provider_file()
          else

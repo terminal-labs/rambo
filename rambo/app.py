@@ -18,14 +18,15 @@ def follow_log_file(log_file_path, exit_triggers):
             time.sleep(0.1)
             file_obj.seek(where)
         else:
-            click.echo(line.strip()) # Strip trailing eol.
+            click.echo(line.strip()) # Strip trailing eol. Echo before break.
             if any(string in line for string in exit_triggers):
                 break
 
 
 def vagrant_up_thread():
     dir_create('.tmp/logs')
-    bash('vagrant up > .tmp/logs/vagrant-up-log') # TODO capture stderr
+    # TODO: Better logs. Concat and cycle logs. Also grab output directly so we can capture formatting.
+    bash('vagrant up > .tmp/logs/vagrant-up-log 2>&1')
 
 def vagrant_up():
     if not dir_exists('.tmp'):
@@ -39,12 +40,13 @@ def vagrant_up():
     click.echo('Up complete.')
 
 def vagrant_ssh():
-    os.system('vagrant ssh') # TODO capture stderr?
+    # TODO: Logging?
+    os.system('vagrant ssh')
 
 def vagrant_destroy(): # TODO add an --all flag to delete the whole .tmp dir. Default leaves logs.
     dir_create('.tmp/logs')
-     # TODO concat and cycle logs.
-    bash('vagrant destroy --force > .tmp/logs/vagrant-destroy-log') # TODO capture stderr
+    # TODO: Better logs. Concat and cycle logs. Also grab output directly so we can capture formatting.
+    bash('vagrant destroy --force > .tmp/logs/vagrant-destroy-log 2>&1')
     follow_log_file('.tmp/logs/vagrant-destroy-log', ['Vagrant done with destroy.'])
     file_delete('.tmp/provider')
     file_delete('.tmp/random_tag')
