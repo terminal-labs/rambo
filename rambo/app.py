@@ -25,7 +25,7 @@ def follow_log_file(log_file_path, exit_triggers):
 
 def vagrant_up_thread():
     dir_create('.tmp/logs')
-    bash('vagrant up > .tmp/logs/vagrant-up-log')
+    bash('vagrant up > .tmp/logs/vagrant-up-log') # TODO capture stderr
 
 def vagrant_up():
     if not dir_exists('.tmp'):
@@ -39,12 +39,12 @@ def vagrant_up():
     click.echo('Up complete.')
 
 def vagrant_ssh():
-    os.system('vagrant ssh')
+    os.system('vagrant ssh') # TODO capture stderr?
 
 def vagrant_destroy(): # TODO add an --all flag to delete the whole .tmp dir. Default leaves logs.
     dir_create('.tmp/logs')
      # TODO concat and cycle logs.
-    bash('vagrant destroy --force > .tmp/logs/vagrant-destroy-log')
+    bash('vagrant destroy --force > .tmp/logs/vagrant-destroy-log') # TODO capture stderr
     follow_log_file('.tmp/logs/vagrant-destroy-log', ['Vagrant done with destroy.'])
     file_delete('.tmp/provider')
     file_delete('.tmp/random_tag')
