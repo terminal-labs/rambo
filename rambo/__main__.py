@@ -11,6 +11,7 @@ from rambo.app import setup_lastpass, vagrant_up, vagrant_ssh, vagrant_destroy
 # Vagrant as a check that the python cli is being used, as well as being a useful var.
 PROJECT_LOCATION = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 os.environ[PROJECT_NAME.upper() + "_ENV"] = PROJECT_LOCATION
+os.environ[PROJECT_NAME.upper() + "_TMP"] = os.path.join(os.getcwd(), '.tmp')
 
 cmd = ''
 command_handeled_by_click = ['up','destory','ssh']
@@ -49,7 +50,7 @@ def up(ctx, provider):
     if 'VAGRANT_CWD' not in os.environ: # Where the Vagrantfile and python code are
         os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # (default installed path)
     if 'VAGRANT_DOTFILE_PATH' not in os.environ: # Where to put .vagrant dir
-        os.environ['VAGRANT_DOTFILE_PATH'] = os.getcwd() + '/.vagrant' # (default cwd)
+        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.join(os.getcwd() + '.vagrant') # (default cwd)
 
     ev_provider = PROJECT_NAME.upper() + '_PROVIDER'
     if provider: # Set only if it's passed so we can use an existing value.
