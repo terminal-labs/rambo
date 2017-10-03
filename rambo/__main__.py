@@ -7,6 +7,11 @@ from bash import bash
 from rambo.settings import PROJECT_NAME, PROVIDERS
 from rambo.app import setup_lastpass, vagrant_up, vagrant_ssh, vagrant_destroy
 
+# Right away, create env var indicating where this code lives. This will be used latter by
+# Vagrant as a check that the python cli is being used, as well as being a useful var.
+PROJECT_LOCATION = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
+os.environ[PROJECT_NAME.upper() + "_ENV"] = PROJECT_LOCATION
+
 cmd = ''
 command_handeled_by_click = ['up','destory','ssh']
 if len(sys.argv) > 1:
@@ -41,12 +46,17 @@ def up(ctx, provider):
     Call Vagrant up with provider option. Provider may also be supplied by
     the RAMBO_PROVIDER environment variable if not passed as a cli option.
     '''
-    envvar = '_'.join([PROJECT_NAME.upper(), 'PROVIDER'])
-    if provider: # Set it only if it's passed so we can use an existing value.
-        os.environ[envvar] = provider
+    if 'VAGRANT_CWD' not in os.environ: # Where the Vagrantfile and python code are
+        os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # (default installed path)
+    if 'VAGRANT_DOTFILE_PATH' not in os.environ: # Where to put .vagrant dir
+        os.environ['VAGRANT_DOTFILE_PATH'] = os.getcwd() + '/.vagrant' # (default cwd)
+
+    ev_provider = PROJECT_NAME.upper() + '_PROVIDER'
+    if provider: # Set only if it's passed so we can use an existing value.
+        os.environ[ev_provider] = provider
     try:
         # Abort if provider not in whitelist.
-        if os.environ[envvar] not in PROVIDERS:
+        if os.environ[ev_provider] not in PROVIDERS:
             # TODO See if there's a better exit / error system
             if provider:
                 sys.exit('ABORTED - Target provider "%s" is not in the providers '
@@ -54,8 +64,8 @@ def up(ctx, provider):
             else:
                 sys.exit('ABORTED - Target provider was not passed, but it is set as '
                          'the environment varibale "%s" to "%s", and it is not in the '
-                         'providers list.' % (envvar, os.environ[envvar]))
-    except KeyError: # provider not set as env var
+                         'providers list.' % (ev_provider, os.environ[ev_provider]))
+    except KeyError: # provider not set as env var (or as cli option)
         pass
     vagrant_up()
 
