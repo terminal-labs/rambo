@@ -10,7 +10,7 @@ puts "-- NOW IN VAGRANT --"
 
 PROJECT_NAME = 'rambo'
 
-if not ENV[PROJECT_NAME.upcase + "_ENV"]
+if not ENV.has_key?(PROJECT_NAME.upcase + "_ENV")
   puts "", "***CAUTION***",
        "Running Vagrant directly and without %s's official CLI." % PROJECT_NAME.capitalize,
        "This is not supported.",

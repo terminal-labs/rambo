@@ -1,25 +1,27 @@
+
 def random_tag
   host = `hostname`.strip # Get the hostname from the shell and removing trailing \n
-  working_dir = File.basename(Dir.pwd)
-  Dir.mkdir('.tmp') unless File.exists?('.tmp')
-  random_tag_filename = '.tmp/random_tag'
-  if !File.file?(random_tag_filename)
-    tag = host + '-' + working_dir + '-' + SecureRandom.hex(6)
-    File.write(random_tag_filename, tag)
+  tmp_dir = ENV[PROJECT_NAME.upcase + '_TMP'] || File.join(File.basename(Dir.pwd), '.tmp')
+  Dir.mkdir(tmp_dir) unless Dir.exist?(tmp_dir)
+  random_tag_path = File.join(tmp_dir, 'random_tag')
+  if !File.file?(random_tag_path)
+    tag = host + '-' + File.basename(File.dirname(tmp_dir)) + '-' + SecureRandom.hex(6)
+    File.write(random_tag_path, tag)
   else
-    tag = File.read(random_tag_filename)
+    tag = File.read(random_tag_path)
   end
+  puts tag
   return tag
 end
 
 def read_provider_file
-  Dir.mkdir('.tmp') unless File.exists?('.tmp')
-  provider_name = '.tmp/provider'
-  if !File.file?(provider_name)
+  tmp_dir = ENV[PROJECT_NAME.upcase + '_TMP'] || File.join(File.basename(Dir.pwd), '.tmp')
+  provider_path = File.join(tmp_dir, 'provider')
+  if !File.file?(provider_path)
     return false
   else
     provider=''
-    File.open(provider_name, 'r') do |f|
+    File.open(provider_path, 'r') do |f|
      provider = f.read()
     end
     return provider
@@ -27,7 +29,7 @@ def read_provider_file
 end
 
 def write_provider_file(provider)
-  Dir.mkdir('.tmp') unless File.exists?('.tmp')
-  provider_name = '.tmp/provider'
-  File.write(provider_name, provider)
+  tmp_dir = ENV[PROJECT_NAME.upcase + '_TMP'] || File.join(File.basename(Dir.pwd), '.tmp')
+  provider_path = File.join(tmp_dir, 'provider')
+  File.write(provider_path, provider)
 end
