@@ -12,6 +12,11 @@ from rambo.app import setup_lastpass, vagrant_up, vagrant_ssh, vagrant_destroy
 PROJECT_LOCATION = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 os.environ[PROJECT_NAME.upper() + "_ENV"] = PROJECT_LOCATION
 os.environ[PROJECT_NAME.upper() + "_TMP"] = os.path.join(os.getcwd(), '.tmp')
+if 'VAGRANT_CWD' not in os.environ: # Where the Vagrantfile and python code are
+    os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # (default installed path)
+if 'VAGRANT_DOTFILE_PATH' not in os.environ: # Where to put .vagrant dir
+    os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # (default cwd)
+    print(os.environ['VAGRANT_DOTFILE_PATH'])
 
 cmd = ''
 command_handeled_by_click = ['up','destory','ssh']
@@ -47,25 +52,20 @@ def up(ctx, provider):
     Call Vagrant up with provider option. Provider may also be supplied by
     the RAMBO_PROVIDER environment variable if not passed as a cli option.
     '''
-    if 'VAGRANT_CWD' not in os.environ: # Where the Vagrantfile and python code are
-        os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # (default installed path)
-    if 'VAGRANT_DOTFILE_PATH' not in os.environ: # Where to put .vagrant dir
-        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.join(os.getcwd() + '.vagrant') # (default cwd)
-
     ev_provider = PROJECT_NAME.upper() + '_PROVIDER'
     if provider: # Set only if it's passed so we can use an existing value.
         os.environ[ev_provider] = provider
     try:
         # Abort if provider not in whitelist.
-        if os.environ[ev_provider] not in PROVIDERS:
+        if os.environ.get(ev_provider) not in PROVIDERS and os.environ.get(ev_provider) is not None:
             # TODO See if there's a better exit / error system
             if provider:
                 sys.exit('ABORTED - Target provider "%s" is not in the providers '
                          'list. Did you have a typo?' % provider)
             else:
                 sys.exit('ABORTED - Target provider was not passed, but it is set as '
-                         'the environment varibale "%s" to "%s", and it is not in the '
-                         'providers list.' % (ev_provider, os.environ[ev_provider]))
+                         'the environment varibale "%s" to "%s", and is not in the '
+                         'providers list.' % (ev_provider, os.environ.get(ev_provider)))
     except KeyError: # provider not set as env var (or as cli option)
         pass
     vagrant_up()
