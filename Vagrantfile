@@ -5,6 +5,21 @@
 # when configuring Rambo. Further logic is loaded with vagrant/core, and
 # then a Vagrantfile for a specific provider (e.g. Vagrantfile.ec2).
 
+# Change CWD for each VM, as set by Rambo
+puts "-- NOW IN VAGRANT --"
+
+PROJECT_NAME = 'rambo'
+
+if not ENV[PROJECT_NAME.upcase + "_ENV"]
+  puts "", "***CAUTION***",
+       "Running Vagrant directly and without %s's official CLI." % PROJECT_NAME.capitalize,
+       "This is not supported.",
+       "***/CAUTION***", ""
+end
+
+if ENV.has_key?("VAGRANT_CWD")
+  Dir.chdir ENV["VAGRANT_CWD"] # Otherwise relative path resources break.
+end
 load "vagrant_resources/modules.rb" # for random_tag
 
 Vagrant.require_version ">= 1.9.7"
