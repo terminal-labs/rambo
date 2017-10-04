@@ -11,7 +11,7 @@ from rambo.scripts import install_lastpass
 # Progressively read a file as it's being written to by another function, i.e. Vagrant.
 # XXX: We should refactor this to catch output directly from Vagrant, and pass it to
 # the shell and a copy to log file. Doing logic on the contents of a log file isn't going to be
-# stable. For instance, we shouldn't have to specify any exit_triggers, we can't factor in every
+# stable. For instance, we shouldn't have to specify any exit_triggers. We can't factor in every
 # kind of exit_trigger Vagrant can produce. Refactoring will also allow for more control over
 # the log file because we're the only ones writing to it. We'll be able to keep old logs,
 # append, cycle file names, etc
@@ -42,7 +42,6 @@ def vagrant_up():
     open('.tmp/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
     thread = Thread(target = vagrant_up_thread) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
-    # TODO concat and cycle logs.
     follow_log_file('.tmp/logs/vagrant-up-log', ['default: Total run time:',
                                                  'Provisioners marked to run always will still run',
                                                  'Print this help'])

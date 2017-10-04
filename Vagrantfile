@@ -5,12 +5,12 @@
 # when configuring Rambo. Further logic is loaded with vagrant/core, and
 # then a Vagrantfile for a specific provider (e.g. Vagrantfile.ec2).
 
-# Change CWD for each VM, as set by Rambo
 puts "-- NOW IN VAGRANT --"
 require "json"
 
+# Change CWD for each VM, as set by Rambo, otherwise relative path resources break.
 if ENV.has_key?("VAGRANT_CWD")
-  Dir.chdir ENV["VAGRANT_CWD"] # Otherwise relative path resources break.
+  Dir.chdir ENV["VAGRANT_CWD"]
 end
 
 SETTINGS = JSON.parse(File.read('rambo/settings.json'))
