@@ -40,8 +40,7 @@ def cli(ctx, debug):
 
 context_settings = {'ignore_unknown_options':True, 'allow_extra_args':True}
 @cli.command(name=cmd, context_settings=context_settings)
-@click.pass_context
-def gen(ctx):
+def gen():
     # TODO: figure out better warning system
     click.echo("warning -- you entered a command " + PROJECT_NAME  +
                " does not understand. passing raw commands to vagrant backend")
@@ -52,46 +51,31 @@ def gen(ctx):
     click.echo(bash(vagrant_cmd).stdout)
 
 @cli.command()
-@click.option('-p', '--provider', default=None,
+@click.option('-p', '--provider', envvar = PROJECT_NAME.upper() + '_PROVIDER',
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
-@click.pass_context
-def up(ctx, provider):
+def up(provider):
     '''
     Call Vagrant up with provider option. Provider may also be supplied by
     the RAMBO_PROVIDER environment variable if not passed as a cli option.
     '''
-    ev_provider = PROJECT_NAME.upper() + '_PROVIDER'
-    if provider: # Set only if it's passed so we can use an existing value.
-        os.environ[ev_provider] = provider
-    try:
-        # Abort if provider not in whitelist.
-        if os.environ.get(ev_provider) not in PROVIDERS and os.environ.get(ev_provider) is not None:
-            # TODO See if there's a better exit / error system
-            if provider:
-                sys.exit('ABORTED - Target provider "%s" is not in the providers '
-                         'list. Did you have a typo?' % provider)
-            else:
-                sys.exit('ABORTED - Target provider was not passed, but it is set as '
-                         'the environment varibale "%s" to "%s", and is not in the '
-                         'providers list.' % (ev_provider, os.environ.get(ev_provider)))
-    except KeyError: # provider not set as env var (or as cli option)
-        pass
-    vagrant_up()
+    # Abort if provider not in whitelist.
+    if provider not in PROVIDERS and provider is not None:
+        # TODO See if there's a better exit / error system
+        sys.exit('ABORTED - Target provider "%s" is not in the providers '
+                 'list. Did you have a typo?' % provider)
+    vagrant_up(provider)
 
 @cli.command()
-@click.pass_context
-def ssh(ctx):
+def ssh():
     vagrant_ssh()
 
 @cli.command()
-@click.pass_context
-def destroy(ctx):
+def destroy():
     vagrant_destroy()
 
 @cli.command()
-@click.pass_context
-def setup(ctx): # threaded setup commands
+def setup(): # threaded setup commands
     # setup_rambo()
     setup_lastpass()
 

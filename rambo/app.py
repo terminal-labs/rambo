@@ -29,18 +29,21 @@ def follow_log_file(log_file_path, exit_triggers):
                 break
 
 
-def vagrant_up_thread():
+def vagrant_up_thread(provider):
     dir_create('.tmp/logs')
     # TODO: Better logs.
-    bash('vagrant up > .tmp/logs/vagrant-up-log 2>&1')
+    if provider:
+        bash('vagrant up %s > .tmp/logs/vagrant-up-log 2>&1' % provider)
+    else:
+        bash('vagrant up > .tmp/logs/vagrant-up-log 2>&1')
 
-def vagrant_up():
+def vagrant_up(provider):
     if not dir_exists('.tmp'):
         dir_create('.tmp')
     dir_create('.tmp/logs')
     # TODO: Better logs.
     open('.tmp/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
-    thread = Thread(target = vagrant_up_thread) # Threaded to write, read, and echo as `up` progresses.
+    thread = Thread(target = vagrant_up_thread, args=(provider,)) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
     follow_log_file('.tmp/logs/vagrant-up-log', ['default: Total run time:',
                                                  'Provisioners marked to run always will still run',
