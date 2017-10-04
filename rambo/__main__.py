@@ -18,6 +18,7 @@ PROVIDERS = SETTINGS['PROVIDERS']
 
 os.environ[PROJECT_NAME.upper() + "_ENV"] = PROJECT_LOCATION
 os.environ[PROJECT_NAME.upper() + "_TMP"] = os.path.join(os.getcwd(), '.tmp')
+# Vagrant requires the following 2 env vars for custom cwd and dotfile path.
 if 'VAGRANT_CWD' not in os.environ: # Where the Vagrantfile and python code are
     os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # (default installed path)
 if 'VAGRANT_DOTFILE_PATH' not in os.environ: # Where to put .vagrant dir
