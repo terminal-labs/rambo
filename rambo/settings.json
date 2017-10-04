@@ -1,0 +1,10 @@
+{
+    "PROVIDERS": [
+        "digitalocean",
+        "docker",
+        "ec2",
+        "lxc",
+        "virtualbox"
+    ],
+    "PROJECT_NAME": "rambo"
+}
