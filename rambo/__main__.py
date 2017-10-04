@@ -45,8 +45,8 @@ def gen(ctx):
     # TODO: figure out better warning system
     click.echo("warning -- you entered a command " + PROJECT_NAME  +
                " does not understand. passing raw commands to vagrant backend")
-    click.echo('you ran "', ' '.join(list(sys.argv)),'"')
-    click.echo('vagrant backend says:')
+    click.echo('You ran "' + ' '.join(list(sys.argv)) + '"')
+    click.echo('Vagrant backend says:')
     click.echo(bash('vagrant ' + sys.argv[1]).stdout)
 
 @cli.command()
