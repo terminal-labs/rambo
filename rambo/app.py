@@ -6,9 +6,15 @@ import click
 from bash import bash
 
 from rambo.utils import get_user_home, dir_exists, dir_create, dir_delete, file_copy, file_delete, file_rename
-from rambo.scripts import install_script, install_lastpass
+from rambo.scripts import install_lastpass
 
 # Progressively read a file as it's being written to by another function, i.e. Vagrant.
+# XXX: We should refactor this to catch output directly from Vagrant, and pass it to
+# the shell and a copy to log file. Doing logic on the contents of a log file isn't going to be
+# stable. For instance, we shouldn't have to specify any exit_triggers, we can't factor in every
+# kind of exit_trigger Vagrant can produce. Refactoring will also allow for more control over
+# the log file because we're the only ones writing to it. We'll be able to keep old logs,
+# append, cycle file names, etc
 def follow_log_file(log_file_path, exit_triggers):
     file_obj = open(log_file_path, 'r')
     while 1:
@@ -25,29 +31,33 @@ def follow_log_file(log_file_path, exit_triggers):
 
 def vagrant_up_thread():
     dir_create('.tmp/logs')
-    # TODO: Better logs. Concat and cycle logs. Also grab output directly so we can capture formatting.
+    # TODO: Better logs.
     bash('vagrant up > .tmp/logs/vagrant-up-log 2>&1')
 
 def vagrant_up():
     if not dir_exists('.tmp'):
         dir_create('.tmp')
     dir_create('.tmp/logs')
+    # TODO: Better logs.
     open('.tmp/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
     thread = Thread(target = vagrant_up_thread) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
     # TODO concat and cycle logs.
-    follow_log_file('.tmp/logs/vagrant-up-log', ['default: Total run time:'])
+    follow_log_file('.tmp/logs/vagrant-up-log', ['default: Total run time:',
+                                                 'Provisioners marked to run always will still run',
+                                                 'Print this help'])
     click.echo('Up complete.')
 
 def vagrant_ssh():
-    # TODO: Logging?
+    # TODO: Better logs.
     os.system('vagrant ssh')
 
 def vagrant_destroy(): # TODO add an --all flag to delete the whole .tmp dir. Default leaves logs.
     dir_create('.tmp/logs')
-    # TODO: Better logs. Concat and cycle logs. Also grab output directly so we can capture formatting.
+    # TODO: Better logs.
     bash('vagrant destroy --force > .tmp/logs/vagrant-destroy-log 2>&1')
-    follow_log_file('.tmp/logs/vagrant-destroy-log', ['Vagrant done with destroy.'])
+    follow_log_file('.tmp/logs/vagrant-destroy-log', ['Vagrant done with destroy.',
+                                                      'Print this help'])
     file_delete('.tmp/provider')
     file_delete('.tmp/random_tag')
     dir_delete('.vagrant')

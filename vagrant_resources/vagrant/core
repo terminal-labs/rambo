@@ -1,13 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-providers = ['digitalocean',
-             'docker',
-             'ec2',
-             'lxc',
-             'virtualbox'
-            ]
-
 # Set target based on cli args. Defaults to empty string.
 target = if ENV["RAMBO_PROVIDER"]
            ENV["RAMBO_PROVIDER"]
@@ -17,7 +10,7 @@ target = if ENV["RAMBO_PROVIDER"]
            'virtualbox'
          end
 
-if (providers.include? target)
+if (SETTINGS["PROVIDERS"].include? target)
   write_provider_file(target)
   load File.expand_path("vagrant_resources/vagrant/Vagrantfile." + target)
 else # Bad arg - we don't have this provider.

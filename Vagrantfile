@@ -7,8 +7,16 @@
 
 # Change CWD for each VM, as set by Rambo
 puts "-- NOW IN VAGRANT --"
+require "json"
 
-PROJECT_NAME = 'rambo'
+if ENV.has_key?("VAGRANT_CWD")
+  Dir.chdir ENV["VAGRANT_CWD"] # Otherwise relative path resources break.
+end
+
+SETTINGS = JSON.parse(File.read('rambo/settings.json'))
+load "vagrant_resources/modules.rb" # for random_tag
+
+PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 
 if not ENV.has_key?(PROJECT_NAME.upcase + "_ENV")
   puts "", "***CAUTION***",
@@ -16,11 +24,6 @@ if not ENV.has_key?(PROJECT_NAME.upcase + "_ENV")
        "This is not supported.",
        "***/CAUTION***", ""
 end
-
-if ENV.has_key?("VAGRANT_CWD")
-  Dir.chdir ENV["VAGRANT_CWD"] # Otherwise relative path resources break.
-end
-load "vagrant_resources/modules.rb" # for random_tag
 
 Vagrant.require_version ">= 1.9.7"
 
