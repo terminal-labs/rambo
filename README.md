@@ -6,7 +6,7 @@ To get up and running fast, see: [INSTALL.md](https://github.com/terminal-labs/r
 ## What Is This Repository For?
 This project is for provisioning and configuration of virtual machines (and containers) in a simple, predictable, and highly reproducible way. Just run one command and your VM is up, code is deployed, and your app is running, on any supported platform.
 
-At this time this repo allows you to create a Debian 8 Jessie VM on multiple providers (AWS EC2, DigitalOcean, Virtualbox, LXC). Several more Operating Systems are available on select providers. The base machine configuration is a Debian 8 Jessie 64bit OS with 1024MB RAM, and 30GB drive.
+At this time this repo allows you to create a Debian 8 Jessie VM on multiple providers (AWS EC2, DigitalOcean, VirtualBox, LXC). Several more Operating Systems are available on select providers. The base machine configuration is a Debian 8 Jessie 64bit OS with 1024MB RAM, and 30GB drive.
 
 One of the goals of this project is be able to run a simple command and have a new VM be created on your provider of choice. Once the VM is initialized SaltStack is used to deploy code to and provision your machine. The SaltStack machine configuration code (states) will run the same regardless of which provider is actually running the machine.
 
