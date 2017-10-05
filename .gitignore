@@ -14,12 +14,13 @@ syntax: glob
 *.pyc
 *.#*
 *#
+*.egg-info
+*flymd*
 
 ## paths
 env.sh
 digitalocean.env.sh
 aws.env.sh
-srv/salt/ssh_keys/**
-.tmp/**
-keys/**
-
+srv/salt/ssh_keys
+.tmp
+auth/keys

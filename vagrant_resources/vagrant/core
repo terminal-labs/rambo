@@ -1,37 +1,16 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-opts = GetoptLong.new(
-  [ '--target', GetoptLong::OPTIONAL_ARGUMENT ]
-)
-
-cli_target_opt = false
-opts.each do |opt, arg|
-  case opt
-    when '--target'
-      cli_target_opt = arg
-  end
-end
-
-providers = ['digitalocean',
-             'docker',
-             'ec2',
-             'lxc',
-             'virtualbox'
-            ]
-
 # Set target based on cli args. Defaults to empty string.
-target = if ENV["TARGET"]
-           ENV["TARGET"]
-         elsif cli_target_opt
-           cli_target_opt
+target = if ENV["RAMBO_PROVIDER"]
+           ENV["RAMBO_PROVIDER"]
          elsif read_provider_file()
            read_provider_file()
          else
            'virtualbox'
          end
 
-if (providers.include? target)
+if (SETTINGS["PROVIDERS"].include? target)
   write_provider_file(target)
   load File.expand_path("vagrant_resources/vagrant/Vagrantfile." + target)
 else # Bad arg - we don't have this provider.
@@ -41,8 +20,6 @@ end
 # clean up files on the host after the guest is destroyed
 Vagrant.configure("2") do |config|
   config.trigger.after :destroy do
-    #Vagrant.destroy
-    #run "rm -Rf .vagrant/"
-    #run "rm -Rf tmp/"
+    puts "Vagrant done with destroy."
   end
 end

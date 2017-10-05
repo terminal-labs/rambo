@@ -2,6 +2,8 @@
 
 FEATURES:
 
+  - Made Rambo a pip installable package.
+  - Created a Python based CLI for Rambo.
   - Added support for multiple users on DigitalOcean.
   - Added a Salt state for Hadoop Ambari.
   - Added basic network modifications for clustering.
