@@ -4,20 +4,20 @@
 To get up and running fast, see: [INSTALL.md](https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md)
 
 ## What Is This Repository For?
-This repo is for provisioning and configuration of virtual machines (and containers) in a simple and predictable way. Just run one command and your vms is up, code is deployed and your app is running, on any supported platform.
+This project is for provisioning and configuration of virtual machines (and containers) in a simple, predictable, and highly reproducible way. Just run one command and your VM is up, code is deployed, and your app is running, on any supported platform.
 
-At this time the repo allows you to create a debian 8 Jessie VM on multiple providers (AWS EC2, DigitalOcean, Virtualbox, LXC) The base machine configuration is a debian 8 Jessie 64bit os with 1024mb ram, and 30GB drive.
+At this time this repo allows you to create a Debian 8 Jessie VM on multiple providers (AWS EC2, DigitalOcean, Virtualbox, LXC). The base machine configuration is a Debian 8 Jessie 64bit os with 1024mb ram, and 30GB drive.
 
-One of the goals of this project is be able to run a simple command (`vagrant up` with some extra custom commands) and have a new vm be created on your provider of choice. Once the vms is initialized saltstack is used to deploy code to your machine and saltstack is also used to otherwize configure the machine. The saltstack machine configuration code (states) will run the same regardless of which provider is actually running the machine.
+One of the goals of this project is be able to run a simple command (`vagrant up` with some extra custom commands) and have a new VM be created on your provider of choice. Once the VM is initialized SaltStack is used to deploy code to and provision your machine. The SaltStack machine configuration code (states) will run the same regardless of which provider is actually running the machine.
 
-Another goal of this repo is to have the spawned vms be maximally similar across providers. Usually, your application will not need to change at all and will simply run on all providers.
+Another goal of this repo is to have the spawned VMs be maximally similar across providers. Usually, your application will not need to change at all and will simply run on all providers.
 
-Since this project uses vagrant and vagrant plugins for the heavy lifting many core vagrant functions still work here on all providers, such as `up`, `ssh`, `destroy`, and `rsync`. All machines, regardless of provider, will also copy the entire cwd (this repo and it's, hidden subdirs, and included sensitive files) into the guest machine. From inside the guest the dir is located at `/vagrant/salt_resources`. Note: this dir copy process is done once on `vagrant up` via rsync, after that no automatic syncing will occur. `vagrant rsync` and `vagrant rsync-auto` can be used to rsync a running vm.
+Since this project uses Vagrant and Vagrant plugins for the heavy lifting, many core Vagrant functions still work here on all providers, such as `up`, `ssh`, `destroy`, and `rsync`. All machines, regardless of provider, will also copy the entire cwd (this repo and it's, hidden subdirs, and included sensitive files) into the guest machine. From inside the guest the dir is located at `/vagrant/salt_resources`. Note: this dir copy process is done once on `vagrant up` via rsync, after that no automatic syncing will occur. `vagrant rsync` and `vagrant rsync-auto` can be used to rsync a running VM.
 
 By default Rambo offers a basic provisioning, but you can customize this. See **Advanced Usage** for that.
 
 ## Basic Usage
-Once some simple installation and configuration steps are complete you can run one of these commands to get your vm:
+Once some simple installation and configuration steps are complete you can run one of these commands to get your VM:
 
 for VirtualBox run
 ```
