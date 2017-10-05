@@ -115,6 +115,6 @@ Now you need to source the aws.env.sh file. cd into the repo and run:
 Finally, run:
 
 ```
-vagrant --target=ec2 up
-vagrant ssh
+rambo up -p ec2
+rambo ssh
 ```
