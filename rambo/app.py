@@ -32,10 +32,7 @@ def follow_log_file(log_file_path, exit_triggers):
 def vagrant_up_thread(provider):
     dir_create('.tmp/logs')
     # TODO: Better logs.
-    if provider:
-        bash('vagrant up %s > .tmp/logs/vagrant-up-log 2>&1' % provider)
-    else:
-        bash('vagrant up > .tmp/logs/vagrant-up-log 2>&1')
+    bash('vagrant up > .tmp/logs/vagrant-up-log 2>&1')
 
 def vagrant_up(provider):
     if not dir_exists('.tmp'):

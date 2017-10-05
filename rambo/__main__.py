@@ -60,6 +60,7 @@ def up(provider):
     the RAMBO_PROVIDER environment variable if not passed as a cli option.
     '''
     # Abort if provider not in whitelist.
+    os.environ[PROJECT_NAME.upper() + "_PROVIDER"] = provider
     if provider not in PROVIDERS and provider is not None:
         # TODO See if there's a better exit / error system
         sys.exit('ABORTED - Target provider "%s" is not in the providers '
