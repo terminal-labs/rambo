@@ -1,25 +1,27 @@
 # Setup and Installation
 
 ## Hardware Recommendations
-For running vms locally in VirtualBox
+For running VMs locally in VirtualBox, we suggest a minimum of:
 
-* Reasonably fast cpu with 2 or more cores and VT-x (I used a Intel i7-3612QM 2.1GHz, 4 core chip)
-* 8gb ram (or more)
-* 16gb free drive space  (or more)
+* Reasonably fast cpu with 2 cores and VT-x (e.g. an Intel i7-3612QM 2.1GHz, 4 core chip)
+* 8gb ram
+* 16gb free drive space
 
 For running containers in LXC locally or spawning machine in AWS EC2/DigitalOcean you can get away with comparatively slow computer and you don't need VT-x. In fact, the LXC/EC2/DigitalOcean providers can be managed from a Raspberry Pi. See: https://www.raspberrypi.org/
 
 ## Summary of Setup:
-You need to install some programs into your host, then you will need to install some Vagrant plugins. You also need to setup full accounts (or login into existing accounts) at DigitalOcean and AWS.
+You need to install some programs into your host, then you will need to install some Vagrant plugins. You also need to setup full accounts (or login into existing accounts) at any cloud provider you want to use.
 
-## Supported OS:
+## Supported Host OS:
 [Ubuntu 16.04 or newer](https://www.ubuntu.com/download/desktop)
 
 [OSX](http://www.apple.com/mac-mini/)
 
+We expect it's likely you can get Rambo to work on any Unix-like system, but we your milleage may vary. We have made no effort to get this working with Windows. Contributions are welcome.
+
 ## Dependencies:
 
-Download and install your Vagrant and VirtualBox.
+Download and install VirtualBox and Vagrant.
 
 - [VirtualBox 5.1 or newer](https://www.virtualbox.org/)
 
@@ -49,7 +51,7 @@ bash setup.sh
 
 # Providers
 
-Rambo supports various providers, and aims to let you switch between them as easily as possible. Nevertheless, some providers do have particular considerations, such as setting up keys and paymentfor cloud services, or specific dependencies for the host OS. This is a list of Rambo's supported providers, with links to specific documentation pages for each.
+Rambo supports various providers, and aims to let you switch between them as easily as possible. Nevertheless, some providers do have particular considerations, such as setting up keys and payment for cloud services, or specific dependencies for the host OS. This is a list of Rambo's supported providers, with links to specific documentation pages for each.
 
 - [AWS EC2](https://github.com/terminal-labs/rambo/blob/master/docs/providers/aws-ec2.md)
 - [DigitalOcean](https://github.com/terminal-labs/rambo/blob/master/docs/providers/digitalocean.md)
@@ -61,8 +63,8 @@ Rambo supports various providers, and aims to let you switch between them as eas
 
 Assuming that you installed the dependencies you should be able to run 
 
-`vagrant up`
+`rambo up`
 
 or the more verbose command 
 
-`vagrant --target=virtualbox up`
+`rambo up -p virtualbox`

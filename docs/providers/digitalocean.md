@@ -86,6 +86,6 @@ Now you need to source the `digitalocean.env.sh` file. cd into the repo and run:
 Finally, run:
 
 ```
-vagrant --target=digitalocean up
-vagrant ssh
+rambo up -p digitalocean
+rambo ssh
 ```
