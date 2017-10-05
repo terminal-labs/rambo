@@ -15,6 +15,7 @@ syntax: glob
 *.#*
 *#
 *.egg-info
+*flymd*
 
 ## paths
 env.sh
