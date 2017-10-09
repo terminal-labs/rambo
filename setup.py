@@ -1,28 +1,22 @@
-from setuptools import setup
 import json
-
-with open(os.path.join(PROJECT_LOCATION, 'rambo/settings.json'), 'r') as f:
-    SETTINGS = json.load(f)
-PROJECT_NAME = SETTINGS['PROJECT_NAME']
+from setuptools import setup, find_packages
 
 setup(
     name='rambo-vagrant',
-    version='0.2.1.dev',
-    description=PROJECT_NAME,
-    url='https://github.com/terminal-labs/' + PROJECT_NAME,
+    version='0.2.2.dev',
+    description='rambo',
+    url='https://github.com/terminal-labs/rambo',
     author='Terminal Labs',
     author_email='solutions@terminallabs.com',
     license=license,
-    packages=[PROJECT_NAME],
+    packages=find_packages(),
     zip_safe=False,
     install_requires=[
         'bash',
         'click'
     ],
-    entry_points={
-          'console_scripts': [
-              "%s=%s.__main__:main" % [PROJECT_NAME, PROJECT_NAME]
-          ]
-      },
-    )
-
+    entry_points='''
+        [console_scripts]
+        rambo=rambo.cli:main
+     '''
+)
