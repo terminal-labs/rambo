@@ -33,12 +33,7 @@ for link in orphan_links
   File.delete(link)
 end
 
-#VM_HOST = "ubuntu-16"
-VM_HOST = "debian-8"
-
 VM_NAME = "rambo-" + random_tag()
-
-VM_SIZE = "2048mb"
 
 FORWARD_SSH = true
 

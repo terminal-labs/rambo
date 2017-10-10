@@ -15,6 +15,42 @@ if (SETTINGS["PROVIDERS"].include? target)
   load File.expand_path("vagrant_resources/vagrant/Vagrantfile." + target)
 else # Bad arg - we don't have this provider.
   abort("ABORTED - Target not in providers list. Did you have a typo?")
+
+hosts = ['debian-8',
+         'ubuntu-1604',
+        ]
+
+VM_HOST = if ENV["VMHOST"]
+          ENV["VMHOST"]
+        elsif cli_vmhost_opt
+          cli_vmhost_opt
+        else
+        'debian-8'
+        end
+
+unless (hosts.include? VM_HOST)
+   abort("ABORTED - VM host not in host list. Did you have a typo?")
+end
+
+unless (providers.include? target)
+   abort("ABORTED - Target not in providers list. Did you have a typo?")
+end
+
+sizes = ['512mb',
+         '1024mb',
+         '2048mb',
+        ]
+
+VM_SIZE = if ENV["VMSIZE"]
+          ENV["VMSIZE"]
+        elsif cli_vmsize_opt
+          cli_vmsize_opt
+        else
+        '1024mb'
+        end
+
+unless (sizes.include? VM_SIZE)
+   abort("ABORTED - VM size not in sizes list. Did you have a typo?")
 end
 
 # clean up files on the host after the guest is destroyed
