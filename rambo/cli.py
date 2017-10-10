@@ -78,7 +78,6 @@ def gen():
 @click.option('-p', '--provider', envvar = PROJECT_NAME.upper() + '_PROVIDER',
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
-
 def up(provider):
     '''
     Call Vagrant up with provider option. Provider may also be supplied by
