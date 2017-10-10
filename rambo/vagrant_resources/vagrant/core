@@ -2,8 +2,8 @@
 # vi: set ft=ruby :
 
 # Set target based on cli args. Defaults to empty string.
-target = if ENV["RAMBO_PROVIDER"]
-           ENV["RAMBO_PROVIDER"]
+target = if ENV[PROJECT_NAME + "_PROVIDER"]
+           ENV[PROJECT_NAME + "_PROVIDER"]
          elsif read_provider_file()
            read_provider_file()
          else
