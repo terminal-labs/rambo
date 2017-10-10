@@ -15,9 +15,9 @@ end
 SETTINGS = JSON.parse(File.read('settings.json'))
 load "vagrant_resources/modules.rb" # for random_tag
 
-PROJECT_NAME = SETTINGS["PROJECT_NAME"]
+PROJECT_NAME = SETTINGS["PROJECT_NAME"].upcase
 
-if not ENV.has_key?(PROJECT_NAME.upcase + "_ENV")
+if not ENV.has_key?(PROJECT_NAME + "_ENV")
   puts "", "***CAUTION***",
        "Running Vagrant directly and without %s's official CLI." % PROJECT_NAME.capitalize,
        "This is not supported.",
