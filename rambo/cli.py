@@ -69,7 +69,7 @@ def cli(ctx, debug, vagrant_cwd, vagrant_dotfile_path):
     if debug:
         ctx._debug = debug
 
-    # Overwrite Vagrant env vars if passed through cli.
+    # Overwrite Vagrant env vars if cli option is passed.
     if vagrant_cwd:
         os.environ['VAGRANT_CWD'] = os.path.normpath(vagrant_cwd)
     if vagrant_dotfile_path:
