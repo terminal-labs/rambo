@@ -59,7 +59,8 @@ pass_context = click.make_pass_decorator(Context, ensure=True)
               help='Debug option not yet implemented.')
 @click.option('--vagrant-cwd', default=None, type=click.Path(),
               help='Path entry point to the Vagrantfile. Defaults to '
-              'the Vagrantfile where %s is installed' % PROJECT_NAME)
+              'the Vagrantfile provided by %s in the installed path.'
+              % PROJECT_NAME.capitalize())
 @click.option('--vagrant-dotfile-path', default=None, type=click.Path(),
               help='Path location of the .vagrant directory for the '
               'virtual machine. Defaults to the current working directory.')
@@ -70,9 +71,9 @@ def cli(ctx, debug, vagrant_cwd, vagrant_dotfile_path):
 
     # Overwrite Vagrant env vars if passed through cli.
     if vagrant_cwd:
-        os.environ['VAGRANT_CWD'] = vagrant_cwd
+        os.environ['VAGRANT_CWD'] = os.path.normpath(vagrant_cwd)
     if vagrant_dotfile_path:
-        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.join(vagrant_dotfile_path + '/.vagrant')
+        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(vagrant_dotfile_path + '/.vagrant'))
 
 context_settings = {'ignore_unknown_options':True, 'allow_extra_args':True}
 @cli.command(name=cmd, context_settings=context_settings)
