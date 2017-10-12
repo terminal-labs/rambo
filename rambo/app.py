@@ -1,12 +1,23 @@
 import os
+import sys
 import time
+import json
 from threading import Thread
 
 import click
 from bash import bash
 
-from rambo.utils import get_user_home, dir_exists, dir_create, dir_delete, file_copy, file_delete, file_rename
+from rambo.utils import get_user_home, dir_exists, dir_create, dir_delete, file_delete, file_rename, set_env_var
 from rambo.scripts import install_lastpass
+
+## GLOBALS
+# Create env var indicating where this code lives. This will be used latter by
+# Vagrant as a check that the python cli is being used, as well as being a useful var.
+PROJECT_LOCATION = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
+    SETTINGS = json.load(f)
+PROVIDERS = SETTINGS['PROVIDERS']
+PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
 # Progressively read a file as it's being written to by another function, i.e. Vagrant.
 # XXX: We should refactor this to catch output directly from Vagrant, and pass it to
@@ -28,14 +39,42 @@ def follow_log_file(log_file_path, exit_triggers):
             if any(string in line for string in exit_triggers):
                 break
 
-
 def vagrant_up_thread():
 
     dir_create('.tmp/logs')
     # TODO: Better logs.
     bash('vagrant up > .tmp/logs/vagrant-up-log 2>&1')
 
-def vagrant_up():
+def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+    print('in vagrant up')
+
+    if vagrant_cwd:
+        print('in cwd if')
+        set_vagrant_env_var('cwd', vagrant_cwd)
+    elif 'VAGRANT_CWD' not in os.environ:
+        print('in cwd elif')
+        os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # (default installed path)
+    else:
+        print('neither caught!')
+    print("os.environ['VAGRANT_CWD'] = ", os.environ['VAGRANT_CWD'])
+
+    if vagrant_dotfile_path:
+        print('in dotfile if')
+        set_vagrant_env_var('dotfile_path', vagrant_dotfile_path)
+    elif 'VAGRANT_DOTFILE_PATH' not in os.environ:
+        print('in dotfile elif')
+        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # (default cwd)
+    else:
+        print('neither caught!')
+    print("os.environ['VAGRANT_DOTFILE_PATH'] = ", os.environ['VAGRANT_DOTFILE_PATH'])
+
+    if provider:
+        set_env_var('provider', provider)
+    if provider not in PROVIDERS and provider is not None:
+        # TODO See if there's a better exit / error system
+        sys.exit('ABORTED - Target provider "%s" is not in the providers '
+                 'list. Did you have a typo?' % provider)
+
     if not dir_exists('.tmp'):
         dir_create('.tmp')
     dir_create('.tmp/logs')
@@ -45,7 +84,8 @@ def vagrant_up():
     thread.start()
     follow_log_file('.tmp/logs/vagrant-up-log', ['default: Total run time:',
                                                  'Provisioners marked to run always will still run',
-                                                 'Print this help'])
+                                                 'Print this help',
+                                                 'try again.'])
     click.echo('Up complete.')
 
 def vagrant_ssh():
@@ -78,3 +118,8 @@ def setup_lastpass():
     thread = Thread(target = setup_lastpass_thread)
     thread.start()
     follow_log_file(get_user_home() + '/.tmp-common/install-lastpass-log', ['one installing lastpass'])
+
+
+class Run_app():
+    def __init__(self):
+        print("in run app init")

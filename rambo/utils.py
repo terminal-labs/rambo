@@ -1,7 +1,27 @@
 import os
+import json
 
 from pathlib import Path
 from shutil import copyfile, move, rmtree
+
+## GLOBALS
+# Create env var indicating where this code lives. This will be used latter by
+# Vagrant as a check that the python cli is being used, as well as being a useful var.
+PROJECT_LOCATION = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
+    SETTINGS = json.load(f)
+PROVIDERS = SETTINGS['PROVIDERS']
+PROJECT_NAME = SETTINGS['PROJECT_NAME']
+
+def set_env_var(name, value):
+    '''Set an environment variable in all caps that is prefixed with the name of the project
+    '''
+    os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = value
+
+def set_vagrant_env_var(name, value):
+    '''Set an environment variable in all caps that is prefixed with the name of the project
+    '''
+    os.environ["VAGRANT_" + name.upper()] = value
 
 def dir_exists(path):
     return os.path.isdir(path)
