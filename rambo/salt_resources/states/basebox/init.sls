@@ -25,6 +25,7 @@ setup_basebox:
       - unzip
       - wget
       - curl
+      - nano
       - emacs
 
 {% if os == 'Ubuntu' %}
