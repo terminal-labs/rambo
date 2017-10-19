@@ -7,7 +7,7 @@ from threading import Thread
 import click
 from bash import bash
 
-from rambo.utils import get_user_home, dir_exists, dir_create, dir_delete, file_delete, file_rename, set_env_var
+from rambo.utils import get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
 from rambo.scripts import install_lastpass
 
 ## GLOBALS
@@ -27,6 +27,13 @@ PROJECT_NAME = SETTINGS['PROJECT_NAME']
 # the log file because we're the only ones writing to it. We'll be able to keep old logs,
 # append, cycle file names, etc
 def follow_log_file(log_file_path, exit_triggers):
+    '''Read a file as it's being written and direct each line to stdout.
+
+    Args:
+        log_file_path (str): Location of the file to be read.
+        exit_triggers (str): String to look for in the file that tells us to
+                             stop reading it.
+    '''
     file_obj = open(log_file_path, 'r')
     while 1:
         where = file_obj.tell()
@@ -39,47 +46,75 @@ def follow_log_file(log_file_path, exit_triggers):
             if any(string in line for string in exit_triggers):
                 break
 
+def set_init_vars():
+    '''Set custom environment variables that are always going to be needed by
+    our custom Ruby code in the Vagrantfile chain.
+    '''
+    # env vars used by Python and Ruby
+    set_env_var('ENV', PROJECT_LOCATION) # location of this code
+    set_env_var('TMP', os.path.join(os.getcwd(), '.tmp')) # tmp in cwd
+
+def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
+    '''Set the environment varialbes prefixed with `VAGRANT_` that vagrant
+    expects, and that we use, to modify some use paths.
+
+    Agrs:
+        vagrant_cwd (str): Location of `Vagrantfile`.
+        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+    '''
+
+    if vagrant_cwd: # loc of Vagrantfile
+        os.environ["VAGRANT_CWD"] = vagrant_cwd # custom
+    elif 'VAGRANT_CWD' not in os.environ:
+        os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # (default installed path)
+
+    if vagrant_dotfile_path: # loc of .vagrant dir
+        os.environ['VAGRANT_DOTFILE_PATH'] = vagrant_dotfile_path # custom
+    elif 'VAGRANT_DOTFILE_PATH' not in os.environ:
+        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # (default cwd)
+
 def vagrant_up_thread():
+    '''Make the final call over the shell to `vagrant up`, and redirect
+    all output to log file.
+    '''
 
     dir_create('.tmp/logs')
     # TODO: Better logs.
     bash('vagrant up > .tmp/logs/vagrant-up-log 2>&1')
 
 def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
-    print('in vagrant up')
+    '''Start a VM / container with `vagrant up`.
+    All str args can also be set as an environment variable; arg takes precedence.
 
-    if vagrant_cwd:
-        print('in cwd if')
-        set_vagrant_env_var('cwd', vagrant_cwd)
-    elif 'VAGRANT_CWD' not in os.environ:
-        print('in cwd elif')
-        os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # (default installed path)
-    else:
-        print('neither caught!')
-    print("os.environ['VAGRANT_CWD'] = ", os.environ['VAGRANT_CWD'])
+    Agrs:
+        ctx (object): Click Context object.
+        provider (str): Sets provider used.
+        vagrant_cwd (str): Location of `Vagrantfile`.
+        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+    '''
+    # TODO: Add registering of VM for all of this installation to see
 
-    if vagrant_dotfile_path:
-        print('in dotfile if')
-        set_vagrant_env_var('dotfile_path', vagrant_dotfile_path)
-    elif 'VAGRANT_DOTFILE_PATH' not in os.environ:
-        print('in dotfile elif')
-        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # (default cwd)
-    else:
-        print('neither caught!')
-    print("os.environ['VAGRANT_DOTFILE_PATH'] = ", os.environ['VAGRANT_DOTFILE_PATH'])
+    if not ctx: # Else handled by cli.
+        set_init_vars()
+        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
+    # TODO See if there's a better exit / error system
     if provider:
         set_env_var('provider', provider)
-    if provider not in PROVIDERS and provider is not None:
-        # TODO See if there's a better exit / error system
-        sys.exit('ABORTED - Target provider "%s" is not in the providers '
-                 'list. Did you have a typo?' % provider)
+        if provider not in PROVIDERS:
+            sys.exit('ABORTED - Target provider "%s" is not in the providers '
+                     'list. Did you have a typo?' % provider)
+    elif get_env_var('PROVIDER') and get_env_var('PROVIDER') not in PROVIDERS:
+        sys.exit('ABORTED - Target provider "%s" is set as an environment '
+                 ' variable, and is not in the providers list. Did you '
+                 'have a typo?' % provider)
 
     if not dir_exists('.tmp'):
         dir_create('.tmp')
     dir_create('.tmp/logs')
     # TODO: Better logs.
     open('.tmp/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
+
     thread = Thread(target = vagrant_up_thread) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
     follow_log_file('.tmp/logs/vagrant-up-log', ['default: Total run time:',
@@ -88,23 +123,52 @@ def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=N
                                                  'try again.'])
     click.echo('Up complete.')
 
-def vagrant_ssh():
+def vagrant_ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+    '''Connect to an running VM / container over ssh.
+    All str args can also be set as an environment variable; arg takes precedence.
+
+    Agrs:
+        ctx (object): Click Context object.
+        vagrant_cwd (str): Location of `Vagrantfile`.
+        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+    '''
     # TODO: Better logs.
+    if not ctx: # Else handled by cli.
+        set_init_vars()
+        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+
     os.system('vagrant ssh')
 
-def vagrant_destroy(): # TODO add an --all flag to delete the whole .tmp dir. Default leaves logs.
+def vagrant_destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+    '''Destroy a VM / container and all its metadata. Default leaves logs.
+    All str args can also be set as an environment variable; arg takes precedence.
+
+    Agrs:
+        ctx (object): Click Context object.
+        vagrant_cwd (str): Location of `Vagrantfile`.
+        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+    '''
+    # TODO add finding and deleting of all VMs registered to this installation.
+    # TODO (optional) add finding and deleting of all VMs across all installations.
+    # TODO add an --all flag to delete the whole .tmp dir. Default leaves logs.
+
+    if not ctx: # Else handled by cli.
+        set_init_vars()
+        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+
+
     dir_create('.tmp/logs')
     # TODO: Better logs.
     bash('vagrant destroy --force > .tmp/logs/vagrant-destroy-log 2>&1')
     follow_log_file('.tmp/logs/vagrant-destroy-log', ['Vagrant done with destroy.',
                                                       'Print this help'])
-    file_delete('.tmp/provider')
-    file_delete('.tmp/random_tag')
-    dir_delete('.vagrant')
+    file_delete(get_env_var('ENV') + '/provider')
+    file_delete(get_env_var('ENV') + '/random_tag')
+    dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
     click.echo('Temporary files removed')
     click.echo('Destroy complete.')
 
-def setup_lastpass_thread():
+def setup_lastpass_thread(vagrant_cwd=None, vagrant_dotfile_path=None):
     dir_create(get_user_home() + '/.tmp-common')
     with open(get_user_home() + '/.tmp-common/install-lastpass.sh', 'w') as file_obj:
         file_obj.write(install_lastpass)

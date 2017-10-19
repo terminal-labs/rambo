@@ -18,6 +18,11 @@ def set_env_var(name, value):
     '''
     os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = value
 
+def get_env_var(name):
+    '''Set an environment variable in all caps that is prefixed with the name of the project
+    '''
+    return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
+
 def set_vagrant_env_var(name, value):
     '''Set an environment variable in all caps that is prefixed with the name of the project
     '''
@@ -31,7 +36,10 @@ def dir_create(path):
         os.makedirs(path)
 
 def dir_delete(path):
-    rmtree(path)
+    try:
+        rmtree(path)
+    except FileNotFoundError:
+        pass
 
 def file_delete(path):
     try:
