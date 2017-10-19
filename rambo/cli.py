@@ -1,11 +1,9 @@
 import os
 import sys
 import json
-import ipdb
 import click
 from bash import bash
 
-from rambo.utils import set_env_var
 from rambo.app import vagrant_up, vagrant_ssh, vagrant_destroy, set_init_vars, set_vagrant_vars
 
 ## GLOBALS

@@ -19,7 +19,6 @@ with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
 PROVIDERS = SETTINGS['PROVIDERS']
 PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
-# Progressively read a file as it's being written to by another function, i.e. Vagrant.
 # XXX: We should refactor this to catch output directly from Vagrant, and pass it to
 # the shell and a copy to log file. Doing logic on the contents of a log file isn't going to be
 # stable. For instance, we shouldn't have to specify any exit_triggers. We can't factor in every
@@ -50,7 +49,7 @@ def set_init_vars():
     '''Set custom environment variables that are always going to be needed by
     our custom Ruby code in the Vagrantfile chain.
     '''
-    # env vars used by Python and Ruby
+    # env vars available to Python and Ruby
     set_env_var('ENV', PROJECT_LOCATION) # location of this code
     set_env_var('TMP', os.path.join(os.getcwd(), '.tmp')) # tmp in cwd
 
