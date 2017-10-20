@@ -23,11 +23,6 @@ def get_env_var(name):
     '''
     return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
 
-def set_vagrant_env_var(name, value):
-    '''Set an environment variable in all caps that is prefixed with the name of the project
-    '''
-    os.environ["VAGRANT_" + name.upper()] = value
-
 def dir_exists(path):
     return os.path.isdir(path)
 
