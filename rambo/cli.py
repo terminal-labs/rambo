@@ -23,7 +23,13 @@ if len(sys.argv) > 1:
     if cmd in command_handeled_by_click:
         cmd = ''
 
-@click.group()
+context_settings = {
+    'ignore_unknown_options': True,
+    'allow_extra_args': True,
+    'help_option_names': ['-h', '--help'],
+}
+
+@click.group(context_settings=context_settings)
 @click.option('--vagrant-cwd', default=None, type=click.Path(),
               help='Path entry point to the Vagrantfile. Defaults to '
               'the Vagrantfile provided by %s in the installed path.'
@@ -36,7 +42,6 @@ def cli(ctx, vagrant_cwd, vagrant_dotfile_path):
     set_init_vars()
     set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-context_settings = {'ignore_unknown_options':True, 'allow_extra_args':True}
 @cli.command(name=cmd, context_settings=context_settings)
 def gen():
     # TODO: figure out better warning system
