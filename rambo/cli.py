@@ -1,11 +1,10 @@
 import os
 import sys
 import json
-
 import click
 from bash import bash
 
-from rambo.app import setup_lastpass, vagrant_up, vagrant_ssh, vagrant_destroy
+from rambo.app import vagrant_up, vagrant_ssh, vagrant_destroy, set_init_vars, set_vagrant_vars
 
 ## GLOBALS
 # Create env var indicating where this code lives. This will be used latter by
@@ -24,43 +23,18 @@ if len(sys.argv) > 1:
     if cmd in command_handeled_by_click:
         cmd = ''
 
-
-def set_env_var(name, value):
-    '''
-    Set an environment variable in all caps that is prefixed with the name of the project
-    '''
-    os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = value
-
-
-class Context(object):
-    def __init__(self):
-        self._project_path = PROJECT_LOCATION
-        self._tmp_path = os.path.join(os.getcwd(), '.tmp')
-        self._provider = None
-        self._debug = False
-        self._vagrant = True
-
-        # env vars used by Python and Ruby
-        set_env_var('env', self._project_path)
-        set_env_var('tmp', self._tmp_path)
-
-        if self._vagrant:
-            # Vagrant requires the following 2 env vars for custom cwd and dotfile path.
-            if 'VAGRANT_CWD' not in os.environ: # Where the Vagrantfile and python code are
-                os.environ['VAGRANT_CWD'] = self._project_path # (default installed path)
-            if 'VAGRANT_DOTFILE_PATH' not in os.environ: # Where to put .vagrant dir (right next to .tmp)
-                os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # (default cwd)
-
-
-pass_context = click.make_pass_decorator(Context, ensure=True)
-
-
 @click.group()
-@click.option('--debug/--no-debug', default=False)
-@pass_context
-def cli(ctx, debug):
-    if debug:
-        ctx._debug = debug
+@click.option('--vagrant-cwd', default=None, type=click.Path(),
+              help='Path entry point to the Vagrantfile. Defaults to '
+              'the Vagrantfile provided by %s in the installed path.'
+              % PROJECT_NAME.capitalize())
+@click.option('--vagrant-dotfile-path', default=None, type=click.Path(),
+              help='Path location of the .vagrant directory for the '
+              'virtual machine. Defaults to the current working directory.')
+@click.pass_context
+def cli(ctx, vagrant_cwd, vagrant_dotfile_path):
+    set_init_vars()
+    set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
 context_settings = {'ignore_unknown_options':True, 'allow_extra_args':True}
 @cli.command(name=cmd, context_settings=context_settings)
@@ -78,30 +52,30 @@ def gen():
 @click.option('-p', '--provider', envvar = PROJECT_NAME.upper() + '_PROVIDER',
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
-def up(provider):
+@click.pass_context
+def up(ctx, provider):
+    '''Start a VM / container with `vagrant up`.
     '''
-    Call Vagrant up with provider option. Provider may also be supplied by
-    the RAMBO_PROVIDER environment variable if not passed as a cli option.
-    '''
-    # Abort if provider not in whitelist.
-    if provider is not None:
-        set_env_var('provider', provider)
-    if provider not in PROVIDERS and provider is not None:
-        # TODO See if there's a better exit / error system
-        sys.exit('ABORTED - Target provider "%s" is not in the providers '
-                 'list. Did you have a typo?' % provider)
-    vagrant_up()
+    vagrant_up(ctx, provider)
 
 @cli.command()
-def ssh():
+@click.pass_context
+def ssh(ctx):
+    '''Connect to an running VM / container over ssh.
+    '''
     vagrant_ssh()
 
 @cli.command()
-def destroy():
+@click.pass_context
+def destroy(ctx):
+    '''Destroy a VM / container and all its metadata. Default leaves logs.
+    '''
     vagrant_destroy()
 
 @cli.command()
 def setup(): # threaded setup commands
+    '''Runs any setup commands. None yet implemented.
+    '''
     # setup_rambo()
     setup_lastpass()
 
