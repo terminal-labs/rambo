@@ -86,7 +86,7 @@ def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=N
     All str args can also be set as an environment variable; arg takes precedence.
 
     Agrs:
-        ctx (object): Click Context object.
+        ctx (object): Click Context object. Used to detect if CLI is used.
         provider (str): Sets provider used.
         vagrant_cwd (str): Location of `Vagrantfile`.
         vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
