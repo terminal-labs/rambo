@@ -54,22 +54,21 @@ def gen():
               'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
 @click.pass_context
 def up(ctx, provider):
-    '''Call Vagrant up with provider option. Provider may also be supplied by
-    the RAMBO_PROVIDER environment variable if not passed as a cli option.
+    '''Start a VM / container with `vagrant up`.
     '''
     vagrant_up(ctx, provider)
 
 @cli.command()
 @click.pass_context
 def ssh(ctx):
-    '''Connect to an running virtual machine over ssh.
+    '''Connect to an running VM / container over ssh.
     '''
     vagrant_ssh()
 
 @cli.command()
 @click.pass_context
 def destroy(ctx):
-    '''Destroy a virtual machine and all its metadata. Default leaves logs.
+    '''Destroy a VM / container and all its metadata. Default leaves logs.
     '''
     vagrant_destroy()
 
