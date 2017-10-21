@@ -19,8 +19,9 @@ base:
     # - nginx                   {# requires {{ grains['dvcs'] }}.repo #}
     # - venv                    {# requires {{ grains['dvcs'] }}.repo, python #}
     # - venv.pip_requirements   {# requires venv #}
-    # - conda                   {# requires users #}
-    # - conda.anaconda          {# requires conda #}
+    - conda                   {# requires users #}
+    - conda.anaconda          {# requires conda #}
+    - conda.add_licensed_packages
     # - conda.pip_requirements  {# requires conda #}
     # - postgresql              {# requires {{ grains['dvcs'] }}.repo #}
     # - conf
