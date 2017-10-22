@@ -10,6 +10,27 @@ place_before_license_application_file:
     - group: {{ grains['deescalated_user'] }}
     - mode: 777
 
+before_conda_license:
+  cmd.run:
+    - name: miniconda3/bin/conda env update --name root --file before_license_application.yml
+    - cwd: /home/{{ grains['deescalated_user'] }}
+    - runas: {{ grains['deescalated_user'] }}
+
+create_continuum_dir:
+  file.directory:
+    - name:  /home/{{ grains['deescalated_user'] }}/.continuum
+    - user:  {{ grains['deescalated_user'] }}
+    - group: {{ grains['deescalated_user'] }}
+    - mode:  777
+
+place_license_file:
+  file.managed:
+    - name: /home/{{ grains['deescalated_user'] }}/.continuum/{{ grains['anaconda_license'] }}
+    - source: salt://files/licenses/anaconda/{{ grains['anaconda_license'] }}
+    - user: {{ grains['deescalated_user'] }}
+    - group: {{ grains['deescalated_user'] }}
+    - mode: 777
+
 place_after_license_application_file:
   file.managed:
     - name: /home/{{ grains['deescalated_user'] }}/after_license_application.yml
@@ -17,12 +38,6 @@ place_after_license_application_file:
     - user: {{ grains['deescalated_user'] }}
     - group: {{ grains['deescalated_user'] }}
     - mode: 777
-
-before_conda_license:
-  cmd.run:
-    - name: miniconda3/bin/conda env update --name root --file before_license_application.yml
-    - cwd: /home/{{ grains['deescalated_user'] }}
-    - runas: {{ grains['deescalated_user'] }}
 
 after_conda_license:
   cmd.run:
