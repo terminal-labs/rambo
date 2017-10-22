@@ -1,3 +1,3 @@
 name: root
 dependencies:
-  - pandas
+  - _license

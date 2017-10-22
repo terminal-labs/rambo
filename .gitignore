@@ -24,3 +24,4 @@ aws.env.sh
 srv/salt/ssh_keys
 .tmp
 **/auth/keys
+**/auth/licenses
