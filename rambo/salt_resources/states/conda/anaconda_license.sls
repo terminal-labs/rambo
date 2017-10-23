@@ -8,7 +8,8 @@ place_before_license_application_file:
     - source: salt://conda/before_license_application.yml
     - user: {{ grains['deescalated_user'] }}
     - group: {{ grains['deescalated_user'] }}
-    - mode: 777
+    - require:
+      - sls: conda.anaconda
 
 before_conda_license:
   cmd.run:
@@ -21,7 +22,6 @@ create_continuum_dir:
     - name:  /home/{{ grains['deescalated_user'] }}/.continuum
     - user:  {{ grains['deescalated_user'] }}
     - group: {{ grains['deescalated_user'] }}
-    - mode:  777
 
 place_license_file:
   file.managed:
@@ -29,7 +29,6 @@ place_license_file:
     - source: salt://files/licenses/anaconda/{{ grains['anaconda_license'] }}
     - user: {{ grains['deescalated_user'] }}
     - group: {{ grains['deescalated_user'] }}
-    - mode: 777
 
 place_after_license_application_file:
   file.managed:
@@ -37,7 +36,6 @@ place_after_license_application_file:
     - source: salt://conda/after_license_application.yml
     - user: {{ grains['deescalated_user'] }}
     - group: {{ grains['deescalated_user'] }}
-    - mode: 777
 
 after_conda_license:
   cmd.run:
