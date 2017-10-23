@@ -2,6 +2,7 @@
 
 FEATURES:
 
+  - Added Salt states for setting up licensed Anaconda.
   - Made Rambo a pip installable package.
   - Created a Python based CLI for Rambo.
   - Added support for multiple users on DigitalOcean.
