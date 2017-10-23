@@ -21,7 +21,7 @@ base:
     # - venv.pip_requirements   {# requires venv #}
     - conda                   {# requires users #}
     - conda.anaconda          {# requires conda #}
-    - conda.add_licensed_packages
+    - conda.anaconda_license  {# requires conda.anaconda #}
     # - conda.pip_requirements  {# requires conda #}
     # - postgresql              {# requires {{ grains['dvcs'] }}.repo #}
     # - conf
