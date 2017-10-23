@@ -126,9 +126,9 @@ Vagrant.configure("2") do |config|
       mv /etc/salt/minion{,-dist}
       cp /vagrant/salt_resources/minions/minion.virtualbox /etc/salt/minion
       cp /vagrant/salt_resources/grains/grains /etc/salt/grains
-      cp -a /vagrant/auth/licenses/. /vagrant/salt_resources/states/files/licenses/
+      mkdir -p /vagrant/salt_resources/states/files/licenses
+      if [ -d "/vagrant/auth/licenses/" ]; then cp -a /vagrant/auth/licenses/. /vagrant/salt_resources/states/files/licenses/; fi
     EOS
-
     config.vm.provision "shell",
       inline: $pre_salt,
       keep_color: true

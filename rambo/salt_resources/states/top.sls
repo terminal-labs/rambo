@@ -4,10 +4,10 @@ base:
     - clean
     - basebox
     - basebox.symlink
-    - network
-    - network.cluster
     - users
     - python
+    # - network
+    # - network.cluster
     # - hg
     # - hg.ssh
     # - hg.repo
@@ -19,9 +19,9 @@ base:
     # - nginx                   {# requires {{ grains['dvcs'] }}.repo #}
     # - venv                    {# requires {{ grains['dvcs'] }}.repo, python #}
     # - venv.pip_requirements   {# requires venv #}
-    - conda                   {# requires users #}
-    - conda.anaconda          {# requires conda #}
-    - conda.anaconda_license  {# requires conda.anaconda #}
+    # - conda                   {# requires users #}
+    # - conda.anaconda          {# requires conda #}
+    # - conda.anaconda_license  {# requires conda.anaconda #}
     # - conda.pip_requirements  {# requires conda #}
     # - postgresql              {# requires {{ grains['dvcs'] }}.repo #}
     # - conf
