@@ -1,3 +1,9 @@
+## 0.2.3 (October 25, 2017)
+
+BUG FIXES:
+
+  - Proper packaging / added in accidentally forgotten MANIFEST file.
+
 ## 0.2.2 (October 25, 2017)
 
 FEATURES:

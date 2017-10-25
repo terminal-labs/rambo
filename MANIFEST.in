@@ -1,0 +1,10 @@
+recursive-include rambo/auth/env_scripts *
+recursive-include rambo/salt_resources *
+recursive-include rambo/vagrant_resources *
+recursive-include docs *
+include rambo/Vagrantfile
+include rambo/settings.json
+include LICENSE
+include README.md
+include CHANGELOG.md
+global-exclude *.py[cdo] __pycache__ *.so *.pyd .DS_Store

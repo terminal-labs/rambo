@@ -18,6 +18,7 @@ syntax: glob
 *flymd*
 
 ## paths
+dist
 env.sh
 digitalocean.env.sh
 aws.env.sh
