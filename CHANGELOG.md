@@ -1,3 +1,9 @@
+## 0.2.4 (October 25, 2017)
+
+BUG FIXES:
+
+  - Including package data
+
 ## 0.2.3 (October 25, 2017)
 
 BUG FIXES:
