@@ -1,7 +1,14 @@
-## 0.2.2 (TBD)
+## 0.2.2 (October 25, 2017)
 
 FEATURES:
 
+  - Added Salt states to apply Anaconda licenses.
+  - Adding a Python API.
+  - Added Nano to base Salt provisioning.
+  - Able to set Vagrant environment variables via the CLI
+  - Refactored packaging for PyPI.
+  - Added in support for Ubuntu 14.04 and Centos 7 guest OSs.
+  - Added in 4GB and 8GB RAM for all supported OSs.
   - Added Salt states for setting up licensed Anaconda.
   - Made Rambo a pip installable package.
   - Created a Python based CLI for Rambo.
@@ -12,6 +19,7 @@ FEATURES:
 
 IMPROVEMENTS:
 
+  - Now downloading base vagrant boxes from vagrantup.com.
   - Now enforcing Vagrant >=1.9.7.
   - VM_NAME now contains host's hostname, and rambo's working dir, and a unique hex id.
   - Now deletes broken symlinks found that would otherwise break Rambo during the rsync process.
@@ -31,7 +39,7 @@ FEATURES:
 
 IMPROVEMENTS:
 
-  - Added default fingerprints for BitBucket and GithHub.
+  - Added default fingerprints for BitBucket and GitHub.
   - Renamed miniconda state to conda.
   - Added documentation for Docker provider.
 
