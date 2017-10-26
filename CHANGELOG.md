@@ -1,16 +1,4 @@
-## 0.2.4 (October 25, 2017)
-
-BUG FIXES:
-
-  - Including package data
-
-## 0.2.3 (October 25, 2017)
-
-BUG FIXES:
-
-  - Proper packaging / added in accidentally forgotten MANIFEST file.
-
-## 0.2.2 (October 25, 2017)
+## 0.3.0 (October 26, 2017)
 
 FEATURES:
 
