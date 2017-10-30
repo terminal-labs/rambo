@@ -17,9 +17,11 @@ ssh-keygen -t rsa -N '' -f "aws.pem"
 xclip -sel clip < aws.pem.pub
 ```
 
-Now go to AWS's "EC2 Dashboard", on the left hand side go to "Key Pairs" and click the "Import Key Pair" button.
+*If you want multiple users or computers to access the same AWS profile or team, you must have unique key names. For example, you will need to change the base name of your `.pem` and `.pem.pub` files to something else like `aws-myname`.
 
-**Create a new key and name the key "Vagrant". Copy the contents of aws.pem.pub into the new key field.
+**Create a new key and name the key the same as the base name of your ssh key. If AWS's key name and the one one your host don't match, you won't communicate to your VM.**
+
+Now go to AWS's "EC2 Dashboard", on the left hand side go to "Key Pairs" and click the "Import Key Pair" button.
 
 Here are instructions on how to setup ssh keys with aws:
 
@@ -101,7 +103,7 @@ After editing, your aws.env.sh file will look similar to this:
 # for aws
 export AWS_ACCESS_KEY_ID="AKIAITT673DAF4YNV7MA"
 export AWS_SECRET_ACCESS_KEY="m25AyjXtiYB2cCWMv1vQeyZtWqiWg0nqxi2Wm2QX"
-export AWS_KEYPAIR_NAME="Vagrant"
+export AWS_KEYPAIR_NAME="aws"
 export AWS_SSH_PRIVKEY="auth/keys/aws.pem"
 ```
 
