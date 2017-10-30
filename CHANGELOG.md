@@ -6,6 +6,7 @@ IMPROVEMENTS:
 
 BUG FIXES:
 
+  - Fix Docker failing on editing non-existant bashrc. Now ensuring existence first.
   - Fixing vagrant up exit trigger when VM not named 'default'.
   - Now AWS makes use of VM_Size flag to produce t2.nano, t2.micro, and t2.small VMs.
 
