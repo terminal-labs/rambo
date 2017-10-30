@@ -6,6 +6,8 @@ IMPROVEMENTS:
 
 BUG FIXES:
 
+  - Now AWS makes use of VM_Size flag to produce t2.nano, t2.micro, and t2.small VMs.
+
 ## 0.3.0 (October 26, 2017)
 
 FEATURES:
