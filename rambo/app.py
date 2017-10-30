@@ -116,7 +116,7 @@ def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=N
 
     thread = Thread(target = vagrant_up_thread) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
-    follow_log_file('.tmp/logs/vagrant-up-log', ['default: Total run time:',
+    follow_log_file('.tmp/logs/vagrant-up-log', ['Total run time:',
                                                  'Provisioners marked to run always will still run',
                                                  'Print this help',
                                                  'try again.'])
