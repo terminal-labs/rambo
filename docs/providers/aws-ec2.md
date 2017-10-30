@@ -77,7 +77,7 @@ Here is the contents of the aws.env.sh file. Edit it by replacing the placeholde
 # for aws
 export AWS_ACCESS_KEY_ID=<YOUR AWS KEY ID>
 export AWS_SECRET_ACCESS_KEY=<YOUR AWS ACCESS KEY>
-export AWS_KEYPAIR_NAME="aws"
+export AWS_KEYPAIR_NAME="Vagrant"
 export AWS_SSH_PRIVKEY="auth/keys/aws.pem"
 ```
 
@@ -101,7 +101,7 @@ After editing, your aws.env.sh file will look similar to this:
 # for aws
 export AWS_ACCESS_KEY_ID="AKIAITT673DAF4YNV7MA"
 export AWS_SECRET_ACCESS_KEY="m25AyjXtiYB2cCWMv1vQeyZtWqiWg0nqxi2Wm2QX"
-export AWS_KEYPAIR_NAME="aws"
+export AWS_KEYPAIR_NAME="Vagrant"
 export AWS_SSH_PRIVKEY="auth/keys/aws.pem"
 ```
 
