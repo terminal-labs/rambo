@@ -18,7 +18,7 @@ clone_lastpass_rep:
      - target: /home/{{ grains['deescalated_user'] }}/lastpass-cli
      - runas: {{ grains['deescalated_user'] }}
      - require:
-       - sls: git
+       - sls: git.ssh
 
 lastpass_cmake:
   cmd.run:
