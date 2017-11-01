@@ -17,7 +17,7 @@ You need to install some programs into your host, then you will need to install 
 
 [OSX](http://www.apple.com/mac-mini/)
 
-We expect it's likely you can get Rambo to work on any Unix-like system, but we your milleage may vary. We have made no effort to get this working with Windows. Contributions are welcome.
+We expect it's likely you can get Rambo to work on any Unix-like system, but your milleage may vary. We have made no effort to get this working with Windows. Contributions are welcome.
 
 ## Dependencies:
 
