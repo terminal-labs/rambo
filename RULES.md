@@ -12,4 +12,4 @@
 
 1. Hooks into other provisioners are welcome, but not other provisioning code (except for SaltStack, which we may expand with sample states for people to use.)
 
-1. If it can be done with SaltStack or Vagrant, it probably should be. Other tools (e.g. Bash) should be added in with discerning fashion.
+1. If it can be done with Python, SaltStack, or Vagrant, it probably should be. Other tools (e.g. Bash) should be added in with discerning fashion.

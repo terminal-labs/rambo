@@ -17,7 +17,7 @@ This project uses Vagrant and Vagrant plugins for some of the heavy lifting, and
 By default Rambo offers a basic provisioning, but you can customize this. See [**Advanced Usage**](#advanced-usage) for that.
 
 ## Basic Usage
-Rambo needs to be installed first. It is a Python package, and can be installed in an Conda or Virtualenv environment with `pip install rambo-suffix`, or the development version (this repo) can be installed with `pip install -e .`. Some providers will need a more configuration for things like key managment (see: [INSTALL.md](https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md)). Once installed, you can run one of these commands to get your VM:
+Rambo needs to be installed first. It is a Python package, and can be installed in an Conda or Virtualenv environment with `pip install rambo-vagrant`, or the development version (this repo) can be installed with `pip install -e .`. Some providers will need a more configuration for things like key managment (see: [INSTALL.md](https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md)). Once installed, you can run one of these commands to get your VM:
 
 for VirtualBox run
 ```
@@ -62,7 +62,41 @@ Rambo has a few Salt States available that are commented out that you can 'turn 
 
 You can add your custom Salt States right into the Salt code and they should be automatically picked up and used. If you want to add provisioning with any other tool, you will need to modify the Vagrantfiles found in `vagrant_resources/vagrant/` to add that provisioning.
 
+### CLI and Python API
+
+**Both the CLI and Python API are young and subject to breaking changes without notice.**
+
+
+Rambo has a CLI and Python API that are compatible. In other words, what you can do in the CLI, you can do in the Python API. To accomplish this the CLI is largely dependant on the Python API. You can access the Python API by importing the various functions in app.py, such as with `from rambo.app import vagrant_up`
+
+Through the Python API you can call `vagrant_up` and `vagrant_destroy` to create and destroy VMs. `vagrant_ssh` is also available and presents an interactive shell to the VM, as if you ran `rambo ssh` with the CLI.
+
+CLI options are available to be set as either functions in app.py, or as parameters to those functions, depending on whether the CLI option was on `rambo` command itself or a subcommand (e.g. `up`). For instance, the following are equivalent:
+
+```
+$ rambo --vagrant-cwd /path up -p virtualbox
+```
+```
+from rambo.app import set_vagrant_vars, vagrant_up
+set_vagrant_vars(vagrant-cwd,"/path")
+vagrant_up(provider="virtualbox")
+```
+
+Currently, all of the CLI options can also be set as environment variables. Environment variables are respected by both the CLI and Python API, but are overridden when set with a CLI option / Python API param.
+
+### Environment Variables
+
+The following environment variables are used by Rambo:
+
+- `VAGRANT_DOTFILE_PATH` - [This is used by Vagrant directly](https://www.vagrantup.com/docs/other/environmental-variables.html#vagrant_dotfile_path), and is able to be set via the CLI / API.
+- `VAGRANT_CWD` - [This is used by Vagrant directly](https://www.vagrantup.com/docs/other/environmental-variables.html#vagrant_cwd), and is able to be set via the CLI / API.
+- `RAMBO_ENV` - This is the location of the project environment Rambo's code lives in. It is generated internally and not able to be set with the CLI / API.
+- `RAMBO_TMP` - This is the location of Rambo's metadata folder specific to each VM. It is automatically placed in the CWD when the CLI / API is used.
+- `RAMBO_PROVIDER` - This is the provider that is being used. It is able to be set via the CLI / API.
+
 ### SSH Alias: Key Sharing and Emacs
+
+**The following is deprecated with Rambo's new CLI / API**
 
 Rambo defaults to using a priveleged user (e.g. `vagrant`, `root`) to provision the machine when it's spawned, but also to create a non-priveleged or deescalated user. This user is for development and for specific production server tasks that do not require root priviliges. Rambo defaults to only sharing keys with the rooted user, so you may need to share your keys deliberately with the deescalated user if you're working there manually (such as during development.) Assuming Rambo is configuring a deescalated user called `webserver`, here's how.
 
