@@ -132,6 +132,9 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell",
       inline: $pre_salt,
       keep_color: true
+    config.vm.provision "shell",
+      inline: PROVISION_SALT_CMD,
+      keep_color: true
   end
   if PROVISION_WITH_CMD
     config.vm.provision "shell",
