@@ -4,13 +4,13 @@
 For running VMs locally in VirtualBox, we suggest a minimum of:
 
 * Reasonably fast cpu with 2 cores and VT-x (e.g. an Intel i7-3612QM 2.1GHz, 4 core chip)
-* 8gb ram
-* 16gb free drive space
+* 8GB ram
+* 16GB free drive space
 
 For running containers in LXC locally or spawning machine in AWS EC2/DigitalOcean you can get away with comparatively slow computer and you don't need VT-x. In fact, the LXC/EC2/DigitalOcean providers can be managed from a Raspberry Pi. See: https://www.raspberrypi.org/
 
 ## Summary of Setup:
-You need to install some programs into your host, then you will need to install some Vagrant plugins. You also need to setup full accounts (or login into existing accounts) at any cloud provider you want to use.
+You need to install some programs into your host for certain providers, then you will need to install some Vagrant plugins. You also need to setup full accounts (or login into existing accounts) at any cloud provider you want to use.
 
 ## Supported Host OS:
 [Ubuntu 16.04 or newer](https://www.ubuntu.com/download/desktop)
@@ -46,7 +46,7 @@ There are no additional dependencies for Mac, however, LXC cannot be used as a p
 cd into the `rambo` repo and run:
 
 ```
-bash setup.sh
+./rambo/setup.sh
 ```
 
 # Providers
