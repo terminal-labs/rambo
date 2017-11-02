@@ -41,3 +41,7 @@ setup_debian_basebox_deps:
     - pkgs:
       - libjpeg62-turbo-dev
 {% endif %}
+
+ensure_bashrc_exists:
+  file.exists:
+    - name: /home/{{ grains['deescalated_user'] }}/.bashrc

@@ -4,7 +4,7 @@ base:
     - clean
     - basebox
     - basebox.symlink
-    - users
+    - users                     {# requires basebox #}
     - python
     # - network
     # - network.cluster
