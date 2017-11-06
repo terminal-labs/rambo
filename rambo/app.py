@@ -51,7 +51,7 @@ def set_init_vars():
     '''
     # env vars available to Python and Ruby
     set_env_var('ENV', PROJECT_LOCATION) # location of this code
-    set_env_var('TMP', os.path.join(os.getcwd(), '.tmp')) # tmp in cwd
+    set_env_var('TMP', os.path.join(os.getcwd(), '.' + PROJECT_NAME + '-tmp')) # tmp in cwd
 
 def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Set the environment varialbes prefixed with `VAGRANT_` that vagrant
@@ -77,9 +77,9 @@ def vagrant_up_thread():
     all output to log file.
     '''
 
-    dir_create('.tmp/logs')
+    dir_create(get_env_var('TMP') + '/logs')
     # TODO: Better logs.
-    bash('vagrant up > .tmp/logs/vagrant-up-log 2>&1')
+    bash('vagrant up >' + get_env_var('TMP') + '/logs/vagrant-up-log 2>&1')
 
 def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
@@ -108,15 +108,15 @@ def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=N
                  ' variable, and is not in the providers list. Did you '
                  'have a typo?' % provider)
 
-    if not dir_exists('.tmp'):
-        dir_create('.tmp')
-    dir_create('.tmp/logs')
+    if not dir_exists(get_env_var('TMP')):
+        dir_create(get_env_var('TMP'))
+    dir_create(get_env_var('TMP') + '/logs')
     # TODO: Better logs.
-    open('.tmp/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
+    open(get_env_var('TMP') + '/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
 
     thread = Thread(target = vagrant_up_thread) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
-    follow_log_file('.tmp/logs/vagrant-up-log', ['Total run time:',
+    follow_log_file(get_env_var('TMP') + '/logs/vagrant-up-log', ['Total run time:',
                                                  'Provisioners marked to run always will still run',
                                                  'Print this help',
                                                  'try again.'])
@@ -149,17 +149,17 @@ def vagrant_destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''
     # TODO add finding and deleting of all VMs registered to this installation.
     # TODO (optional) add finding and deleting of all VMs across all installations.
-    # TODO add an --all flag to delete the whole .tmp dir. Default leaves logs.
+    # TODO add an --all flag to delete the whole .rambo-tmp dir. Default leaves logs.
 
     if not ctx: # Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
 
-    dir_create('.tmp/logs')
+    dir_create(get_env_var('TMP') + '/logs')
     # TODO: Better logs.
-    bash('vagrant destroy --force > .tmp/logs/vagrant-destroy-log 2>&1')
-    follow_log_file('.tmp/logs/vagrant-destroy-log', ['Vagrant done with destroy.',
+    bash('vagrant destroy --force >' + get_env_var('TMP') + '/logs/vagrant-destroy-log 2>&1')
+    follow_log_file( get_env_var('TMP') + '/logs/vagrant-destroy-log', ['Vagrant done with destroy.',
                                                       'Print this help'])
     file_delete(get_env_var('ENV') + '/provider')
     file_delete(get_env_var('ENV') + '/random_tag')
