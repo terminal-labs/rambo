@@ -161,8 +161,8 @@ def vagrant_destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     bash('vagrant destroy --force >' + get_env_var('TMP') + '/logs/vagrant-destroy-log 2>&1')
     follow_log_file( get_env_var('TMP') + '/logs/vagrant-destroy-log', ['Vagrant done with destroy.',
                                                       'Print this help'])
-    file_delete(get_env_var('ENV') + '/provider')
-    file_delete(get_env_var('ENV') + '/random_tag')
+    file_delete(get_env_var('TMP') + '/provider')
+    file_delete(get_env_var('TMP') + '/random_tag')
     dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
     click.echo('Temporary files removed')
     click.echo('Destroy complete.')
