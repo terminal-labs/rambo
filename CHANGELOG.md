@@ -1,4 +1,4 @@
-## 0.3.1.dev (TBD)
+## 0.3.1 (November 8, 2017)
 
 FEATURES:
 
@@ -6,8 +6,12 @@ FEATURES:
 
 IMPROVEMENTS:
 
+  - Updated docs for CLI, Python API, Environment Variables
+  - Renamed tmp dir to rambo-tmp.
+
 BUG FIXES:
 
+  - `rambo destroy` now finds and deletes metadata in tmp dir.
   - Fix Docker failing on editing non-existant bashrc. Now ensuring existence first.
   - Fixing vagrant up exit trigger when VM not named 'default'.
   - Fixed bug preventing provisioning without Salt.
