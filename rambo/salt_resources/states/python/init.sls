@@ -1,3 +1,5 @@
+{% set os = salt['grains.get']('os') %}
+
 ## Commented sections use a compiled python.
 #python_install_dir:
 #  file.directory:
@@ -38,9 +40,23 @@
 python_packages:
   pkg.installed:
     - pkgs:
-      - python-dev
-      - python-pip
+{% if os == 'Ubuntu' or os == 'Debian' or os == 'CentOS' %}
       - python-setuptools
       - python-virtualenv
+{% endif %}
+{% if os == 'Ubuntu' or os == 'Debian'%}
+      - python
+      - python-pip
+      - python-dev
       - python3
       - python3-pip
+      - python3-dev
+{% endif %}
+{% if os == 'CentOS' %}
+      - python
+      - python2-pip
+      - python-devel
+      - python36u
+      - python36u-pip
+      - python36u-devel
+{% endif %}
