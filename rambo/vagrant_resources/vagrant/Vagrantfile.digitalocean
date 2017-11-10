@@ -26,41 +26,4 @@ Vagrant.configure("2") do |config|
   config.ssh.forward_agent = FORWARD_SSH
   config.vm.box = "digital_ocean"
   config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
-  if COPY_DIR_WITH_RSYNC
-    config.vm.synced_folder ".",
-      "/vagrant",
-      type: "rsync"
-  else
-    config.vm.synced_folder ".",
-      "/vagrant",
-      type: "rsync",
-      disabled: true
-  end
-  config.vm.provision "shell",
-    inline: "wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + VM_HOST + "/official/sources.list",
-    keep_color: true
-  if PROVISION_WITH_SALT
-    config.vm.provision :salt do |salt|
-      salt.bootstrap_options = "-P"
-      salt.verbose = true
-    end
-    $pre_salt = <<-EOS
-      mv /etc/salt/minion{,-dist}
-      cp /vagrant/salt_resources/minions/minion.digitalocean /etc/salt/minion
-      cp /vagrant/salt_resources/grains/grains /etc/salt/grains
-      mkdir -p /vagrant/salt_resources/states/files/licenses
-      if [ -d "/vagrant/auth/licenses/" ]; then cp -a /vagrant/auth/licenses/. /vagrant/salt_resources/states/files/licenses/; fi
-    EOS
-    config.vm.provision "shell",
-      inline: $pre_salt,
-      keep_color: true
-    config.vm.provision "shell",
-      inline: PROVISION_SALT_CMD,
-      keep_color: true
-  end
-  if PROVISION_WITH_CMD
-    config.vm.provision "shell",
-      inline: PROVISION_CMD,
-      keep_color: true
-  end
 end
