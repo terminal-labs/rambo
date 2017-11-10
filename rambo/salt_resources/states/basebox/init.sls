@@ -1,8 +1,25 @@
 {% set os = salt['grains.get']('os') %}
 
+{% if os == 'CentOS' %}
+install_ius_for_centos:
+  cmd.run:
+    - name: yum -y install https://centos7.iuscommunity.org/ius-release.rpm
+{% endif %}
+
 setup_basebox:
   pkg.installed:
     - pkgs:
+{% if os == 'Ubuntu' or os == 'Debian' or os == 'CentOS' %}
+      - rsync
+      - p7zip
+      - zip
+      - unzip
+      - wget
+      - curl
+      - nano
+      - emacs
+{% endif %}
+{% if os == 'Ubuntu' or os == 'Debian'%}
       - build-essential
       - libreadline6-dev
       - libbz2-dev
@@ -19,27 +36,25 @@ setup_basebox:
       - libmpdec-dev
       - libfreetype6-dev
       - libpq-dev
-      - rsync
-      - p7zip
-      - zip
-      - unzip
-      - wget
-      - curl
-      - nano
-      - emacs
-
+{% endif %}
 {% if os == 'Ubuntu' %}
-setup_ubuntu_basebox_deps:
-  pkg.installed:
-    - pkgs:
       - libjpeg-turbo8-dev
 {% endif %}
-
 {% if os == 'Debian' %}
-setup_debian_basebox_deps:
-  pkg.installed:
-    - pkgs:
       - libjpeg62-turbo-dev
+{% endif %}
+{% if os == 'CentOS' %}
+      - epel-release
+{% endif %}
+
+{% if os == 'CentOS' %}
+special_group_install_for_centos:
+  cmd.run:
+    - name: yum -y groupinstall 'Development Tools'
+
+special_post_install_yum_update_for_centos:
+  cmd.run:
+    - name: yum -y update
 {% endif %}
 
 ensure_bashrc_exists:
