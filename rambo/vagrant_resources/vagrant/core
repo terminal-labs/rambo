@@ -46,14 +46,7 @@ unless (sizes.include? VM_SIZE)
    abort("ABORTED - VM size not in sizes list. Did you have a typo?")
 end
 
-# clean up files on the host after the guest is destroyed
-Vagrant.configure("2") do |config|
-  config.trigger.after :destroy do
-    puts "Vagrant done with destroy."
-  end
-end
-
-#redundant code from LXC and VirtualBox vagrant files
+# Provisioning
 Vagrant.configure("2") do |config|
   if COPY_DIR_WITH_RSYNC == true
     config.vm.synced_folder ".",
@@ -74,21 +67,15 @@ Vagrant.configure("2") do |config|
      salt.verbose = true
     end
     $pre_salt = <<-EOS
-      mv /etc/salt/minion{,-dist}
-      if [ target == "virtualbox" ]; then cp /vagrant/salt_resources/minions/minion.virtualbox /etc/salt/minion; fi
-      if [ target == "lxc" ]; then cp /vagrant/salt_resources/minions/minion.lxc /etc/salt/minion; fi
-      if [ target == "ec2" ]; then cp /vagrant/salt_resources/minions/minion.ec2 /etc/salt/minion; fi
-      if [ target == 'digitalocean" ] then cp /vagrant/salt_resources/minions/minion.digitalocean /etc/salt/minion; fi
-      if [ target == "docker" ]; then cp /vagrant/salt_resources/minions/minion.docker /etc/salt/minion; fi
-      cp /vagrant/salt_resources/grains/grains /etc/salt/grains
-      mkdir -p /vagrant/salt_resources/states/files/licenses
+      mv /etc/salt/minion{,-dist};
+      cp /vagrant/salt_resources/minions/minion.#{target}  /etc/salt/minion;
+      cp /vagrant/salt_resources/grains/grains /etc/salt/grains;
+      mkdir -p /vagrant/salt_resources/states/files/licenses;
       if [ -d "/vagrant/auth/licenses/" ]; then cp -a /vagrant/auth/licenses/. /vagrant/salt_resources/states/files/licenses/; fi
       EOS
     config.vm.provision "shell",
       inline: $pre_salt,
       keep_color: true
-
-    PROVISION_SALT_CMD = SET_HOSTNAME + "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-level info"
 
     config.vm.provision "shell",
       inline: PROVISION_SALT_CMD,
@@ -98,5 +85,12 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell",
       inline: PROVISION_CMD,
       keep_color: true
+  end
+end
+
+# clean up files on the host after the guest is destroyed
+Vagrant.configure("2") do |config|
+  config.trigger.after :destroy do
+    puts "Vagrant done with destroy."
   end
 end
