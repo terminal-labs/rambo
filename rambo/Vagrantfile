@@ -52,7 +52,7 @@ target = if ENV[PROJECT_NAME + "_PROVIDER"]
 
 if (SETTINGS["PROVIDERS"].include? target)
   write_provider_file(target)
-  load File.expand_path("vagrant_resources/vagrant/Vagrantfile." + target)
+  load File.expand_path("vagrant_resources/vagrantfiles/" + target)
 else # Bad arg - we don't have this provider.
   abort("ABORTED - Target not in providers list. Did you have a typo?")
 end
