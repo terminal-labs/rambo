@@ -74,7 +74,7 @@ sizes = ['512mb',
 VM_SIZE = if ENV["VMSIZE"]
           ENV["VMSIZE"]
         else
-        '1024mb'
+        '2048mb'
         end
 
 unless (sizes.include? VM_SIZE)
