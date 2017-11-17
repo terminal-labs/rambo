@@ -2,8 +2,7 @@
 # vi: set ft=ruby :
 #
 # This file is meant to contain vars that are most likely to be changed
-# when configuring Rambo. Further logic is loaded with vagrant/core, and
-# then a Vagrantfile for a specific provider (e.g. Vagrantfile.ec2).
+# when configuring Rambo. Further logic is loaded with a Vagrantfile for a specific provider (e.g. ec2, lxc).
 
 require "json"
 
@@ -16,6 +15,16 @@ SETTINGS = JSON.parse(File.read('settings.json'))
 load "vagrant_resources/modules.rb" # for random_tag
 
 PROJECT_NAME = SETTINGS["PROJECT_NAME"].upcase
+
+VM_NAME = PROJECT_NAME + "-" + random_tag()
+
+FORWARD_SSH = true
+
+COPY_DIR_WITH_RSYNC = true
+
+PROVISION_WITH_SALT = true
+
+PROVISION_WITH_CMD = false
 
 if not ENV.has_key?(PROJECT_NAME + "_ENV")
   puts "", "***CAUTION***",
@@ -31,33 +40,103 @@ for link in orphan_links
   puts "Deleting broken symlink #{link}"
   File.delete(link)
 end
--
-VM_NAME = PROJECT_NAME + "-" + random_tag()
 
-FORWARD_SSH = true
+#load the rest of the vagrant ruby code
+target = if ENV[PROJECT_NAME + "_PROVIDER"]
+           ENV[PROJECT_NAME + "_PROVIDER"]
+         elsif read_provider_file()
+           read_provider_file()
+         else
+           'virtualbox'
+         end
 
-COPY_DIR_WITH_RSYNC = true
+if (SETTINGS["PROVIDERS"].include? target)
+  write_provider_file(target)
+  load File.expand_path("vagrant_resources/vagrantfiles/" + target)
+else # Bad arg - we don't have this provider.
+  abort("ABORTED - Target not in providers list. Did you have a typo?")
+end
 
-PROVISION_WITH_SALT = true
+hosts = ['debian-8',
+         'ubuntu-1604',
+        ]
 
-PROVISION_WITH_CMD = false
+VM_HOST = if ENV["VMHOST"]
+          ENV["VMHOST"]
+        else
+        'debian-8'
+        end
 
-if PROVISION_WITH_SALT
-  ## Construct commands to have Salt provision the machine.
-  # Pass var to allow Salt to set the hostname to the VM_NAME.
-  SET_HOSTNAME = "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval hostname " + VM_NAME + " --log-level info; "
+unless (hosts.include? VM_HOST)
+   abort("ABORTED - VM host not in host list. Did you have a typo?")
+end
 
-  # Set hostname + run highstate.
-  PROVISION_SALT_CMD = SET_HOSTNAME + "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-level info"
+sizes = ['512mb',
+         '1024mb',
+         '2048mb',
+        ]
 
-  # Add website branch var if applicable.
-  if ENV["WEBSITE_BRANCH"]
-    PROVISION_SALT_CMD = "sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH " + ENV["WEBSITE_BRANCH"] + " --log-level info; " + PROVISION_SALT_CMD
+VM_SIZE = if ENV["VMSIZE"]
+          ENV["VMSIZE"]
+        else
+        '1024mb'
+        end
+
+unless (sizes.include? VM_SIZE)
+   abort("ABORTED - VM size not in sizes list. Did you have a typo?")
+end
+
+# Provisioning
+Vagrant.configure("2") do |config|
+  if COPY_DIR_WITH_RSYNC == true
+    config.vm.synced_folder ".",
+      "/vagrant",
+      type: "rsync"
+  else
+    config.vm.synced_folder ".",
+      "/vagrant",
+      type: "rsync",
+      disabled: true
+  end
+  config.vm.provision "shell",
+    inline: "wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + VM_HOST + "/official/sources.list",
+    keep_color: true
+  if PROVISION_WITH_SALT
+    config.vm.provision :salt do |salt|
+      salt.bootstrap_options = "-P"
+     salt.verbose = true
+    end
+    $salt = <<-EOS
+      mv /etc/salt/minion{,-dist}
+      cp /vagrant/salt_resources/minions/minion.#{target}  /etc/salt/minion
+      cp /vagrant/salt_resources/grains/grains /etc/salt/grains
+      mkdir -p /vagrant/salt_resources/states/files/licenses
+      if [ -d "/vagrant/auth/licenses/" ]; then
+          cp -a /vagrant/auth/licenses/. /vagrant/salt_resources/states/files/licenses/
+      fi
+
+      if [ #{ENV["WEBSITE_BRANCH"]} ]; 
+         then sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]} --log-level info
+      fi
+
+      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval hostname #{VM_NAME} --log-level info
+      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-level info
+
+      EOS
+    config.vm.provision "shell",
+      inline: $salt,
+      keep_color: true
+  end
+  if PROVISION_WITH_CMD
+    config.vm.provision "shell",
+      inline: "",
+      keep_color: true
   end
 end
 
-if PROVISION_WITH_CMD
-  PROVISION_CMD = ""
+# clean up files on the host after the guest is destroyed
+Vagrant.configure("2") do |config|
+  config.trigger.after :destroy do
+    puts "Vagrant done with destroy."
+  end
 end
-#load the rest of the vagrant ruby code
-load File.expand_path("vagrant_resources/vagrant/core")
