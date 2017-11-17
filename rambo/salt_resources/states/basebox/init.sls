@@ -1,4 +1,4 @@
-{% set os = salt['grains.get']('os') %}
+{% set os, os_family = salt['grains.item']('os', 'os_family') %}
 
 {% if os == 'CentOS' %}
 install_ius_for_centos:
@@ -17,7 +17,7 @@ setup_basebox:
       - curl
       - nano
       - emacs
-{% if os == 'Ubuntu' or os == 'Debian'%}
+{% if os_family == 'Debian'%}
       - build-essential
       - libreadline6-dev
       - libbz2-dev

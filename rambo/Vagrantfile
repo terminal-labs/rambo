@@ -97,8 +97,7 @@ Vagrant.configure("2") do |config|
       disabled: true
   end
   config.vm.provision "shell",
-    # Cloud images don't have reliable apt sources.
-    inline: "wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + VM_HOST + "/official/sources.list",
+    inline: "if [ -f /etc/apt/sources.list ]; then wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + VM_HOST + "/official/sources.list; fi",
     keep_color: true
   if PROVISION_WITH_SALT
     config.vm.provision :salt do |salt|
