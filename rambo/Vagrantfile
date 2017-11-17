@@ -15,15 +15,10 @@ SETTINGS = JSON.parse(File.read('settings.json'))
 load "vagrant_resources/modules.rb" # for random_tag
 
 PROJECT_NAME = SETTINGS["PROJECT_NAME"].upcase
-
 VM_NAME = PROJECT_NAME + "-" + random_tag()
-
 FORWARD_SSH = true
-
 COPY_DIR_WITH_RSYNC = true
-
 PROVISION_WITH_SALT = true
-
 PROVISION_WITH_CMD = false
 
 if not ENV.has_key?(PROJECT_NAME + "_ENV")
@@ -42,7 +37,7 @@ for link in orphan_links
 end
 
 #load the rest of the vagrant ruby code
-target = if ENV[PROJECT_NAME + "_PROVIDER"]
+provider = if ENV[PROJECT_NAME + "_PROVIDER"]
            ENV[PROJECT_NAME + "_PROVIDER"]
          elsif read_provider_file()
            read_provider_file()
@@ -50,11 +45,11 @@ target = if ENV[PROJECT_NAME + "_PROVIDER"]
            'virtualbox'
          end
 
-if (SETTINGS["PROVIDERS"].include? target)
-  write_provider_file(target)
-  load File.expand_path("vagrant_resources/vagrantfiles/" + target)
+if (SETTINGS["PROVIDERS"].include? provider)
+  write_provider_file(provider)
+  load File.expand_path("vagrant_resources/vagrantfiles/" + provider)
 else # Bad arg - we don't have this provider.
-  abort("ABORTED - Target not in providers list. Did you have a typo?")
+  abort("ABORTED - Provider not in providers list. Did you have a typo?")
 end
 
 hosts = ['debian-8',
@@ -79,7 +74,7 @@ sizes = ['512mb',
 VM_SIZE = if ENV["VMSIZE"]
           ENV["VMSIZE"]
         else
-        '1024mb'
+        '2048mb'
         end
 
 unless (sizes.include? VM_SIZE)
@@ -99,6 +94,7 @@ Vagrant.configure("2") do |config|
       disabled: true
   end
   config.vm.provision "shell",
+    # Cloud images don't have reliable apt sources.
     inline: "wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + VM_HOST + "/official/sources.list",
     keep_color: true
   if PROVISION_WITH_SALT
@@ -106,22 +102,20 @@ Vagrant.configure("2") do |config|
       salt.bootstrap_options = "-P"
      salt.verbose = true
     end
+    # Bash to set prepare and initiate Salt provisioning.
     $salt = <<-EOS
       mv /etc/salt/minion{,-dist}
-      cp /vagrant/salt_resources/minions/minion.#{target}  /etc/salt/minion
+      cp /vagrant/salt_resources/minions/minion.#{provider}  /etc/salt/minion
       cp /vagrant/salt_resources/grains/grains /etc/salt/grains
       mkdir -p /vagrant/salt_resources/states/files/licenses
       if [ -d "/vagrant/auth/licenses/" ]; then
           cp -a /vagrant/auth/licenses/. /vagrant/salt_resources/states/files/licenses/
       fi
-
-      if [ #{ENV["WEBSITE_BRANCH"]} ]; 
-         then sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]} --log-level info
+      if [ #{ENV["WEBSITE_BRANCH"]} ]; then
+          sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]} --log-level info
       fi
-
       sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval hostname #{VM_NAME} --log-level info
       sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-level info
-
       EOS
     config.vm.provision "shell",
       inline: $salt,
@@ -129,7 +123,7 @@ Vagrant.configure("2") do |config|
   end
   if PROVISION_WITH_CMD
     config.vm.provision "shell",
-      inline: "",
+      inline: "", # TODO: Pass in path to bash file as cli arg
       keep_color: true
   end
 end
