@@ -62,7 +62,7 @@ All Rambo code that is used to provision the VM is kept where Rambo is installed
 
 Rambo has a few Salt States available that are commented out that you can 'turn on' and use. You will need to uncomment any states you want in the `salt_resources/states/top.sls` file. Then you will need to uncomment and supply your relevant data in the `salt_resources/grains/grains` file. Of course you can add your own as well.
 
-You can add your custom Salt States right into the Salt code and they should be automatically picked up and used. If you want to add provisioning with any other tool, you will need to modify the Vagrantfiles found in `vagrant_resources/vagrant/` to add that provisioning.
+You can add your custom Salt States right into the Salt code and they should be automatically picked up and used. If you want to add provisioning with any other tool, you will need to modify the Vagrantfiles found in `vagrant_resources/vagrantfiles/` to add that provisioning.
 
 ### CLI and Python API
 
