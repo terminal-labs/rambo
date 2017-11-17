@@ -107,17 +107,20 @@ Vagrant.configure("2") do |config|
      salt.verbose = true
     end
     $salt = <<-EOS
-      mv /etc/salt/minion{,-dist};
-      cp /vagrant/salt_resources/minions/minion.#{target}  /etc/salt/minion;
-      cp /vagrant/salt_resources/grains/grains /etc/salt/grains;
-      mkdir -p /vagrant/salt_resources/states/files/licenses;
-      if [ -d "/vagrant/auth/licenses/" ]; then cp -a /vagrant/auth/licenses/. /vagrant/salt_resources/states/files/licenses/; fi
+      mv /etc/salt/minion{,-dist}
+      cp /vagrant/salt_resources/minions/minion.#{target}  /etc/salt/minion
+      cp /vagrant/salt_resources/grains/grains /etc/salt/grains
+      mkdir -p /vagrant/salt_resources/states/files/licenses
+      if [ -d "/vagrant/auth/licenses/" ]; then
+          cp -a /vagrant/auth/licenses/. /vagrant/salt_resources/states/files/licenses/
+      fi
 
+      if [ #{ENV["WEBSITE_BRANCH"]} ]; 
+         then sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]} --log-level info
+      fi
 
-      if [ #{ENV["WEBSITE_BRANCH"]} ]; then sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]} --log-level info; fi
-
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval hostname #{VM_NAME} --log-level info;
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-level info;
+      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval hostname #{VM_NAME} --log-level info
+      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-level info
 
       EOS
     config.vm.provision "shell",
