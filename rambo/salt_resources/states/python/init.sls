@@ -40,10 +40,8 @@
 python_packages:
   pkg.installed:
     - pkgs:
-{% if os == 'Ubuntu' or os == 'Debian' or os == 'CentOS' %}
       - python-setuptools
       - python-virtualenv
-{% endif %}
 {% if os == 'Ubuntu' or os == 'Debian'%}
       - python
       - python-pip
@@ -51,8 +49,7 @@ python_packages:
       - python3
       - python3-pip
       - python3-dev
-{% endif %}
-{% if os == 'CentOS' %}
+{% elif os == 'CentOS' %}
       - python
       - python2-pip
       - python-devel

@@ -9,7 +9,6 @@ install_ius_for_centos:
 setup_basebox:
   pkg.installed:
     - pkgs:
-{% if os == 'Ubuntu' or os == 'Debian' or os == 'CentOS' %}
       - rsync
       - p7zip
       - zip
@@ -18,7 +17,6 @@ setup_basebox:
       - curl
       - nano
       - emacs
-{% endif %}
 {% if os == 'Ubuntu' or os == 'Debian'%}
       - build-essential
       - libreadline6-dev
