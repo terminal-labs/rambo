@@ -43,7 +43,7 @@ sudo apt install -y build-essential linux-headers-$(uname -r) lxc lxc-templates 
 There are no additional dependencies for Mac, however, LXC cannot be used as a provider at this time.
 
 ### Install Vagrant Plugins:
-Run the setup bash script. Download it from https://raw.githubusercontent.com/terminal-labs/rambo/master/rambo/setup.sh and run it or run it from your installed Rambo source (in `rambo/setup.sh`):
+Run the setup bash script. Download it from https://raw.githubusercontent.com/terminal-labs/rambo/master/rambo/setup.sh and run it, or run it from your installed Rambo source (in `rambo/setup.sh`):
 
 ```
  bash setup.sh
