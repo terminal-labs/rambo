@@ -1,3 +1,5 @@
+{% set saltstates = 'rambo' %}
+
 {{ grains['deescalated_user'] }}:
   user.present:
     - home: /home/{{ grains['deescalated_user'] }}
@@ -10,4 +12,4 @@ color_prompt:
     - cwd: /home/{{ grains['deescalated_user'] }}
     - runas: {{ grains['deescalated_user'] }}
     - require:
-      - sls: basebox
+      - sls: {{ saltstates }}.basebox
