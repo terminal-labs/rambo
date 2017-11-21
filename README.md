@@ -93,7 +93,7 @@ The following environment variables are used by Rambo:
 - `VAGRANT_DOTFILE_PATH` - [This is used by Vagrant directly](https://www.vagrantup.com/docs/other/environmental-variables.html#vagrant_dotfile_path), and is able to be set via the CLI / API.
 - `VAGRANT_CWD` - [This is used by Vagrant directly](https://www.vagrantup.com/docs/other/environmental-variables.html#vagrant_cwd), and is able to be set via the CLI / API.
 - `RAMBO_ENV` - This is the location of the project environment Rambo's code lives in. It is generated internally and not able to be set with the CLI / API.
-- `RAMBO_TMP` - This is the location of Rambo's metadata folder specific to each VM. It is automatically placed in the CWD when the CLI / API is used.
+- `RAMBO_TMPDIR_PATH` - This is the location of Rambo's metadata folder specific to each VM. It is automatically placed in the CWD when the CLI / API is used.
 - `RAMBO_PROVIDER` - This is the provider that is being used. It is able to be set via the CLI / API.
 
 ### SSH Alias: Key Sharing and Emacs
