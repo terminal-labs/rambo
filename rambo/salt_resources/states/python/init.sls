@@ -42,7 +42,7 @@ python_packages:
     - pkgs:
       - python-setuptools
       - python-virtualenv
-{% if os_family 'Debian'%}
+{% if os_family == 'Debian'%}
       - python
       - python-pip
       - python-dev
