@@ -52,12 +52,13 @@ def set_init_vars(tmpdir_path=None):
     # env vars available to Python and Ruby
     set_env_var('ENV', PROJECT_LOCATION) # location of this code
     
-    if tmpdir_path:
+    # loc of tmpdir_path
+    if tmpdir_path: # cli / api
         set_env_var('TMPDIR_PATH', os.path.join(tmpdir_path + '.' + PROJECT_NAME + '-tmp'))
-    elif get_env_var('TMPDIR_PATH'):
+    elif get_env_var('TMPDIR_PATH'): # Previously set env var
         set_env_var('TMPDIR_PATH', os.path.join(get_env_var('TMPDIR_PATH') + '.' + PROJECT_NAME + '-tmp'))
-    else:
-        set_env_var('TMPDIR_PATH', os.path.join(os.getcwd(), '.' + PROJECT_NAME + '-tmp'))
+    else: # Not set, set to default loc
+        set_env_var('TMPDIR_PATH', os.path.join(os.getcwd(), '.' + PROJECT_NAME + '-tmp')) # default (cwd)
         
 def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Set the environment varialbes prefixed with `VAGRANT_` that vagrant
@@ -68,15 +69,16 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
     '''
 
-    if vagrant_cwd: # loc of Vagrantfile
-        os.environ["VAGRANT_CWD"] = vagrant_cwd # custom
-    elif 'VAGRANT_CWD' not in os.environ:
-        os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # (default installed path)
-
-    if vagrant_dotfile_path: # loc of .vagrant dir
-        os.environ['VAGRANT_DOTFILE_PATH'] = vagrant_dotfile_path # custom
-    elif 'VAGRANT_DOTFILE_PATH' not in os.environ:
-        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # (default cwd)
+    # loc of Vagrantfile
+    if vagrant_cwd: # cli / api
+        os.environ["VAGRANT_CWD"] = vagrant_cwd
+    elif 'VAGRANT_CWD' not in os.environ: # Not set in env var
+        os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # default (installed path)
+    # loc of .vagrant dir
+    if vagrant_dotfile_path: # cli / api
+        os.environ['VAGRANT_DOTFILE_PATH'] = vagrant_dotfile_path
+    elif 'VAGRANT_DOTFILE_PATH' not in os.environ: # Not set in env var
+        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # default (cwd)
 
 def vagrant_up_thread():
     '''Make the final call over the shell to `vagrant up`, and redirect
