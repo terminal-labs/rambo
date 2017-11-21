@@ -45,14 +45,20 @@ def follow_log_file(log_file_path, exit_triggers):
             if any(string in line for string in exit_triggers):
                 break
 
-def set_init_vars():
+def set_init_vars(tmpdir_path=None):
     '''Set custom environment variables that are always going to be needed by
     our custom Ruby code in the Vagrantfile chain.
     '''
     # env vars available to Python and Ruby
     set_env_var('ENV', PROJECT_LOCATION) # location of this code
-    set_env_var('TMP', os.path.join(os.getcwd(), '.' + PROJECT_NAME + '-tmp')) # tmp in cwd
-
+    
+    if tmpdir_path:
+        set_env_var('TMPDIR_PATH', os.path.join(tmpdir_path + '.' + PROJECT_NAME + '-tmp'))
+    elif get_env_var('TMPDIR_PATH'):
+        set_env_var('TMPDIR_PATH', os.path.join(get_env_var('TMPDIR_PATH') + '.' + PROJECT_NAME + '-tmp'))
+    else:
+        set_env_var('TMPDIR_PATH', os.path.join(os.getcwd(), '.' + PROJECT_NAME + '-tmp'))
+        
 def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Set the environment varialbes prefixed with `VAGRANT_` that vagrant
     expects, and that we use, to modify some use paths.
@@ -77,9 +83,9 @@ def vagrant_up_thread():
     all output to log file.
     '''
 
-    dir_create(get_env_var('TMP') + '/logs')
+    dir_create(get_env_var('TMPDIR_PATH') + '/logs')
     # TODO: Better logs.
-    bash('vagrant up >' + get_env_var('TMP') + '/logs/vagrant-up-log 2>&1')
+    bash('vagrant up >' + get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log 2>&1')
 
 def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
@@ -108,15 +114,15 @@ def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=N
                  ' variable, and is not in the providers list. Did you '
                  'have a typo?' % provider)
 
-    if not dir_exists(get_env_var('TMP')):
-        dir_create(get_env_var('TMP'))
-    dir_create(get_env_var('TMP') + '/logs')
+    if not dir_exists(get_env_var('TMPDIR_PATH')):
+        dir_create(get_env_var('TMPDIR_PATH'))
+    dir_create(get_env_var('TMPDIR_PATH') + '/logs')
     # TODO: Better logs.
-    open(get_env_var('TMP') + '/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
+    open(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
 
     thread = Thread(target = vagrant_up_thread) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
-    follow_log_file(get_env_var('TMP') + '/logs/vagrant-up-log', ['Total run time:',
+    follow_log_file(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log', ['Total run time:',
                                                  'Provisioners marked to run always will still run',
                                                  'Print this help',
                                                  'try again.'])
@@ -155,14 +161,13 @@ def vagrant_destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-
-    dir_create(get_env_var('TMP') + '/logs')
+    dir_create(get_env_var('TMPDIR_PATH') + '/logs')
     # TODO: Better logs.
-    bash('vagrant destroy --force >' + get_env_var('TMP') + '/logs/vagrant-destroy-log 2>&1')
-    follow_log_file( get_env_var('TMP') + '/logs/vagrant-destroy-log', ['Vagrant done with destroy.',
+    bash('vagrant destroy --force >' + get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log 2>&1')
+    follow_log_file( get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log', ['Vagrant done with destroy.',
                                                       'Print this help'])
-    file_delete(get_env_var('TMP') + '/provider')
-    file_delete(get_env_var('TMP') + '/random_tag')
+    file_delete(get_env_var('TMPDIR_PATH') + '/provider')
+    file_delete(get_env_var('TMPDIR_PATH') + '/random_tag')
     dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
     click.echo('Temporary files removed')
     click.echo('Destroy complete.')

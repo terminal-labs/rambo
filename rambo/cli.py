@@ -37,9 +37,12 @@ context_settings = {
 @click.option('--vagrant-dotfile-path', default=None, type=click.Path(),
               help='Path location of the .vagrant directory for the '
               'virtual machine. Defaults to the current working directory.')
+@click.option('--tmpdir-path', default=None, type=click.Path(),
+              help='Path location of the .rambo-tmp directory for the virtual'
+              ' machine. Defaults to the current working directory')
 @click.pass_context
-def cli(ctx, vagrant_cwd, vagrant_dotfile_path):
-    set_init_vars()
+def cli(ctx, vagrant_cwd, vagrant_dotfile_path, tmpdir_path):
+    set_init_vars(tmpdir_path)
     set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
 @cli.command(name=cmd, context_settings=context_settings)
@@ -68,14 +71,14 @@ def up(ctx, provider):
 def ssh(ctx):
     '''Connect to an running VM / container over ssh.
     '''
-    vagrant_ssh()
+    vagrant_ssh(ctx)
 
 @cli.command()
 @click.pass_context
 def destroy(ctx):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
     '''
-    vagrant_destroy()
+    vagrant_destroy(ctx)
 
 @cli.command()
 def setup(): # threaded setup commands
