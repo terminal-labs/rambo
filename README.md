@@ -88,7 +88,7 @@ Currently, all of the CLI options can also be set as environment variables. Envi
 
 ### Environment Variables
 
-The following environment variables are used by Rambo:
+The following environment variables are used by Rambo, and can be set manually before using Rambo to change its behavior:
 
 - `VAGRANT_DOTFILE_PATH` - [This is used by Vagrant directly](https://www.vagrantup.com/docs/other/environmental-variables.html#vagrant_dotfile_path), and is able to be set via the CLI / API.
 - `VAGRANT_CWD` - [This is used by Vagrant directly](https://www.vagrantup.com/docs/other/environmental-variables.html#vagrant_cwd), and is able to be set via the CLI / API.
