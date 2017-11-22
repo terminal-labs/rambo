@@ -67,18 +67,20 @@ unless (hosts.include? VM_HOST)
    abort("ABORTED - VM host not in host list. Did you have a typo?")
 end
 
-sizes = ['512mb',
-         '1024mb',
-         '2048mb',
-        ]
+sizes = {'512' => '20gb',
+         '1024' => '30gb',
+         '2048' => '40gb',
+        }
 
-VM_SIZE = if ENV["VMSIZE"]
+VM_RAM = if ENV["VMSIZE"] and sizes.has_key? :ENV["VMSIZE"]
           ENV["VMSIZE"]
         else
-        '2048mb'
-        end
+        '2048'
+         end
 
-unless (sizes.include? VM_SIZE)
+VM_HARDDRIVE = sizes[VM_RAM]
+
+unless (sizes.include? VM_RAM)
    abort("ABORTED - VM size not in sizes list. Did you have a typo?")
 end
 
