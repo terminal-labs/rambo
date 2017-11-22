@@ -29,9 +29,9 @@ base:
     # - supervisord
     # - hadoop
     # - hadoop.hortonworks
-    # - hadoop.hortonworks.ambari
-    # - hadoop.hortonworks.edgenode
-    # - hadoop.hortonworks.worker
+    # - hadoop.hortonworks-ambari    {# requires hadoop.hortonworks #}
+    # - hadoop.hortonworks-edgenode  {# requires hadoop.hortonworks #}
+    # - hadoop.hortonworks-worker    {# requires hadoop.hortonworks #}
   'roles:prod':
     - match: grain
     - deploy_keys
