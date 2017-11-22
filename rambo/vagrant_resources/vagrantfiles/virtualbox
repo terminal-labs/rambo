@@ -5,27 +5,10 @@ Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |provider|
     # set unique vm name
     provider.name = VM_NAME
-    if VM_SIZE == "512mb"
-      provider.memory = 512
-      config.vm.box = "terminal-labs/tl-" + VM_HOST + "-64bit-20gb"
-      config.vm.box_url = "terminal-labs/tl-" + VM_HOST + "-64bit-20gb"
-    elsif VM_SIZE == "1024mb"
-      provider.memory = 1024
-      config.vm.box = "terminal-labs/tl-" + VM_HOST + "-64bit-30gb"
-      config.vm.box_url = "terminal-labs/tl-" + VM_HOST + "-64bit-30gb"
-    elsif VM_SIZE == "2048mb"
-      provider.memory = 2048
-      config.vm.box = "terminal-labs/tl-" + VM_HOST + "-64bit-40gb"
-      config.vm.box_url = "terminal-labs/tl-" + VM_HOST + "-64bit-40gb"
-    elsif VM_SIZE == "4096mb"
-      provider.memory = 4096
-      config.vm.box = "terminal-labs/tl-" + VM_HOST + "-64bit-60gb"
-      config.vm.box_url = "terminal-labs/tl-" + VM_HOST + "-64bit-60gb"
-    elsif VM_SIZE == "8192mb"
-      provider.memory = 8192
-      config.vm.box = "terminal-labs/tl-" + VM_HOST + "-64bit-80gb"
-      config.vm.box_url = "terminal-labs/tl-" + VM_HOST + "-64bit-80gb"
-    end
+      provider.memory = ENV[PROJECT_NAME + "_RAM"]
+      config.vm.box = "terminal-labs/tl-" + VM_HOST + "-64bit-" + ENV[PROJECT_NAME + "_DRIVESIZE"]
+      config.vm.box_url = "terminal-labs/tl-" + VM_HOST + "-64bit-" + ENV[PROJECT_NAME + "_DRIVESIZE"]
+
     provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
     provider.customize ['modifyvm', :id, '--nictype2', 'virtio']
   end

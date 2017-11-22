@@ -15,11 +15,11 @@ Vagrant.configure("2") do |config|
     provider.availability_zone = "us-west-1c"
     provider.region = "us-west-1"
     provider.ami = "ami-a5d621e1"
-    if VM_SIZE == "512mb"
+    if ENV[PROJECT_NAME + "_RAM"] == "512"
       provider.instance_type = "t2.nano"
-    elsif VM_SIZE == "1024mb"
+    elsif ENV[PROJECT_NAME + "_RAM"] == "1024"
       provider.instance_type = "t2.micro"
-    elsif VM_SIZE == "2048mb"
+    elsif ENV[PROJECT_NAME + "_RAM"] == "2048"
       provider.instance_type = "t2.small"
     end
     provider.block_device_mapping = [{
