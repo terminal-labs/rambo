@@ -5,16 +5,16 @@ Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |provider|
     # set unique vm name
     provider.name = VM_NAME
-      provider.memory = ENV[PROJECT_NAME + "_RAM"]
-      config.vm.box = "terminal-labs/tl-" + VM_HOST + "-64bit-" + ENV[PROJECT_NAME + "_DRIVESIZE"]
-      config.vm.box_url = "terminal-labs/tl-" + VM_HOST + "-64bit-" + ENV[PROJECT_NAME + "_DRIVESIZE"]
+      provider.memory = get_env_var_rb("RAM")
+      config.vm.box = "terminal-labs/tl-" + get_env_var_rb("GUEST") + "-64bit-" + get_env_var_rb("DRIVESIZE")
+      config.vm.box_url = "terminal-labs/tl-" + get_env_var_rb("GUEST") + "-64bit-" + get_env_var_rb("DRIVESIZE")
 
     provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
     provider.customize ['modifyvm', :id, '--nictype2', 'virtio']
   end
   config.ssh.username = "vagrant"
   config.ssh.forward_agent = FORWARD_SSH
-  if VM_HOST != "centos-7"
+  if get_env_var_rb("GUEST") != "centos-7"
     config.vm.hostname = VM_NAME
   end
   config.vm.network :forwarded_port,
