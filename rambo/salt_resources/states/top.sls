@@ -28,7 +28,7 @@ base:
     # - django
     # - supervisord
     # - hadoop
-    # - hadoop.hortonworks.ambari
+    # - hadoop.hortonworks
     # - hadoop.hortonworks.ambari
     # - hadoop.hortonworks.edgenode
     # - hadoop.hortonworks.worker
