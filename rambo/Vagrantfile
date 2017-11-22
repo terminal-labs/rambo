@@ -72,15 +72,13 @@ sizes = {'512' => '20gb',
          '2048' => '40gb',
         }
 
-VM_RAM = if ENV["VMSIZE"] and sizes.has_key? :ENV["VMSIZE"]
-          ENV["VMSIZE"]
-        else
-        '2048'
-         end
+if not ENV.has_key?("RAMBO_RAM")
+  ENV["RAMBO_RAM"]="2048"
+end
 
-VM_HARDDRIVE = sizes[VM_RAM]
+ENV["RAMBO_DRIVESIZE"]=sizes[ENV["RAMBO_RAM"]]
 
-unless (sizes.include? VM_RAM)
+unless (sizes.include? ENV["RAMBO_RAM"])
    abort("ABORTED - VM size not in sizes list. Did you have a typo?")
 end
 
