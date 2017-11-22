@@ -67,18 +67,18 @@ unless (hosts.include? VM_HOST)
    abort("ABORTED - VM host not in host list. Did you have a typo?")
 end
 
-sizes = ['512mb',
-         '1024mb',
-         '2048mb',
-        ]
+sizes = {'512' => '20gb',
+         '1024' => '30gb',
+         '2048' => '40gb',
+        }
 
-VM_SIZE = if ENV["VMSIZE"]
-          ENV["VMSIZE"]
-        else
-        '2048mb'
-        end
+if not ENV.has_key?(PROJECT_NAME + "_RAM")
+  ENV[PROJECT_NAME + "_RAM"]="2048"
+end
 
-unless (sizes.include? VM_SIZE)
+ENV[PROJECT_NAME + "_DRIVESIZE"]=sizes[ENV[PROJECT_NAME + "_RAM"]]
+
+unless (sizes.include? ENV[PROJECT_NAME + "_RAM"])
    abort("ABORTED - VM size not in sizes list. Did you have a typo?")
 end
 
