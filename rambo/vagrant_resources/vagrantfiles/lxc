@@ -4,17 +4,17 @@
 Vagrant.configure("2") do |config|
   config.vm.provider :lxc do |provider|
     provider.backingstore = "loop"
-    if VM_RAM == "512"
+    if ENV["RAMBO_RAM"] == "512"
       provider.customize "cgroup.memory.limit_in_bytes",
         "512M"
       provider.backingstore_option "--fssize",
         "20G"
-    elsif VM_RAM == "1024"
+    elsif ENV["RAMBO_RAM"] == "1024"
       provider.customize "cgroup.memory.limit_in_bytes",
         "1024M"
       provider.backingstore_option "--fssize",
         "30G"
-    elsif VM_RAM == "2048"
+    elsif ENV["RAMBO_RAM"] == "2048"
       provider.customize "cgroup.memory.limit_in_bytes",
         "2048M"
       provider.backingstore_option "--fssize",
