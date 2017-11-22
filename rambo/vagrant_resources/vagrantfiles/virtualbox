@@ -5,9 +5,9 @@ Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |provider|
     # set unique vm name
     provider.name = VM_NAME
-      provider.memory = ENV["RAMBO_RAM"]
-      config.vm.box = "terminal-labs/tl-" + VM_HOST + "-64bit-" + ENV["RAMBO_DRIVESIZE"]
-      config.vm.box_url = "terminal-labs/tl-" + VM_HOST + "-64bit-" + ENV["RAMBO_DRIVESIZE"]
+      provider.memory = ENV[PROJECT_NAME + "_RAM"]
+      config.vm.box = "terminal-labs/tl-" + VM_HOST + "-64bit-" + ENV[PROJECT_NAME + "_DRIVESIZE"]
+      config.vm.box_url = "terminal-labs/tl-" + VM_HOST + "-64bit-" + ENV[PROJECT_NAME + "_DRIVESIZE"]
 
     provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
     provider.customize ['modifyvm', :id, '--nictype2', 'virtio']

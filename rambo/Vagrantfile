@@ -72,13 +72,13 @@ sizes = {'512' => '20gb',
          '2048' => '40gb',
         }
 
-if not ENV.has_key?("RAMBO_RAM")
-  ENV["RAMBO_RAM"]="2048"
+if not ENV.has_key?(PROJECT_NAME + "_RAM")
+  ENV[PROJECT_NAME + "_RAM"]="2048"
 end
 
-ENV["RAMBO_DRIVESIZE"]=sizes[ENV["RAMBO_RAM"]]
+ENV[PROJECT_NAME + "_DRIVESIZE"]=sizes[ENV[PROJECT_NAME + "_RAM"]]
 
-unless (sizes.include? ENV["RAMBO_RAM"])
+unless (sizes.include? ENV[PROJECT_NAME + "_RAM"])
    abort("ABORTED - VM size not in sizes list. Did you have a typo?")
 end
 
