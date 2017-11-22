@@ -27,7 +27,11 @@ base:
     # - conf
     # - django
     # - supervisord
-    # - hadoop.ambari
+    # - hadoop
+    # - hadoop.hortonworks
+    # - hadoop.hortonworks-ambari    {# requires hadoop.hortonworks #}
+    # - hadoop.hortonworks-edgenode  {# requires hadoop.hortonworks #}
+    # - hadoop.hortonworks-worker    {# requires hadoop.hortonworks #}
   'roles:prod':
     - match: grain
     - deploy_keys
