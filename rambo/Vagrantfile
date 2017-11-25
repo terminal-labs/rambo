@@ -12,7 +12,7 @@ if ENV.has_key?("VAGRANT_CWD")
 end
 
 SETTINGS = JSON.parse(File.read('settings.json'))
-load "vagrant_resources/modules.rb" # for random_tag
+require_relative "vagrant_resources/modules.rb" # for random_tag
 
 PROJECT_NAME = SETTINGS["PROJECT_NAME"].upcase
 VM_NAME = PROJECT_NAME + "-" + random_tag()
@@ -21,7 +21,7 @@ COPY_DIR_WITH_RSYNC = true
 PROVISION_WITH_SALT = true
 PROVISION_WITH_CMD = false
 
-if not ENV.has_key?(PROJECT_NAME + "_ENV")
+if not get_env_var_rb("ENV")
   puts "", "***CAUTION***",
        "Running Vagrant directly and without %s's official CLI." % PROJECT_NAME.capitalize,
        "This is not supported.",
@@ -37,8 +37,8 @@ for link in orphan_links
 end
 
 #load the rest of the vagrant ruby code
-provider = if ENV[PROJECT_NAME + "_PROVIDER"]
-           ENV[PROJECT_NAME + "_PROVIDER"]
+provider = if get_env_var_rb("PROVIDER")
+           get_env_var_rb("PROVIDER")
          elsif read_provider_file()
            read_provider_file()
          else
@@ -57,13 +57,11 @@ hosts = ['debian-8',
          'centos-7',
         ]
 
-VM_HOST = if ENV["VMHOST"]
-          ENV["VMHOST"]
-        else
-        'debian-8'
-        end
+if not get_env_var_rb("GUEST")
+  set_env_var_rb("GUEST", "debian-8")
+end
 
-unless (hosts.include? VM_HOST)
+unless (hosts.include? get_env_var_rb("GUEST"))
    abort("ABORTED - VM host not in host list. Did you have a typo?")
 end
 
@@ -72,13 +70,13 @@ sizes = {'512' => '20gb',
          '2048' => '40gb',
         }
 
-if not ENV.has_key?(PROJECT_NAME + "_RAM")
-  ENV[PROJECT_NAME + "_RAM"]="2048"
+if not get_env_var_rb("RAM")
+  set_env_var_rb("RAM", "2048")
 end
 
-ENV[PROJECT_NAME + "_DRIVESIZE"]=sizes[ENV[PROJECT_NAME + "_RAM"]]
+set_env_var_rb("DRIVESIZE",sizes[get_env_var_rb("RAM")])
 
-unless (sizes.include? ENV[PROJECT_NAME + "_RAM"])
+unless (sizes.include? get_env_var_rb("RAM"))
    abort("ABORTED - VM size not in sizes list. Did you have a typo?")
 end
 
@@ -95,7 +93,7 @@ Vagrant.configure("2") do |config|
       disabled: true
   end
   config.vm.provision "shell",
-    inline: "if [ -f /etc/apt/sources.list ]; then wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + VM_HOST + "/official/sources.list; fi",
+    inline: "if [ -f /etc/apt/sources.list ]; then wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + get_env_var_rb("GUEST") + "/official/sources.list; fi",
     keep_color: true
   if PROVISION_WITH_SALT
     config.vm.provision :salt do |salt|
