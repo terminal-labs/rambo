@@ -33,9 +33,11 @@ def write_provider_file(provider)
 end
 
 def set_env_var_rb(name, value)
+  # Set an environment variable in all caps that is prefixed with the name of the project
   ENV[PROJECT_NAME.upcase + "_" + name.upcase] = value
 end
 
 def get_env_var_rb(name)
+  # Get an environment variable in all caps that is prefixed with the name of the project
   return ENV[PROJECT_NAME.upcase + "_" + name.upcase]
 end
