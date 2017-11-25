@@ -19,7 +19,7 @@ def set_env_var(name, value):
     os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = value
 
 def get_env_var(name):
-    '''Set an environment variable in all caps that is prefixed with the name of the project
+    '''Get an environment variable in all caps that is prefixed with the name of the project
     '''
     return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
 
