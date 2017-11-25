@@ -31,3 +31,11 @@ def write_provider_file(provider)
   provider_path = File.join(tmp_dir, 'provider')
   File.write(provider_path, provider)
 end
+
+def set_env_var_rb(name, value)
+  ENV[PROJECT_NAME.upcase + "_" + name.upcase] = value
+end
+
+def get_env_var_rb(name)
+  return ENV[PROJECT_NAME.upcase + "_" + name.upcase]
+end
