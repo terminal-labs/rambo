@@ -4,7 +4,7 @@ failhard: True
 
 file_roots:
   base:
-    - /vagrant/salt_resources/states
+    - /vagrant/saltstack/states
 
 grains:
   roles:
