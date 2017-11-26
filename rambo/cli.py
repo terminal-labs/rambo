@@ -6,12 +6,12 @@ import pkg_resources
 from bash import bash
 
 from rambo.app import (
+    destroy,
     export,
     set_init_vars,
     set_vagrant_vars,
-    vagrant_destroy,
-    vagrant_ssh,
-    vagrant_up,
+    ssh,
+    up,
 )
 
 ## GLOBALS
@@ -75,21 +75,21 @@ def gen():
 def up_cmd(ctx, provider):
     '''Start a VM / container with `vagrant up`.
     '''
-    vagrant_up(ctx, provider)
+    up(ctx, provider)
 
 @cli.command('ssh')
 @click.pass_context
 def ssh_cmd(ctx):
     '''Connect to an running VM / container over ssh.
     '''
-    vagrant_ssh(ctx)
+    ssh(ctx)
 
 @cli.command('destroy')
 @click.pass_context
 def destroy_cmd(ctx):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
     '''
-    vagrant_destroy(ctx)
+    destroy(ctx)
 
 @cli.command('export')
 @click.option('-f', '--force', is_flag=True)

@@ -93,7 +93,7 @@ def export(ctx=None, force=None, resource=None, export_path=None):
         dir_delete(dst)
     copytree(src, dst)
 
-def vagrant_up_thread():
+def up_thread():
     '''Make the final call over the shell to `vagrant up`, and redirect
     all output to log file.
     '''
@@ -102,7 +102,7 @@ def vagrant_up_thread():
     # TODO: Better logs.
     bash('vagrant up >' + get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log 2>&1')
 
-def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -135,7 +135,7 @@ def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=N
     # TODO: Better logs.
     open(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
 
-    thread = Thread(target = vagrant_up_thread) # Threaded to write, read, and echo as `up` progresses.
+    thread = Thread(target = up_thread) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
     follow_log_file(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log', ['Total run time:',
                                                  'Provisioners marked to run always will still run',
@@ -143,7 +143,7 @@ def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=N
                                                  'try again.'])
     click.echo('Up complete.')
 
-def vagrant_ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Connect to an running VM / container over ssh.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -159,7 +159,7 @@ def vagrant_ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     os.system('vagrant ssh')
 
-def vagrant_destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
     All str args can also be set as an environment variable; arg takes precedence.
 
