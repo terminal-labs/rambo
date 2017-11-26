@@ -3,6 +3,7 @@ import sys
 import time
 import json
 from threading import Thread
+from shutil import copytree
 
 import click
 from bash import bash
@@ -79,6 +80,18 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         os.environ['VAGRANT_DOTFILE_PATH'] = vagrant_dotfile_path
     elif 'VAGRANT_DOTFILE_PATH' not in os.environ: # Not set in env var
         os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # default (cwd)
+
+def export(ctx=None, force=None, resource=None, export_path=None):
+    '''Drop default SaltStack code in the CWD / user defined space
+    '''
+    resource='saltstack'
+    print(os.path.normpath(os.path.join(PROJECT_LOCATION, resource)))
+    src = os.path.normpath(os.path.join(PROJECT_LOCATION, resource))
+    dst = os.path.join(os.getcwd(), resource)
+    if dir_exists(dst):
+        click.confirm("The destination '%s' exists. Delete it and then export?" % dst, abort=True)
+        dir_delete(dst)
+    copytree(src, dst)
 
 def vagrant_up_thread():
     '''Make the final call over the shell to `vagrant up`, and redirect
