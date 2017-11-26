@@ -93,12 +93,19 @@ def destroy_cmd(ctx):
 
 @cli.command('export')
 @click.option('-f', '--force', is_flag=True)
+@click.option('-s', '--salt', '--saltstack', 'src', flag_value='saltstack',
+              default=True)
+@click.option('-V', '--vagrant', 'src', flag_value='vagrant')
+@click.option('-p', '--python', 'src', flag_value='python')
+@click.option('-a', '--all', 'src', flag_value='all')
+@click.option('-O', '--output-path', type=click.Path(), default=None,
+              help='The output path.')
 @click.pass_context
-def export_cmd(ctx, force):
+def export_cmd(ctx, force, src, output_path):
     '''Export stuff.
     '''
     print('in export_cmd')
-    export(ctx, force)
+    export(ctx, force, src, output_path)
 
 @cli.command('setup')
 def setup_cmd(): # threaded setup commands

@@ -8,7 +8,7 @@ from shutil import copytree
 import click
 from bash import bash
 
-from rambo.utils import get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
+from rambo.utils import get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete, file_copy
 from rambo.scripts import install_lastpass
 
 ## GLOBALS
@@ -52,7 +52,7 @@ def set_init_vars(tmpdir_path=None):
     '''
     # env vars available to Python and Ruby
     set_env_var('ENV', PROJECT_LOCATION) # location of this code
-    
+
     # loc of tmpdir_path
     if tmpdir_path: # cli / api
         set_env_var('TMPDIR_PATH', os.path.join(tmpdir_path + '.' + PROJECT_NAME + '-tmp'))
@@ -60,7 +60,7 @@ def set_init_vars(tmpdir_path=None):
         set_env_var('TMPDIR_PATH', os.path.join(get_env_var('TMPDIR_PATH') + '.' + PROJECT_NAME + '-tmp'))
     else: # Not set, set to default loc
         set_env_var('TMPDIR_PATH', os.path.join(os.getcwd(), '.' + PROJECT_NAME + '-tmp')) # default (cwd)
-        
+
 def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Set the environment varialbes prefixed with `VAGRANT_` that vagrant
     expects, and that we use, to modify some use paths.
@@ -84,14 +84,21 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
 def export(ctx=None, force=None, resource=None, export_path=None):
     '''Drop default SaltStack code in the CWD / user defined space
     '''
-    resource='saltstack'
-    print(os.path.normpath(os.path.join(PROJECT_LOCATION, resource)))
-    src = os.path.normpath(os.path.join(PROJECT_LOCATION, resource))
-    dst = os.path.join(os.getcwd(), resource)
-    if dir_exists(dst):
-        click.confirm("The destination '%s' exists. Delete it and then export?" % dst, abort=True)
-        dir_delete(dst)
-    copytree(src, dst)
+    print(resource)
+    if resource in ('saltstack', 'vagrant'):
+        src = os.path.normpath(os.path.join(PROJECT_LOCATION, resource))
+        dst = os.path.join(os.getcwd(), resource)
+        if dir_exists(dst):
+            click.confirm("The destination '%s' exists. Delete it and then export?" % dst, abort=True)
+            dir_delete(dst)
+        copytree(src, dst)
+
+    if resource in ('python', 'vagrant'):
+        file_copy(os.path.normpath(os.path.join(PROJECT_LOCATION, 'settings.json')), os.path.join(os.getcwd(), 'settings.json'))
+
+    # if resource == 'python':
+    #     file_copy(os.path.normpath(os.path.join(PROJECT_LOCATION, '*.py')), os.path.join(os.getcwd(), '*.py'))
+
 
 def up_thread():
     '''Make the final call over the shell to `vagrant up`, and redirect
