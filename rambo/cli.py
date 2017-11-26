@@ -5,7 +5,14 @@ import click
 import pkg_resources
 from bash import bash
 
-from rambo.app import vagrant_up, vagrant_ssh, vagrant_destroy, set_init_vars, set_vagrant_vars
+from rambo.app import (
+    export,
+    set_init_vars,
+    set_vagrant_vars,
+    vagrant_destroy,
+    vagrant_ssh,
+    vagrant_up,
+)
 
 ## GLOBALS
 # Create env var indicating where this code lives. This will be used latter by
@@ -52,40 +59,49 @@ def cli(ctx, vagrant_cwd, vagrant_dotfile_path, tmpdir_path):
 @cli.command(name=cmd, context_settings=context_settings)
 def gen():
     # TODO: figure out better warning system
-    click.echo("warning -- you entered a command " + PROJECT_NAME  +
-               " does not understand. passing raw commands to vagrant backend")
-    click.echo('You ran "' + ' '.join(sys.argv) + '"')
+    click.echo("Warning -- you entered a command %s does not understand. "
+               "Passing raw commands to Vagrant backend" % PROJECT_NAME.capitalize())
+    click.echo('You ran "%s"' % ' '.join(sys.argv))
     click.echo('Vagrant backend says:')
     sys.argv.pop(0)
     vagrant_cmd = 'vagrant ' + ' '.join(sys.argv)
     click.echo(bash(vagrant_cmd).stdout)
 
-@cli.command()
+@cli.command('up')
 @click.option('-p', '--provider', envvar = PROJECT_NAME.upper() + '_PROVIDER',
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
 @click.pass_context
-def up(ctx, provider):
+def up_cmd(ctx, provider):
     '''Start a VM / container with `vagrant up`.
     '''
     vagrant_up(ctx, provider)
 
-@cli.command()
+@cli.command('ssh')
 @click.pass_context
-def ssh(ctx):
+def ssh_cmd(ctx):
     '''Connect to an running VM / container over ssh.
     '''
     vagrant_ssh(ctx)
 
-@cli.command()
+@cli.command('destroy')
 @click.pass_context
-def destroy(ctx):
+def destroy_cmd(ctx):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
     '''
     vagrant_destroy(ctx)
 
-@cli.command()
-def setup(): # threaded setup commands
+@cli.command('export')
+@click.option('-f', '--force', is_flag=True)
+@click.pass_context
+def export_cmd(ctx, force):
+    '''Export stuff.
+    '''
+    print('in export_cmd')
+    export(ctx, force)
+
+@cli.command('setup')
+def setup_cmd(): # threaded setup commands
     '''Runs any setup commands. None yet implemented.
     '''
     # setup_rambo()
