@@ -10,7 +10,6 @@ vpn_vars_config:
     - cwd: /home/{{ grains['deescalated_user'] }}
     - runas: {{ grains['deescalated_user'] }}
 
-
 vpn_conf:
   file.managed:
     - name: /home/{{ grains['deescalated_user'] }}/openvpn-ca/vars
@@ -64,12 +63,25 @@ vpn_kernal_packet_forwarding:
   cmd.run:
     - name: sed -i 's/^#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
 
-# vpn_firewall_stuff_for_later:
-#   cmd.run:
-#     - name: ip route | grep default | awk '{print $NF}'
+vpn_ufw_packet_forward:
+  cmd.run:
+    - name: sed -i 's/^DEFAULT_FORWARD_POLICY=\"DROP\"/DEFAULT_FORWARD_POLICY=\"ACCEPT\"/g' /etc/default/ufw
+    
+vpn_ufw_rules:
+  file.managed:
+    - name: /etc/ufw/before.rules
+    - source: salt://vpn/before.rules
+    - template: jinja
 
+vpn_ufw_allow_port:
+  cmd.run:
+    - name: ufw allow 1194/upd; ufw allow OpenSSH
 
-# vpn_restart:
-#   module.run:
-#     - name: service.restart
-#     - m_name: openvpn
+vpn_ufw_restart:
+  cmd.run:
+    - name: ufw disable; yes | ufw enable
+
+vpn_restart_openvpn_service:
+  module.run:
+    - name: service.restart
+    - m_name: openvpn@server
