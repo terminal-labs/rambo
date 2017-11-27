@@ -14,7 +14,7 @@ end
 SETTINGS = JSON.parse(File.read('settings.json'))
 require_relative "vagrant_resources/modules.rb" # for random_tag
 
-PROJECT_NAME = SETTINGS["PROJECT_NAME"].upcase
+PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 VM_NAME = PROJECT_NAME + "-" + random_tag()
 FORWARD_SSH = true
 COPY_DIR_WITH_RSYNC = true
@@ -53,6 +53,7 @@ else # Bad arg - we don't have this provider.
 end
 
 hosts = ['debian-8',
+         'ubuntu-1404',
          'ubuntu-1604',
          'centos-7',
         ]
