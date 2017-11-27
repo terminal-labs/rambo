@@ -1,6 +1,23 @@
-## 0.3.2.dev (TBD)
+## 0.3.2 (November 27, 2017)
 
+FEATURES:
 
+  - Added additional Salt states for Hadoop edgenode and worker.
+  - Allowing setting custom tmpdir path.
+
+IMPROVEMENTS:
+
+  - Using standard get/set_env_var_rb functions.
+  - Change VM_SIZE to RAMBO_RAM and created RAMBO_DRIVESIZE.
+  - Changed VM_Host to RAMBO_GUEST_OS
+  - Cleaned up some Vagrant code.
+
+BUG FIXES:
+
+  - Stop setting a default apt source on CentOS.
+  - Stop setting hostname on CentOS. Another ticket was made for that.
+  - Passing ctx to ssh and destroy commands.
+  - Changed name of base box according to the box name change on app.vagrantup.com for the default Debian box.
 
 ## 0.3.1 (November 8, 2017)
 
