@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import click
+import pkg_resources
 from bash import bash
 
 from rambo.app import vagrant_up, vagrant_ssh, vagrant_destroy, set_init_vars, set_vagrant_vars
@@ -14,6 +15,8 @@ with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
     SETTINGS = json.load(f)
 PROVIDERS = SETTINGS['PROVIDERS']
 PROJECT_NAME = SETTINGS['PROJECT_NAME']
+
+version = pkg_resources.get_distribution('rambo-vagrant').version
 
 ## BASE COMMAND LIST
 cmd = ''
@@ -40,6 +43,7 @@ context_settings = {
 @click.option('--tmpdir-path', default=None, type=click.Path(),
               help='Path location of the .rambo-tmp directory for the virtual'
               ' machine. Defaults to the current working directory')
+@click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
 @click.pass_context
 def cli(ctx, vagrant_cwd, vagrant_dotfile_path, tmpdir_path):
     set_init_vars(tmpdir_path)
