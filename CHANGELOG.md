@@ -1,3 +1,9 @@
+## 0.3.3.dev (TBD)
+
+FEATURES:
+
+  - Added ubuntu 14.04 to hosts list.
+
 ## 0.3.2 (November 27, 2017)
 
 FEATURES:
