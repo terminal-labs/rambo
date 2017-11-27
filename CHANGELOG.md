@@ -4,6 +4,10 @@ FEATURES:
 
   - Added ubuntu 14.04 to hosts list.
 
+IMPROVEMENTS:
+
+  - Add version cli option.
+
 ## 0.3.2 (November 27, 2017)
 
 FEATURES:
