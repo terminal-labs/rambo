@@ -71,7 +71,7 @@ sizes = {'512' => '20gb',
         }
 
 if not get_env_var_rb("RAM")
-  set_env_var_rb("RAM", "2048")
+  set_env_var_rb("RAM", "1024")
 end
 
 set_env_var_rb("DRIVESIZE",sizes[get_env_var_rb("RAM")])
