@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider :aws do |provider|
     # set unique vm name
     provider.tags = {
-      "Name" => PROJECT_NAME + "-" + random_tag()
+      "Name" => VM_NAME
     }
 
     provider.access_key_id = ENV["AWS_ACCESS_KEY_ID"]
