@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Rambo-vagrant',
-    version='0.3.3',
+    version='0.3.4.dev',
     description='Virtual Machines on Any Provider',
     url='https://github.com/terminal-labs/rambo',
     author='Terminal Labs',
