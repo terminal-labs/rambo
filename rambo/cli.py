@@ -82,20 +82,23 @@ def destroy_cmd(ctx):
     '''
     destroy(ctx)
 
-@cli.command('export')
-@click.option('-f', '--force', is_flag=True)
+@cli.command('export', short_help="Export %s's source code." % PROJECT_NAME.capitalize())
+@click.option('-f', '--force', is_flag=True,
+              help='Accept attempts to overwrite and merge.')
 @click.option('-s', '--salt', '--saltstack', 'src', flag_value='saltstack',
-              default=True)
-@click.option('-V', '--vagrant', 'src', flag_value='vagrant')
-@click.option('-p', '--python', 'src', flag_value='python')
-@click.option('-a', '--all', 'src', flag_value='all')
+              default=True, help='Export SaltStack code.' )
+@click.option('-V', '--vagrant', 'src', flag_value='vagrant',
+              help='Export Vagrant code.')
+@click.option('-p', '--python', 'src', flag_value='python',
+              help='Export Python code.')
+@click.option('-a', '--all', 'src', flag_value='all',
+              help="Export all of %s's project code." % PROJECT_NAME.capitalize())
 @click.option('-O', '--output-path', type=click.Path(), default=None,
-              help='The output path.')
+              help='The optional output path.')
 @click.pass_context
 def export_cmd(ctx, force, src, output_path):
-    '''Export stuff.
+    '''Export code to a handy place for the user to view and edit.
     '''
-    print('in export_cmd')
     export(ctx, force, src, output_path)
 
 @cli.command('setup')
@@ -103,7 +106,8 @@ def setup_cmd(): # threaded setup commands
     '''Runs any setup commands. None yet implemented.
     '''
     # setup_rambo()
-    setup_lastpass()
+    # setup_lastpass()
+    click.echo('Not implemented.')
 
 @cli.command('ssh')
 @click.pass_context
