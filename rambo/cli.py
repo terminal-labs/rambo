@@ -27,10 +27,15 @@ version = pkg_resources.get_distribution('rambo-vagrant').version
 
 ## BASE COMMAND LIST
 cmd = ''
-command_handeled_by_click = ['up','destory','ssh']
+commands_handled_by_click = [
+    'destory_cmd',
+    'export_cmd',
+    'ssh_cmd',
+    'up_cmd',
+]
 if len(sys.argv) > 1:
     cmd = (sys.argv[1])
-    if cmd in command_handeled_by_click:
+    if cmd in commands_handled_by_click:
         cmd = ''
 
 context_settings = {
