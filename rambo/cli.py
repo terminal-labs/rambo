@@ -39,6 +39,7 @@ context_settings = {
     'help_option_names': ['-h', '--help'],
 }
 
+## Main CLI entry point
 @click.group(context_settings=context_settings)
 @click.option('--vagrant-cwd', default=None, type=click.Path(),
               help='Path entry point to the Vagrantfile. Defaults to '
@@ -56,6 +57,7 @@ def cli(ctx, vagrant_cwd, vagrant_dotfile_path, tmpdir_path):
     set_init_vars(tmpdir_path)
     set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
+## Catch-all for everything that doesn't hit a subcommand
 @cli.command(name=cmd, context_settings=context_settings)
 def gen():
     # TODO: figure out better warning system
@@ -67,23 +69,7 @@ def gen():
     vagrant_cmd = 'vagrant ' + ' '.join(sys.argv)
     click.echo(bash(vagrant_cmd).stdout)
 
-@cli.command('up')
-@click.option('-p', '--provider', envvar = PROJECT_NAME.upper() + '_PROVIDER',
-              help='Provider for the virtual machine. '
-              'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
-@click.pass_context
-def up_cmd(ctx, provider):
-    '''Start a VM / container with `vagrant up`.
-    '''
-    up(ctx, provider)
-
-@cli.command('ssh')
-@click.pass_context
-def ssh_cmd(ctx):
-    '''Connect to an running VM / container over ssh.
-    '''
-    ssh(ctx)
-
+## Subcommands
 @cli.command('destroy')
 @click.pass_context
 def destroy_cmd(ctx):
@@ -113,5 +99,23 @@ def setup_cmd(): # threaded setup commands
     '''
     # setup_rambo()
     setup_lastpass()
+
+@cli.command('ssh')
+@click.pass_context
+def ssh_cmd(ctx):
+    '''Connect to an running VM / container over ssh.
+    '''
+    ssh(ctx)
+
+@cli.command('up')
+@click.option('-p', '--provider', envvar = PROJECT_NAME.upper() + '_PROVIDER',
+              help='Provider for the virtual machine. '
+              'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
+@click.pass_context
+def up_cmd(ctx, provider):
+    '''Start a VM / container with `vagrant up`.
+    '''
+    up(ctx, provider)
+
 
 main = cli
