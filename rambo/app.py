@@ -119,23 +119,25 @@ def export(ctx=None, force=None, resource=None, export_path=None):
     '''Drop default code in the CWD / user defined space. Operate on saltstack,
     vagrant, or python resources.
     '''
+    output_dir = os.path.normpath(export_path) or os.getcwd()
+
     if resource in ('vagrant', 'saltstack'):
         srcs = [os.path.normpath(os.path.join(PROJECT_LOCATION, resource))]
-        dsts = [os.path.join(os.getcwd(), resource)]
+        dsts = [os.path.join(output_dir, resource)]
 
     if resource == 'vagrant':
         srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, 'settings.json')))
         srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, 'Vagrantfile')))
-        dsts.append(os.path.join(os.getcwd(), 'settings.json'))
-        dsts.append(os.path.join(os.getcwd(), 'Vagrantfile'))
+        dsts.append(os.path.join(output_dir, 'settings.json'))
+        dsts.append(os.path.join(output_dir, 'Vagrantfile'))
 
     if resource == 'python':
         srcs = [os.path.normpath(os.path.join(PROJECT_LOCATION, 'settings.json'))]
-        dsts = [os.path.join(os.getcwd(), 'settings.json')]
+        dsts = [os.path.join(output_dir, 'settings.json')]
         for file in os.listdir(os.path.normpath(os.path.join(PROJECT_LOCATION))):
             if file.endswith('.py'):
                 srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, file)))
-                dsts.append(os.path.join(os.getcwd(), file))
+                dsts.append(os.path.join(output_dir, file))
 
     if not force:
         for path in dsts:
@@ -149,6 +151,7 @@ def export(ctx=None, force=None, resource=None, export_path=None):
         try:
             distutils.dir_util.copy_tree(src, dst) # Merge copy tree with overwrites.
         except DistutilsFileError:
+            os.makedirs(dst, exist_ok=True) # Make parent dirs if needed.
             copy(src, dst) # Copy file with overwrites.
     click.echo('Done with export.')
 
