@@ -4,13 +4,13 @@ failhard: True
 
 file_roots:
   base:
-    - /vagrant/salt_resources/states
+    - /vagrant/saltstack/states
 
 grains:
   roles:
     - project
     - dev
-  user: vagrant
-  group: vagrant
-  
+  user: root
+  group: root
+
 # postgres.bins_dir: '/usr/lib/postgresql/9.6/bin/' # location of the postgres bin's path to the relevant minion for this module

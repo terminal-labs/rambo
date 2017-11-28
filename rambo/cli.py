@@ -5,7 +5,14 @@ import click
 import pkg_resources
 from bash import bash
 
-from rambo.app import vagrant_up, vagrant_ssh, vagrant_destroy, set_init_vars, set_vagrant_vars
+from rambo.app import (
+    destroy,
+    export,
+    set_init_vars,
+    set_vagrant_vars,
+    ssh,
+    up,
+)
 
 ## GLOBALS
 # Create env var indicating where this code lives. This will be used latter by
@@ -20,10 +27,15 @@ version = pkg_resources.get_distribution('rambo-vagrant').version
 
 ## BASE COMMAND LIST
 cmd = ''
-command_handeled_by_click = ['up','destory','ssh']
+commands_handled_by_click = [
+    'destory_cmd',
+    'export_cmd',
+    'ssh_cmd',
+    'up_cmd',
+]
 if len(sys.argv) > 1:
     cmd = (sys.argv[1])
-    if cmd in command_handeled_by_click:
+    if cmd in commands_handled_by_click:
         cmd = ''
 
 context_settings = {
@@ -32,6 +44,7 @@ context_settings = {
     'help_option_names': ['-h', '--help'],
 }
 
+## Main CLI entry point
 @click.group(context_settings=context_settings)
 @click.option('--vagrant-cwd', default=None, type=click.Path(),
               help='Path entry point to the Vagrantfile. Defaults to '
@@ -49,46 +62,69 @@ def cli(ctx, vagrant_cwd, vagrant_dotfile_path, tmpdir_path):
     set_init_vars(tmpdir_path)
     set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
+## Catch-all for everything that doesn't hit a subcommand
 @cli.command(name=cmd, context_settings=context_settings)
 def gen():
     # TODO: figure out better warning system
-    click.echo("warning -- you entered a command " + PROJECT_NAME  +
-               " does not understand. passing raw commands to vagrant backend")
-    click.echo('You ran "' + ' '.join(sys.argv) + '"')
+    click.echo("Warning -- you entered a command %s does not understand. "
+               "Passing raw commands to Vagrant backend" % PROJECT_NAME.capitalize())
+    click.echo('You ran "%s"' % ' '.join(sys.argv))
     click.echo('Vagrant backend says:')
     sys.argv.pop(0)
     vagrant_cmd = 'vagrant ' + ' '.join(sys.argv)
     click.echo(bash(vagrant_cmd).stdout)
 
-@cli.command()
+## Subcommands
+@cli.command('destroy')
+@click.pass_context
+def destroy_cmd(ctx):
+    '''Destroy a VM / container and all its metadata. Default leaves logs.
+    '''
+    destroy(ctx)
+
+@cli.command('export', short_help="Export %s's source code." % PROJECT_NAME.capitalize())
+@click.option('-f', '--force', is_flag=True,
+              help='Accept attempts to overwrite and merge.')
+@click.option('-s', '--salt', '--saltstack', 'src', flag_value='saltstack',
+              default=True, help='Export SaltStack code.' )
+@click.option('-V', '--vagrant', 'src', flag_value='vagrant',
+              help='Export Vagrant code.')
+@click.option('-p', '--python', 'src', flag_value='python',
+              help='Export Python code.')
+@click.option('-a', '--all', 'src', flag_value='all',
+              help="Export all of %s's project code." % PROJECT_NAME.capitalize())
+@click.option('-O', '--output-path', type=click.Path(), default=None,
+              help='The optional output path.')
+@click.pass_context
+def export_cmd(ctx, force, src, output_path):
+    '''Export code to a handy place for the user to view and edit.
+    '''
+    export(ctx, force, src, output_path)
+
+@cli.command('setup')
+def setup_cmd(): # threaded setup commands
+    '''Runs any setup commands. None yet implemented.
+    '''
+    # setup_rambo()
+    # setup_lastpass()
+    click.echo('Not implemented.')
+
+@cli.command('ssh')
+@click.pass_context
+def ssh_cmd(ctx):
+    '''Connect to an running VM / container over ssh.
+    '''
+    ssh(ctx)
+
+@cli.command('up')
 @click.option('-p', '--provider', envvar = PROJECT_NAME.upper() + '_PROVIDER',
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
 @click.pass_context
-def up(ctx, provider):
+def up_cmd(ctx, provider):
     '''Start a VM / container with `vagrant up`.
     '''
-    vagrant_up(ctx, provider)
+    up(ctx, provider)
 
-@cli.command()
-@click.pass_context
-def ssh(ctx):
-    '''Connect to an running VM / container over ssh.
-    '''
-    vagrant_ssh(ctx)
-
-@cli.command()
-@click.pass_context
-def destroy(ctx):
-    '''Destroy a VM / container and all its metadata. Default leaves logs.
-    '''
-    vagrant_destroy(ctx)
-
-@cli.command()
-def setup(): # threaded setup commands
-    '''Runs any setup commands. None yet implemented.
-    '''
-    # setup_rambo()
-    setup_lastpass()
 
 main = cli

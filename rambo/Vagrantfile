@@ -12,7 +12,7 @@ if ENV.has_key?("VAGRANT_CWD")
 end
 
 SETTINGS = JSON.parse(File.read('settings.json'))
-require_relative "vagrant_resources/modules.rb" # for random_tag
+require_relative "vagrant/modules.rb" # for random_tag
 
 PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 VM_NAME = PROJECT_NAME + "-" + random_tag()
@@ -47,7 +47,7 @@ provider = if get_env_var_rb("PROVIDER")
 
 if (SETTINGS["PROVIDERS"].include? provider)
   write_provider_file(provider)
-  load File.expand_path("vagrant_resources/vagrantfiles/" + provider)
+  load File.expand_path("vagrant/vagrantfiles/" + provider)
 else # Bad arg - we don't have this provider.
   abort("ABORTED - Provider not in providers list. Did you have a typo?")
 end
@@ -104,11 +104,11 @@ Vagrant.configure("2") do |config|
     # Bash to set prepare and initiate Salt provisioning.
     $salt = <<-EOS
       mv /etc/salt/minion{,-dist}
-      cp /vagrant/salt_resources/minions/minion.#{provider}  /etc/salt/minion
-      cp /vagrant/salt_resources/grains/grains /etc/salt/grains
-      mkdir -p /vagrant/salt_resources/states/files/licenses
+      cp /vagrant/saltstack/minions/minion.#{provider}  /etc/salt/minion
+      cp /vagrant/saltstack/grains/grains /etc/salt/grains
+      mkdir -p /vagrant/saltstack/states/files/licenses
       if [ -d "/vagrant/auth/licenses/" ]; then
-          cp -a /vagrant/auth/licenses/. /vagrant/salt_resources/states/files/licenses/
+          cp -a /vagrant/auth/licenses/. /vagrant/saltstack/states/files/licenses/
       fi
       if [ #{ENV["WEBSITE_BRANCH"]} ]; then
           sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]} --log-level info
