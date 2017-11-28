@@ -2,7 +2,12 @@ import os
 import sys
 import time
 import json
+import distutils
+from distutils.dir_util import copy_tree
+from distutils.errors import DistutilsFileError
 from threading import Thread
+from shutil import copy
+
 
 import click
 from bash import bash
@@ -45,13 +50,14 @@ def follow_log_file(log_file_path, exit_triggers):
             if any(string in line for string in exit_triggers):
                 break
 
+## Defs used by main cli cmd
 def set_init_vars(tmpdir_path=None):
     '''Set custom environment variables that are always going to be needed by
     our custom Ruby code in the Vagrantfile chain.
     '''
     # env vars available to Python and Ruby
     set_env_var('ENV', PROJECT_LOCATION) # location of this code
-    
+
     # loc of tmpdir_path
     if tmpdir_path: # cli / api
         set_env_var('TMPDIR_PATH', os.path.join(tmpdir_path + '.' + PROJECT_NAME + '-tmp'))
@@ -59,7 +65,7 @@ def set_init_vars(tmpdir_path=None):
         set_env_var('TMPDIR_PATH', os.path.join(get_env_var('TMPDIR_PATH') + '.' + PROJECT_NAME + '-tmp'))
     else: # Not set, set to default loc
         set_env_var('TMPDIR_PATH', os.path.join(os.getcwd(), '.' + PROJECT_NAME + '-tmp')) # default (cwd)
-        
+
 def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Set the environment varialbes prefixed with `VAGRANT_` that vagrant
     expects, and that we use, to modify some use paths.
@@ -80,7 +86,106 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     elif 'VAGRANT_DOTFILE_PATH' not in os.environ: # Not set in env var
         os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # default (cwd)
 
-def vagrant_up_thread():
+## Defs for cli subcommands
+def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+    '''Destroy a VM / container and all its metadata. Default leaves logs.
+    All str args can also be set as an environment variable; arg takes precedence.
+
+    Agrs:
+        ctx (object): Click Context object.
+        vagrant_cwd (str): Location of `Vagrantfile`.
+        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+    '''
+    # TODO add finding and deleting of all VMs registered to this installation.
+    # TODO (optional) add finding and deleting of all VMs across all installations.
+    # TODO add an --all flag to delete the whole .rambo-tmp dir. Default leaves logs.
+
+    if not ctx: # Else handled by cli.
+        set_init_vars()
+        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+
+    dir_create(get_env_var('TMPDIR_PATH') + '/logs')
+    # TODO: Better logs.
+    bash('vagrant destroy --force >' + get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log 2>&1')
+    follow_log_file( get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log', ['Vagrant done with destroy.',
+                                                      'Print this help'])
+    file_delete(get_env_var('TMPDIR_PATH') + '/provider')
+    file_delete(get_env_var('TMPDIR_PATH') + '/random_tag')
+    dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
+    click.echo('Temporary files removed')
+    click.echo('Destroy complete.')
+
+def export(ctx=None, force=None, resource=None, export_path=None):
+    '''Drop default code in the CWD / user defined space. Operate on saltstack,
+    vagrant, or python resources.
+    '''
+    if export_path:
+        output_dir = os.path.normpath(export_path)
+    else:
+        output_dir = os.getcwd()
+
+    if resource in ('vagrant', 'saltstack'):
+        srcs = [os.path.normpath(os.path.join(PROJECT_LOCATION, resource))]
+        dsts = [os.path.join(output_dir, resource)]
+
+    if resource == 'vagrant':
+        srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, 'settings.json')))
+        srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, 'Vagrantfile')))
+        dsts.append(os.path.join(output_dir, 'settings.json'))
+        dsts.append(os.path.join(output_dir, 'Vagrantfile'))
+
+    if resource == 'python':
+        srcs = [os.path.normpath(os.path.join(PROJECT_LOCATION, 'settings.json'))]
+        dsts = [os.path.join(output_dir, 'settings.json')]
+        for file in os.listdir(os.path.normpath(os.path.join(PROJECT_LOCATION))):
+            if file.endswith('.py'):
+                srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, file)))
+                dsts.append(os.path.join(output_dir, file))
+
+    if resource == 'all':
+        srcs = []
+        dsts = []
+        for file in os.listdir(os.path.normpath(os.path.join(PROJECT_LOCATION))):
+            srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, file)))
+            dsts.append(os.path.join(output_dir, file))
+
+    if not force:
+        for path in dsts:
+            if os.path.exists(path):
+                click.confirm("One or more destination files or directories in "
+                              "'%s' already exists. Attempt to merge and "
+                              "overwrite?" % dsts, abort=True)
+                break # We only need general confirmation of an overwrite once.
+
+    for src, dst in zip(srcs, dsts):
+        try:
+            distutils.dir_util.copy_tree(src, dst) # Merge copy tree with overwrites.
+        except DistutilsFileError:
+            try:
+                copy(src, dst) # Copy file with overwrites.
+            except FileNotFoundError:
+                os.makedirs(os.path.dirname(dst), exist_ok=True) # Make parent dirs if needed.
+                copy(src, dst) # Copy file with overwrites.
+
+    click.echo('Done with export.')
+
+def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+    '''Connect to an running VM / container over ssh.
+    All str args can also be set as an environment variable; arg takes precedence.
+
+    Agrs:
+        ctx (object): Click Context object.
+        vagrant_cwd (str): Location of `Vagrantfile`.
+        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+    '''
+    # TODO: Better logs.
+    if not ctx: # Else handled by cli.
+        set_init_vars()
+        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+
+    os.system('vagrant ssh')
+
+def up_thread():
     '''Make the final call over the shell to `vagrant up`, and redirect
     all output to log file.
     '''
@@ -89,7 +194,7 @@ def vagrant_up_thread():
     # TODO: Better logs.
     bash('vagrant up >' + get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log 2>&1')
 
-def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -122,7 +227,7 @@ def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=N
     # TODO: Better logs.
     open(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
 
-    thread = Thread(target = vagrant_up_thread) # Threaded to write, read, and echo as `up` progresses.
+    thread = Thread(target = up_thread) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
     follow_log_file(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log', ['Total run time:',
                                                  'Provisioners marked to run always will still run',
@@ -130,50 +235,7 @@ def vagrant_up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=N
                                                  'try again.'])
     click.echo('Up complete.')
 
-def vagrant_ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
-    '''Connect to an running VM / container over ssh.
-    All str args can also be set as an environment variable; arg takes precedence.
-
-    Agrs:
-        ctx (object): Click Context object.
-        vagrant_cwd (str): Location of `Vagrantfile`.
-        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
-    '''
-    # TODO: Better logs.
-    if not ctx: # Else handled by cli.
-        set_init_vars()
-        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
-
-    os.system('vagrant ssh')
-
-def vagrant_destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
-    '''Destroy a VM / container and all its metadata. Default leaves logs.
-    All str args can also be set as an environment variable; arg takes precedence.
-
-    Agrs:
-        ctx (object): Click Context object.
-        vagrant_cwd (str): Location of `Vagrantfile`.
-        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
-    '''
-    # TODO add finding and deleting of all VMs registered to this installation.
-    # TODO (optional) add finding and deleting of all VMs across all installations.
-    # TODO add an --all flag to delete the whole .rambo-tmp dir. Default leaves logs.
-
-    if not ctx: # Else handled by cli.
-        set_init_vars()
-        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
-
-    dir_create(get_env_var('TMPDIR_PATH') + '/logs')
-    # TODO: Better logs.
-    bash('vagrant destroy --force >' + get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log 2>&1')
-    follow_log_file( get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log', ['Vagrant done with destroy.',
-                                                      'Print this help'])
-    file_delete(get_env_var('TMPDIR_PATH') + '/provider')
-    file_delete(get_env_var('TMPDIR_PATH') + '/random_tag')
-    dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
-    click.echo('Temporary files removed')
-    click.echo('Destroy complete.')
-
+## Unused defs
 def setup_lastpass_thread(vagrant_cwd=None, vagrant_dotfile_path=None):
     dir_create(get_user_home() + '/.tmp-common')
     with open(get_user_home() + '/.tmp-common/install-lastpass.sh', 'w') as file_obj:
