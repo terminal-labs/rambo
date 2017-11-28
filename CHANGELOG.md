@@ -1,4 +1,4 @@
-## 0.3.3.dev (TBD)
+## 0.3.3 (November 28, 2017)
 
 FEATURES:
 
