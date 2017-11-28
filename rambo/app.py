@@ -2,13 +2,17 @@ import os
 import sys
 import time
 import json
+import distutils
+from distutils.dir_util import copy_tree
+from distutils.errors import DistutilsFileError
 from threading import Thread
-from shutil import copytree
+from shutil import copy
+
 
 import click
 from bash import bash
 
-from rambo.utils import get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete, file_copy
+from rambo.utils import get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
 from rambo.scripts import install_lastpass
 
 ## GLOBALS
@@ -82,22 +86,41 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # default (cwd)
 
 def export(ctx=None, force=None, resource=None, export_path=None):
-    '''Drop default SaltStack code in the CWD / user defined space
+    '''Drop default code in the CWD / user defined space. Operate on saltstack,
+    vagrant, or python resources.
     '''
-    print(resource)
-    if resource in ('saltstack', 'vagrant'):
-        src = os.path.normpath(os.path.join(PROJECT_LOCATION, resource))
-        dst = os.path.join(os.getcwd(), resource)
-        if dir_exists(dst):
-            click.confirm("The destination '%s' exists. Delete it and then export?" % dst, abort=True)
-            dir_delete(dst)
-        copytree(src, dst)
+    if resource in ('vagrant', 'saltstack'):
+        srcs = [os.path.normpath(os.path.join(PROJECT_LOCATION, resource))]
+        dsts = [os.path.join(os.getcwd(), resource)]
 
-    if resource in ('python', 'vagrant'):
-        file_copy(os.path.normpath(os.path.join(PROJECT_LOCATION, 'settings.json')), os.path.join(os.getcwd(), 'settings.json'))
+    if resource == 'vagrant':
+        srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, 'settings.json')))
+        srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, 'Vagrantfile')))
+        dsts.append(os.path.join(os.getcwd(), 'settings.json'))
+        dsts.append(os.path.join(os.getcwd(), 'Vagrantfile'))
 
-    # if resource == 'python':
-    #     file_copy(os.path.normpath(os.path.join(PROJECT_LOCATION, '*.py')), os.path.join(os.getcwd(), '*.py'))
+    if resource == 'python':
+        srcs = [os.path.normpath(os.path.join(PROJECT_LOCATION, 'settings.json'))]
+        dsts = [os.path.join(os.getcwd(), 'settings.json')]
+        for file in os.listdir(os.path.normpath(os.path.join(PROJECT_LOCATION))):
+            if file.endswith('.py'):
+                srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, file)))
+                dsts.append(os.path.join(os.getcwd(), file))
+
+    if not force:
+        for path in dsts:
+            if os.path.exists(path):
+                click.confirm("One or more destination files or directories in "
+                              "'%s' already exists. Attempt to merge and "
+                              "overwrite?" % dsts, abort=True)
+                break # We only need general confirmation of an overwrite once.
+
+    for src, dst in zip(srcs, dsts):
+        try:
+            distutils.dir_util.copy_tree(src, dst) # Merge copy tree with overwrites.
+        except DistutilsFileError:
+            copy(src, dst) # Copy file with overwrites.
+    click.echo('Done with export.')
 
 
 def up_thread():
