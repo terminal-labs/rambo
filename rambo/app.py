@@ -119,7 +119,10 @@ def export(ctx=None, force=None, resource=None, export_path=None):
     '''Drop default code in the CWD / user defined space. Operate on saltstack,
     vagrant, or python resources.
     '''
-    output_dir = os.path.normpath(export_path) or os.getcwd()
+    if export_path:
+        output_dir = os.path.normpath(export_path)
+    else:
+        output_dir = os.getcwd()
 
     if resource in ('vagrant', 'saltstack'):
         srcs = [os.path.normpath(os.path.join(PROJECT_LOCATION, resource))]
@@ -139,6 +142,13 @@ def export(ctx=None, force=None, resource=None, export_path=None):
                 srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, file)))
                 dsts.append(os.path.join(output_dir, file))
 
+    if resource == 'all':
+        srcs = []
+        dsts = []
+        for file in os.listdir(os.path.normpath(os.path.join(PROJECT_LOCATION))):
+            srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, file)))
+            dsts.append(os.path.join(output_dir, file))
+
     if not force:
         for path in dsts:
             if os.path.exists(path):
@@ -151,8 +161,12 @@ def export(ctx=None, force=None, resource=None, export_path=None):
         try:
             distutils.dir_util.copy_tree(src, dst) # Merge copy tree with overwrites.
         except DistutilsFileError:
-            os.makedirs(dst, exist_ok=True) # Make parent dirs if needed.
-            copy(src, dst) # Copy file with overwrites.
+            try:
+                copy(src, dst) # Copy file with overwrites.
+            except FileNotFoundError:
+                os.makedirs(os.path.dirname(dst), exist_ok=True) # Make parent dirs if needed.
+                copy(src, dst) # Copy file with overwrites.
+
     click.echo('Done with export.')
 
 def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
