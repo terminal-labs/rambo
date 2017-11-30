@@ -85,7 +85,11 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     if vagrant_cwd: # cli / api
         os.environ["VAGRANT_CWD"] = vagrant_cwd
     elif 'VAGRANT_CWD' not in os.environ: # Not set in env var
-        os.environ['VAGRANT_CWD'] = PROJECT_LOCATION # default (installed path)
+        # if custom Vagrantfile exists in the default location.
+        if os.path.isfile(os.path.join(os.getcwd(), 'Vagrantfile')):
+            os.environ['VAGRANT_CWD'] = os.getcwd()
+        else: # use default (installed) path
+            os.environ['VAGRANT_CWD'] = PROJECT_LOCATION
     # loc of .vagrant dir
     if vagrant_dotfile_path: # cli / api
         os.environ['VAGRANT_DOTFILE_PATH'] = vagrant_dotfile_path
@@ -179,7 +183,7 @@ def export(ctx=None, force=None, resource=None, export_path=None):
                 os.makedirs(os.path.dirname(dst), exist_ok=True) # Make parent dirs if needed.
                 copy(src, dst) # Copy file with overwrites.
 
-    click.echo('Done with export.')
+    click.echo('Done exporting %s code.' % resource)
 
 def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Connect to an running VM / container over ssh.
