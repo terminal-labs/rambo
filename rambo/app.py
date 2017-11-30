@@ -51,18 +51,24 @@ def follow_log_file(log_file_path, exit_triggers):
                 break
 
 ## Defs used by main cli cmd
-def set_init_vars(tmpdir_path=None):
+def set_init_vars(cwd=None, tmpdir_path=None):
     '''Set custom environment variables that are always going to be needed by
     our custom Ruby code in the Vagrantfile chain.
     '''
     # env vars available to Python and Ruby
-    set_env_var('ENV', PROJECT_LOCATION) # location of this code
+    set_env_var('ENV', PROJECT_LOCATION) # installed location of this code
+
+    # effective CWD (likely real CWD, but may be changed by user.
+    if cwd: # cli / api
+        set_env_var('CWD', cwd)
+    elif not get_env_var('CWD'): # Not previously set env var either
+        set_env_var('CWD', os.getcwd())
 
     # loc of tmpdir_path
     if tmpdir_path: # cli / api
         set_env_var('TMPDIR_PATH', os.path.join(tmpdir_path + '.' + PROJECT_NAME + '-tmp'))
     elif get_env_var('TMPDIR_PATH'): # Previously set env var
-        set_env_var('TMPDIR_PATH', os.path.join(get_env_var('TMPDIR_PATH') + '.' + PROJECT_NAME + '-tmp'))
+        set_env_var('TMPDIR_PATH', os.path.join(get_env_var('TMPDIR_PATH') + '.' + PROJECT_NAME + '-tmp')) ## TODO: suspicious, check this.
     else: # Not set, set to default loc
         set_env_var('TMPDIR_PATH', os.path.join(os.getcwd(), '.' + PROJECT_NAME + '-tmp')) # default (cwd)
 
@@ -118,6 +124,12 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 def export(ctx=None, force=None, resource=None, export_path=None):
     '''Drop default code in the CWD / user defined space. Operate on saltstack,
     vagrant, or python resources.
+
+    Agrs:
+        ctx (object): Click Context object. Used to detect if CLI is used.
+        force (str): Detects if we should overwrite and merge.
+        resource (str): Resource to export: saltstack, vagrant, python, or all.
+        export_path (str): Dir to export resources to.
     '''
     if export_path:
         output_dir = os.path.normpath(export_path)
@@ -209,6 +221,12 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     if not ctx: # Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+
+    # Point to custom saltstack dir if we have it.
+    if 'saltstack' in os.listdir(get_env_var('cwd')):
+        set_env_var('salt_dir', get_env_var('cwd'))
+    else:
+        set_env_var('salt_dir', PROJECT_LOCATION)
 
     # TODO See if there's a better exit / error system
     if provider:

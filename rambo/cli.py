@@ -53,13 +53,17 @@ context_settings = {
 @click.option('--vagrant-dotfile-path', default=None, type=click.Path(),
               help='Path location of the .vagrant directory for the '
               'virtual machine. Defaults to the current working directory.')
+@click.option('--cwd', default=None, type=click.Path(),
+              help='The CWD of for this command. Defaults to '
+              'actual CWD, but may be set for customization. Used to look '
+              'for optional resources such as custom SaltStack code.')
 @click.option('--tmpdir-path', default=None, type=click.Path(),
               help='Path location of the .rambo-tmp directory for the virtual'
               ' machine. Defaults to the current working directory')
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
 @click.pass_context
-def cli(ctx, vagrant_cwd, vagrant_dotfile_path, tmpdir_path):
-    set_init_vars(tmpdir_path)
+def cli(ctx, vagrant_cwd, vagrant_dotfile_path, cwd, tmpdir_path):
+    set_init_vars(cwd, tmpdir_path)
     set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
 ## Catch-all for everything that doesn't hit a subcommand
