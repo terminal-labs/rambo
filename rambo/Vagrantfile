@@ -24,6 +24,9 @@ PROVISION_WITH_CMD = false
 unless get_env_var_rb('SYNC')
   set_env_var_rb('SYNC', 'rsync')
 end
+unless get_env_var_rb('cwd')
+  set_env_var_rb('cwd', Dir.pwd)
+end
 
 unless get_env_var_rb("ENV")
   puts "", "***CAUTION***",
@@ -62,7 +65,7 @@ hosts = ['debian-8',
          'centos-7',
         ]
 
-if not get_env_var_rb("GUEST_OS")
+unless get_env_var_rb("GUEST_OS")
   set_env_var_rb("GUEST_OS", "debian-8")
 end
 
@@ -75,7 +78,7 @@ sizes = {'512' => '20gb',
          '2048' => '40gb',
         }
 
-if not get_env_var_rb("RAM")
+unless get_env_var_rb("RAM")
   set_env_var_rb("RAM", "1024")
 end
 

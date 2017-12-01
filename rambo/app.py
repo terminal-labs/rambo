@@ -62,15 +62,25 @@ def set_init_vars(cwd=None, tmpdir_path=None):
     if cwd: # cli / api
         set_env_var('CWD', cwd)
     elif not get_env_var('CWD'): # Not previously set env var either
-        set_env_var('CWD', os.getcwd())
+        try:
+            set_env_var('CWD', os.getcwd())
+        except FileNotFoundError:
+            click.echo('Your current working directory no longer exists. '
+                       'Did you delete it? Check for it with `ls ..`', err=True)
+            raise click.Abort()
 
     # loc of tmpdir_path
     if tmpdir_path: # cli / api
-        set_env_var('TMPDIR_PATH', os.path.join(tmpdir_path + '.' + PROJECT_NAME + '-tmp'))
+        set_env_var('TMPDIR_PATH',
+                    os.path.join(tmpdir_path, '.%s-tmp' % PROJECT_NAME))
     elif get_env_var('TMPDIR_PATH'): # Previously set env var
-        set_env_var('TMPDIR_PATH', os.path.join(get_env_var('TMPDIR_PATH') + '.' + PROJECT_NAME + '-tmp')) ## TODO: suspicious, check this.
+        set_env_var('TMPDIR_PATH',
+                    os.path.join(get_env_var('TMPDIR_PATH'),
+                                 '.%s-tmp' % PROJECT_NAME))
     else: # Not set, set to default loc
-        set_env_var('TMPDIR_PATH', os.path.join(os.getcwd(), '.' + PROJECT_NAME + '-tmp')) # default (cwd)
+        set_env_var('TMPDIR_PATH',
+                    os.path.join(os.getcwd(),
+                                 '.%s-tmp' % PROJECT_NAME)) # default (cwd)
 
 def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Set the environment varialbes prefixed with `VAGRANT_` that vagrant
@@ -80,7 +90,6 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         vagrant_cwd (str): Location of `Vagrantfile`.
         vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
     '''
-
     # loc of Vagrantfile
     if vagrant_cwd: # cli / api
         os.environ["VAGRANT_CWD"] = vagrant_cwd
@@ -94,7 +103,7 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     if vagrant_dotfile_path: # cli / api
         os.environ['VAGRANT_DOTFILE_PATH'] = vagrant_dotfile_path
     elif 'VAGRANT_DOTFILE_PATH' not in os.environ: # Not set in env var
-        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd() + '/.vagrant')) # default (cwd)
+        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd(), '.vagrant')) # default (cwd)
 
 ## Defs for cli subcommands
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
@@ -117,8 +126,9 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     dir_create(get_env_var('TMPDIR_PATH') + '/logs')
     # TODO: Better logs.
     bash('vagrant destroy --force >' + get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log 2>&1')
-    follow_log_file( get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log', ['Vagrant done with destroy.',
-                                                      'Print this help'])
+    follow_log_file(get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log',
+                    ['Vagrant done with destroy.',
+                     'Print this help'])
     file_delete(get_env_var('TMPDIR_PATH') + '/provider')
     file_delete(get_env_var('TMPDIR_PATH') + '/random_tag')
     dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
@@ -251,10 +261,13 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     thread = Thread(target = up_thread) # Threaded to write, read, and echo as `up` progresses.
     thread.start()
-    follow_log_file(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log', ['Total run time:',
-                                                 'Provisioners marked to run always will still run',
-                                                 'Print this help',
-                                                 'try again.'])
+    follow_log_file(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log',
+                    ['Total run time:',
+                     'Provisioners marked to run always will still run',
+                     'Print this help',
+                     'try again.',
+                     'Local data directory: /.vagrant',
+    ])
     click.echo('Up complete.')
 
 ## Unused defs
