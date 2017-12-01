@@ -106,6 +106,9 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd(), '.vagrant')) # default (cwd)
 
 ## Defs for cli subcommands
+def config_auth():
+    pass
+
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
     All str args can also be set as an environment variable; arg takes precedence.
@@ -194,6 +197,20 @@ def export(ctx=None, force=None, resource=None, export_path=None):
                 copy(src, dst) # Copy file with overwrites.
 
     click.echo('Done exporting %s code.' % resource)
+
+def install_plugins(plugin=None):
+    '''Install all of the vagrant plugins needed for all plugins
+    '''
+    if plugin is not 'all':
+        for plugin in SETTINGS['PLUGINS']:
+            bash('vagrant plugin install %s' % plugin)
+    elif plugin in SETTINGS['PLUGINS']:
+        bash('vagrant plugin install %s' % plugin)
+    else:
+        click.confirm("The plugin %s is not in our list of plugins. Attempt "
+                      "to install anyway?" % plugin, abort=True)
+        bash('vagrant plugin install %s' % plugin)
+
 
 def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Connect to an running VM / container over ssh.

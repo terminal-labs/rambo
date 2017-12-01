@@ -6,8 +6,10 @@ import pkg_resources
 from bash import bash
 
 from rambo.app import (
+    config_auth,
     destroy,
     export,
+    install_plugins,
     set_init_vars,
     set_vagrant_vars,
     ssh,
@@ -105,13 +107,28 @@ def export_cmd(ctx, force, src, output_path):
     '''
     export(ctx, force, src, output_path)
 
-@cli.command('setup')
-def setup_cmd(): # threaded setup commands
+@cli.command('init')
+@click.option('-p', '--plugin',
+              help='Vagrant plugin to install. Defaults to `all`. '
+              'These plugins are installed by default: %s.' % SETTINGS['PLUGINS'])
+@click.option('-a', '--auth',
+              help='Install auth dir and create key source files '
+              'for cloud providers.')
+def init_cmd(plugin, auth): # threaded setup commands
     '''Runs any setup commands. None yet implemented.
     '''
-    # setup_rambo()
-    # setup_lastpass()
-    click.echo('Not implemented.')
+    print('in cmd')
+    if plugin:
+        print(plugin)
+        install_plugins(plugin)
+        print('plugins done')
+    if auth:
+        print(auth)
+        config_auth()
+        print('auth done')
+    if not (auth and plugin): # Default behavior with no options specified.
+        install_plugins(plugin)
+        config_auth()
 
 @cli.command('ssh')
 @click.pass_context
