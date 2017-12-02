@@ -3,6 +3,7 @@ import sys
 import time
 import json
 import distutils
+import subprocess
 from distutils.dir_util import copy_tree
 from distutils.errors import DistutilsFileError
 from threading import Thread
@@ -24,12 +25,14 @@ with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
 PROVIDERS = SETTINGS['PROVIDERS']
 PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
-# XXX: We should refactor this to catch output directly from Vagrant, and pass it to
-# the shell and a copy to log file. Doing logic on the contents of a log file isn't going to be
-# stable. For instance, we shouldn't have to specify any exit_triggers. We can't factor in every
-# kind of exit_trigger Vagrant can produce. Refactoring will also allow for more control over
-# the log file because we're the only ones writing to it. We'll be able to keep old logs,
-# append, cycle file names, etc
+## XXX: We should refactor this to catch output directly from Vagrant, and pass it to
+## the shell and a copy to log file. Doing logic on the contents of a log file isn't going to be
+## stable. For instance, we shouldn't have to specify any exit_triggers. We can't factor in every
+## kind of exit_trigger Vagrant can produce. Refactoring will also allow for more control over
+## the log file because we're the only ones writing to it. We'll be able to keep old logs,
+## append, cycle file names, etc.
+##
+## Once this is done both the follow_log_file and run_cmd can probably be removed.
 def follow_log_file(log_file_path, exit_triggers):
     '''Read a file as it's being written and direct each line to stdout.
 
@@ -49,6 +52,22 @@ def follow_log_file(log_file_path, exit_triggers):
             click.echo(line.strip()) # Strip trailing eol. Echo before break.
             if any(string in line for string in exit_triggers):
                 break
+
+def run_cmd(cmd):
+    '''Run a cmd in the shell, and output stdout and stderr.
+    This blocks until completion and then outputs both buffers once the
+    process is completed. This does no logging.
+    '''
+    if isinstance(cmd, str):
+        cmd = cmd.split()
+
+    sp = subprocess.Popen(
+        cmd,
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE)
+    out, err = sp.communicate()
+    click.echo(out)
+    click.echo(err, err=True)
 
 ## Defs used by main cli cmd
 def set_init_vars(cwd=None, tmpdir_path=None):
@@ -138,12 +157,11 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     click.echo('Temporary files removed')
     click.echo('Destroy complete.')
 
-def export(ctx=None, force=None, resource=None, export_path=None):
+def export(force=None, resource=None, export_path=None):
     '''Drop default code in the CWD / user defined space. Operate on saltstack,
     vagrant, or python resources.
 
     Agrs:
-        ctx (object): Click Context object. Used to detect if CLI is used.
         force (str): Detects if we should overwrite and merge.
         resource (str): Resource to export: saltstack, vagrant, python, or all.
         export_path (str): Dir to export resources to.
@@ -198,19 +216,31 @@ def export(ctx=None, force=None, resource=None, export_path=None):
 
     click.echo('Done exporting %s code.' % resource)
 
-def install_plugins(plugin=None):
+def init():
+    '''Install all default plugins and setup auth directory.
+    '''
+    config_auth()
+    install_plugins(('all',))
+
+def install_auth():
+    '''Install auth directory.
+    '''
+    pass
+
+def install_plugins(plugins=None):
     '''Install all of the vagrant plugins needed for all plugins
     '''
-    if plugin is not 'all':
-        for plugin in SETTINGS['PLUGINS']:
-            bash('vagrant plugin install %s' % plugin)
-    elif plugin in SETTINGS['PLUGINS']:
-        bash('vagrant plugin install %s' % plugin)
-    else:
-        click.confirm("The plugin %s is not in our list of plugins. Attempt "
-                      "to install anyway?" % plugin, abort=True)
-        bash('vagrant plugin install %s' % plugin)
-
+    for plugin in plugins:
+        if plugin == 'all':
+            click.echo('Installing all default plugins.')
+            for plugin in SETTINGS['PLUGINS']:
+                run_cmd('vagrant plugin install %s' % plugin)
+        elif plugin in SETTINGS['PLUGINS']:
+            run_cmd('vagrant plugin install %s' % plugin)
+        else:
+            click.confirm('The plugin "%s" is not in our list of plugins. Attempt '
+                          'to install anyway?' % plugin, abort=True)
+            run_cmd('vagrant plugin install %s' % plugin)
 
 def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Connect to an running VM / container over ssh.
@@ -232,8 +262,6 @@ def up_thread():
     '''Make the final call over the shell to `vagrant up`, and redirect
     all output to log file.
     '''
-
-    dir_create(get_env_var('TMPDIR_PATH') + '/logs')
     # TODO: Better logs.
     bash('vagrant up >' + get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log 2>&1')
 
@@ -272,8 +300,7 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     if not dir_exists(get_env_var('TMPDIR_PATH')):
         dir_create(get_env_var('TMPDIR_PATH'))
-    dir_create(get_env_var('TMPDIR_PATH') + '/logs')
-    # TODO: Better logs.
+    dir_create(get_env_var('TMPDIR_PATH') + '/logs')    # TODO: Better logs.
     open(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
 
     thread = Thread(target = up_thread) # Threaded to write, read, and echo as `up` progresses.
