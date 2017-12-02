@@ -137,14 +137,16 @@ def up_cmd(ctx, provider):
 ### Sub-subcommands
 ## subcommands of init_cmd
 @init_cmd.command('plugins')
+@click.option('-f', '--force', is_flag=True,
+              help='Install plugins without confirmation.')
 @click.argument('plugins', nargs=-1, type=str)
-def plugins_cmd(plugins):
+def plugins_cmd(force, plugins):
     '''Install passed args as vagrant plugins. `all` or no args installs
     all default vagrant plugins.
     '''
-    if not plugins:
+    if not plugins: # No args means all default plugins.
         plugins = ('all',)
-    install_plugins(plugins)
+    install_plugins(force, plugins)
 
 @init_cmd.command('auth')
 def auth_cmd():

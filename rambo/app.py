@@ -220,14 +220,14 @@ def init():
     '''Install all default plugins and setup auth directory.
     '''
     config_auth()
-    install_plugins(('all',))
+    install_plugins()
 
 def install_auth():
     '''Install auth directory.
     '''
     pass
 
-def install_plugins(plugins=None):
+def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins
     '''
     for plugin in plugins:
@@ -238,7 +238,8 @@ def install_plugins(plugins=None):
         elif plugin in SETTINGS['PLUGINS']:
             run_cmd('vagrant plugin install %s' % plugin)
         else:
-            click.confirm('The plugin "%s" is not in our list of plugins. Attempt '
+            if not force:
+                click.confirm('The plugin "%s" is not in our list of plugins. Attempt '
                           'to install anyway?' % plugin, abort=True)
             run_cmd('vagrant plugin install %s' % plugin)
 
