@@ -11,18 +11,24 @@ if ENV.has_key?("VAGRANT_CWD")
   Dir.chdir ENV["VAGRANT_CWD"]
 end
 
-SETTINGS = JSON.parse(File.read('settings.json'))
 require_relative "vagrant/modules.rb" # for random_tag
 
+## Default Settings
+SETTINGS = JSON.parse(File.read('settings.json'))
 PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 VM_NAME = PROJECT_NAME + "-" + random_tag()
 FORWARD_SSH = true
-COPY_DIR_WITH_RSYNC = true
 CUSTOM_PKG_SRC = true
 PROVISION_WITH_SALT = true
 PROVISION_WITH_CMD = false
+unless get_env_var_rb('SYNC')
+  set_env_var_rb('SYNC', 'rsync')
+end
+unless get_env_var_rb('cwd')
+  set_env_var_rb('cwd', Dir.pwd)
+end
 
-if not get_env_var_rb("ENV")
+unless get_env_var_rb("ENV")
   puts "", "***CAUTION***",
        "Running Vagrant directly and without %s's official CLI." % PROJECT_NAME.capitalize,
        "This is not supported.",
@@ -59,7 +65,7 @@ hosts = ['debian-8',
          'centos-7',
         ]
 
-if not get_env_var_rb("GUEST_OS")
+unless get_env_var_rb("GUEST_OS")
   set_env_var_rb("GUEST_OS", "debian-8")
 end
 
@@ -72,7 +78,7 @@ sizes = {'512' => '20gb',
          '2048' => '40gb',
         }
 
-if not get_env_var_rb("RAM")
+unless get_env_var_rb("RAM")
   set_env_var_rb("RAM", "1024")
 end
 
@@ -82,17 +88,27 @@ unless (sizes.include? get_env_var_rb("RAM"))
    abort("ABORTED - VM size not in sizes list. Did you have a typo?")
 end
 
+custom_code_dirs = [
+  'ansible',
+  'chef',
+  'puppet',
+  'saltstack',
+  'shell',
+  'vagrant',
+]
+
 # Provisioning
 Vagrant.configure("2") do |config|
-  if COPY_DIR_WITH_RSYNC == true
-    config.vm.synced_folder ".",
-      "/vagrant",
-      type: "rsync"
-  else
-    config.vm.synced_folder ".",
-      "/vagrant",
-      type: "rsync",
-      disabled: true
+  if get_env_var_rb('SYNC') != 'disabled'
+    config.vm.synced_folder '.', "/vagrant", type: get_env_var_rb('SYNC')
+    for custom_code_dir in custom_code_dirs
+      if Dir.exist?(File.join(get_env_var_rb("CWD"), custom_code_dir))
+        config.vm.synced_folder File.join(get_env_var_rb("CWD"), custom_code_dir),
+          File.join("/vagrant", custom_code_dir), type: get_env_var_rb('SYNC')
+      end
+    end
+  else # Disable all syncing. Breaks default method of provisioning.
+    config.vm.synced_folder get_env_var_rb("CWD"), "/vagrant", disabled: true
   end
   if CUSTOM_PKG_SRC == true
     config.vm.provision "shell",

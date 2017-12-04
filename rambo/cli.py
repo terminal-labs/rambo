@@ -8,6 +8,9 @@ from bash import bash
 from rambo.app import (
     destroy,
     export,
+    init,
+    install_auth,
+    install_plugins,
     set_init_vars,
     set_vagrant_vars,
     ssh,
@@ -25,7 +28,7 @@ PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
 version = pkg_resources.get_distribution('rambo-vagrant').version
 
-## BASE COMMAND LIST
+### BASE COMMAND LIST
 cmd = ''
 commands_handled_by_click = [
     'destory_cmd',
@@ -44,7 +47,7 @@ context_settings = {
     'help_option_names': ['-h', '--help'],
 }
 
-## Main CLI entry point
+### Main command / CLI entry point
 @click.group(context_settings=context_settings)
 @click.option('--vagrant-cwd', default=None, type=click.Path(),
               help='Path entry point to the Vagrantfile. Defaults to '
@@ -53,16 +56,20 @@ context_settings = {
 @click.option('--vagrant-dotfile-path', default=None, type=click.Path(),
               help='Path location of the .vagrant directory for the '
               'virtual machine. Defaults to the current working directory.')
+@click.option('--cwd', default=None, type=click.Path(),
+              help='The CWD of for this command. Defaults to '
+              'actual CWD, but may be set for customization. Used to look '
+              'for optional resources such as custom SaltStack code.')
 @click.option('--tmpdir-path', default=None, type=click.Path(),
               help='Path location of the .rambo-tmp directory for the virtual'
               ' machine. Defaults to the current working directory')
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
 @click.pass_context
-def cli(ctx, vagrant_cwd, vagrant_dotfile_path, tmpdir_path):
-    set_init_vars(tmpdir_path)
+def cli(ctx, vagrant_cwd, vagrant_dotfile_path, cwd, tmpdir_path):
+    set_init_vars(cwd, tmpdir_path)
     set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-## Catch-all for everything that doesn't hit a subcommand
+### Catch-all for everything that doesn't hit a subcommand
 @cli.command(name=cmd, context_settings=context_settings)
 def gen():
     # TODO: figure out better warning system
@@ -74,7 +81,7 @@ def gen():
     vagrant_cmd = 'vagrant ' + ' '.join(sys.argv)
     click.echo(bash(vagrant_cmd).stdout)
 
-## Subcommands
+### Subcommands
 @cli.command('destroy')
 @click.pass_context
 def destroy_cmd(ctx):
@@ -95,24 +102,24 @@ def destroy_cmd(ctx):
               help="Export all of %s's project code." % PROJECT_NAME.capitalize())
 @click.option('-O', '--output-path', type=click.Path(), default=None,
               help='The optional output path.')
-@click.pass_context
-def export_cmd(ctx, force, src, output_path):
+def export_cmd(force, src, output_path):
     '''Export code to a handy place for the user to view and edit.
     '''
-    export(ctx, force, src, output_path)
+    export(force, src, output_path)
 
-@cli.command('setup')
-def setup_cmd(): # threaded setup commands
+@cli.group('init', invoke_without_command=True)
+@click.pass_context
+def init_cmd(ctx):
     '''Runs any setup commands. None yet implemented.
     '''
-    # setup_rambo()
-    # setup_lastpass()
-    click.echo('Not implemented.')
+    # If auth and plugins are both not specified, run both.
+    if ctx.invoked_subcommand is None:
+        init()
 
-@cli.command('ssh')
+@cli.command('ssh', short_help="Connect with `vagrant ssh`")
 @click.pass_context
 def ssh_cmd(ctx):
-    '''Connect to an running VM / container over ssh.
+    '''Connect to an running VM / container over ssh with `vagrant ssh`.
     '''
     ssh(ctx)
 
@@ -126,5 +133,24 @@ def up_cmd(ctx, provider):
     '''
     up(ctx, provider)
 
+### Sub-subcommands
+## subcommands of init_cmd
+@init_cmd.command('plugins')
+@click.option('-f', '--force', is_flag=True,
+              help='Install plugins without confirmation.')
+@click.argument('plugins', nargs=-1, type=str)
+def plugins_cmd(force, plugins):
+    '''Install passed args as vagrant plugins. `all` or no args installs
+    all default vagrant plugins.
+    '''
+    if not plugins: # No args means all default plugins.
+        plugins = ('all',)
+    install_plugins(force, plugins)
+
+@init_cmd.command('auth')
+def auth_cmd():
+    '''Install auth directory.
+    '''
+    install_auth()
 
 main = cli
