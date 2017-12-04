@@ -2,19 +2,20 @@ import os
 import sys
 import time
 import json
+import shutil
 import distutils
 import subprocess
 from distutils.dir_util import copy_tree
 from distutils.errors import DistutilsFileError
 from threading import Thread
-from shutil import copy
-
 
 import click
 from bash import bash
 
-from rambo.utils import get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
+from rambo.providers import load_provider_keys
 from rambo.scripts import install_lastpass
+from rambo.utils import get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
+
 
 ## GLOBALS
 # Create env var indicating where this code lives. This will be used latter by
@@ -207,12 +208,12 @@ def export(force=None, resource=None, export_path=None):
     for src, dst in zip(srcs, dsts):
         try:
             distutils.dir_util.copy_tree(src, dst) # Merge copy tree with overwrites.
-        except DistutilsFileError:
+        except DistutilsFileError: # It's a file, not a dir.
             try:
-                copy(src, dst) # Copy file with overwrites.
+                shutil.copy(src, dst) # Copy file with overwrites.
             except FileNotFoundError:
                 os.makedirs(os.path.dirname(dst), exist_ok=True) # Make parent dirs if needed.
-                copy(src, dst) # Copy file with overwrites.
+                shutil.copy(src, dst) # Copy file with overwrites.
 
     click.echo('Done exporting %s code.' % resource)
 
@@ -225,7 +226,22 @@ def init():
 def install_auth():
     '''Install auth directory.
     '''
-    pass
+    license_dir = os.path.join(get_env_var('cwd'), 'auth/licenses')
+    try:
+        os.makedirs(license_dir)
+        click.echo('The path %s was just created.'
+                   % license_dir)
+    except FileExistsError:
+        pass # Dir already created. Moving on.
+    click.echo('Any (license) files you put in %s will be synced into your VM.'
+               % license_dir)
+
+    try:
+        shutil.copytree(os.path.join(get_env_var('env'), 'auth/env_scripts'), os.path.join(get_env_var('cwd'), 'auth/keys'))
+    except FileExistsError:
+        pass # key_dir exists, don't overwrite it!
+
+    load_provider_keys()
 
 def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins
