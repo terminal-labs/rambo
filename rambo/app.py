@@ -126,9 +126,6 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd(), '.vagrant')) # default (cwd)
 
 ## Defs for cli subcommands
-def config_auth():
-    pass
-
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
     All str args can also be set as an environment variable; arg takes precedence.
@@ -220,7 +217,7 @@ def export(force=None, resource=None, export_path=None):
 def init():
     '''Install all default plugins and setup auth directory.
     '''
-    config_auth()
+    install_auth()
     install_plugins()
 
 def install_auth():
@@ -236,12 +233,19 @@ def install_auth():
     click.echo('Any (license) files you put in %s will be synced into your VM.'
                % license_dir)
 
-    try:
-        shutil.copytree(os.path.join(get_env_var('env'), 'auth/env_scripts'), os.path.join(get_env_var('cwd'), 'auth/keys'))
-    except FileExistsError:
-        pass # key_dir exists, don't overwrite it!
+    for filename in os.listdir(os.path.join(get_env_var('env'), 'auth/env_scripts')):
+        dst = os.path.join(get_env_var('cwd'), 'auth/keys', os.path.splitext(filename)[0])
+        if not os.path.isfile(dst):
+            shutil.copy(os.path.join(get_env_var('env'), 'auth/env_scripts', filename), dst)
+            click.echo('Added template key loading scripts to %s.' % dst)
+        else:
+            click.echo('File %s exists. Leaving it.' % dst)
 
-    load_provider_keys()
+    # TODO: Have Rambo optionally store the same keys that may be in auth/keys in metadata,
+    # added from the cli/api. Automatically check if keys in metatdata and not keys
+    # in env vars, and set them. This is an avenue for expanding the cli/api's use
+    # and not needing the auth key scripts.
+    # load_provider_keys()
 
 def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins

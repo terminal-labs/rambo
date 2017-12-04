@@ -6,7 +6,6 @@ import pkg_resources
 from bash import bash
 
 from rambo.app import (
-    config_auth,
     destroy,
     export,
     init,
