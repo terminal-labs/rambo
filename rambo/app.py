@@ -302,12 +302,6 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    # Point to custom saltstack dir if we have it.
-    if 'saltstack' in os.listdir(get_env_var('cwd')):
-        set_env_var('salt_dir', get_env_var('cwd'))
-    else:
-        set_env_var('salt_dir', PROJECT_LOCATION)
-
     # TODO See if there's a better exit / error system
     if provider:
         set_env_var('provider', provider)
