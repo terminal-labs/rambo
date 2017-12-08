@@ -32,7 +32,6 @@ base:
     # - hadoop.hortonworks-ambari    {# requires hadoop.hortonworks #}
     # - hadoop.hortonworks-edgenode  {# requires hadoop.hortonworks #}
     # - hadoop.hortonworks-worker    {# requires hadoop.hortonworks #}
-    # - hadoop.ambari
     # - vpn
   'roles:prod':
     - match: grain
