@@ -33,7 +33,7 @@ base:
     # - hadoop.hortonworks-edgenode  {# requires hadoop.hortonworks #}
     # - hadoop.hortonworks-worker    {# requires hadoop.hortonworks #}
     # - hadoop.ambari
-    - vpn
+    # - vpn
   'roles:prod':
     - match: grain
     - deploy_keys

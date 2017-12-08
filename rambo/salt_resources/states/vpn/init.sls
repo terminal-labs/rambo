@@ -85,3 +85,28 @@ vpn_restart_openvpn_service:
   module.run:
     - name: service.restart
     - m_name: openvpn@server
+
+vpn_create_client_dir:
+  file.directory:
+    - user: {{ grains['deescalated_user'] }}
+    - group: {{ grains['deescalated_user'] }}
+    - mode: 700
+    - makedirs: True
+    - name: /home/{{ grains['deescalated_user'] }}/client-configs/files
+
+vpn_create_cliant_base:
+  file.managed:
+    - name: /home/{{ grains['deescalated_user'] }}/client-configs/base.conf
+    - source: salt://vpn/base.conf
+    - user: {{ grains['deescalated_user'] }}
+    - group: {{ grains['deescalated_user'] }}
+    - mode: 700
+
+vpn_create_make_config_script:
+  file.managed:
+    - name: /home/{{ grains['deescalated_user'] }}/client-configs/make_config.sh
+    - source: salt://vpn/make_config.sh
+    - user: {{ grains['deescalated_user'] }}
+    - group: {{ grains['deescalated_user'] }}
+    - mode: 700
+
