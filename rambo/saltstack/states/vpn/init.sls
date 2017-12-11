@@ -59,7 +59,7 @@ vpn_server_conf:
     - user: {{ grains['deescalated_user'] }}
     - group: {{ grains['deescalated_user'] }}
 
-vpn_kernal_packet_forwarding:
+vpn_kernel_packet_forwarding:
   cmd.run:
     - name: sed -i 's/^#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
 
@@ -94,7 +94,7 @@ vpn_create_client_dir:
     - makedirs: True
     - name: /home/{{ grains['deescalated_user'] }}/client-configs/files
 
-vpn_create_cliant_base:
+vpn_create_client_base:
   file.managed:
     - name: /home/{{ grains['deescalated_user'] }}/client-configs/base.conf
     - source: salt://vpn/base.conf
