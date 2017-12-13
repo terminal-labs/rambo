@@ -1,16 +1,18 @@
+import click
+import distutils
+import errno
+import json
 import os
+import pty
+import shutil
+import subprocess
 import sys
 import time
-import json
-import shutil
-import distutils
-import subprocess
 from distutils.dir_util import copy_tree
 from distutils.errors import DistutilsFileError
+from select import select
+from subprocess import Popen
 from threading import Thread
-
-import click
-from bash import bash
 
 from rambo.providers import load_provider_keys
 from rambo.scripts import install_lastpass
@@ -26,49 +28,76 @@ with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
 PROVIDERS = SETTINGS['PROVIDERS']
 PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
-## XXX: We should refactor this to catch output directly from Vagrant, and pass it to
-## the shell and a copy to log file. Doing logic on the contents of a log file isn't going to be
-## stable. For instance, we shouldn't have to specify any exit_triggers. We can't factor in every
-## kind of exit_trigger Vagrant can produce. Refactoring will also allow for more control over
-## the log file because we're the only ones writing to it. We'll be able to keep old logs,
-## append, cycle file names, etc.
-##
-## Once this is done both the follow_log_file and run_cmd can probably be removed.
-def follow_log_file(log_file_path, exit_triggers):
-    '''Read a file as it's being written and direct each line to stdout.
+def write_to_log(data=None, file_name=None):
+    '''Write data to log files. Will append data to a single combined log.
+    Additionally write data to a log with a custom name (such as stderr)
+    for any custom logs.
 
     Args:
-        log_file_path (str): Location of the file to be read.
-        exit_triggers (str): String to look for in the file that tells us to
-                             stop reading it.
+        data (str or bytes): Data to write to log file.
+        file_name (str): Used to create (or append to) an additional
+                         log file with a custom name. Custom name always gets
+                         `.log` added to the end.
     '''
-    file_obj = open(log_file_path, 'r')
-    while 1:
-        where = file_obj.tell()
-        line = file_obj.readline()
-        if not line:
-            time.sleep(0.1)
-            file_obj.seek(where)
-        else:
-            click.echo(line.strip()) # Strip trailing eol. Echo before break.
-            if any(string in line for string in exit_triggers):
-                break
+    try:
+        data = data.decode('utf-8')
+    except AttributeError:
+        pass # already a string
 
-def run_cmd(cmd):
-    '''Run a cmd in the shell, and output stdout and stderr.
-    This blocks until completion and then outputs both buffers once the
-    process is completed. This does no logging.
+    data = ''.join([data.rstrip(), '\n']) # strip possible eol chars and add back exactly one
+
+    dir_create(get_env_var('LOG_PATH'))
+    fd_path = os.path.join(get_env_var('LOG_PATH'), 'history.log')
+    fd = open(fd_path, 'a+')
+    fd.write(data)
+    fd.close()
+    if file_name:
+        fd_custom_path = os.path.join(get_env_var('LOG_PATH'), ''.join([file_name, '.log']))
+        fd_custom = open(fd_custom_path, 'a+')
+        fd_custom.write(data)
+        fd_custom.close()
+
+def invoke_shell(cmd=None):
+    '''Run a command in the shell in a pty. This outputs in near real-time,
+    logs both stderr and stdout in a combined file, and detects stderr for
+    our own error handling.
+
+    Returns returncode (exitcode) of the command.
+
+    Args:
+        cmd (str): The cmd string that is passed to the shell and executed.
     '''
-    if isinstance(cmd, str):
-        cmd = cmd.split()
-
-    sp = subprocess.Popen(
-        cmd,
-        stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE)
-    out, err = sp.communicate()
-    click.echo(out)
-    click.echo(err, err=True)
+    masters, slaves = zip(pty.openpty(), pty.openpty())
+    cmd=cmd.split()
+    with Popen(cmd, stdin=slaves[0], stdout=slaves[0], stderr=slaves[1]) as p:
+        for fd in slaves:
+            os.close(fd) # no input
+            readable = {
+                masters[0]: sys.stdout.buffer, # store buffers seperately
+                masters[1]: sys.stderr.buffer,
+            }
+        while readable:
+            for fd in select(readable, [], [])[0]:
+                try:
+                    data = os.read(fd, 1024) # read available
+                except OSError as e:
+                    if e.errno != errno.EIO:
+                        raise #XXX cleanup
+                    del readable[fd] # EIO means EOF on some systems
+                else:
+                    if not data: # EOF
+                        del readable[fd]
+                    else:
+                        if fd == masters[0]: # We caught stdout
+                            click.echo(data.rstrip())
+                            write_to_log(data)
+                        else: # We caught stderr
+                            click.echo(data.rstrip(), err=True)
+                            write_to_log(data, 'stderr')
+                        readable[fd].flush()
+    for fd in masters:
+        os.close(fd)
+    return p.returncode
 
 ## Defs used by main cli cmd
 def set_init_vars(cwd=None, tmpdir_path=None):
@@ -101,6 +130,7 @@ def set_init_vars(cwd=None, tmpdir_path=None):
         set_env_var('TMPDIR_PATH',
                     os.path.join(os.getcwd(),
                                  '.%s-tmp' % PROJECT_NAME)) # default (cwd)
+    set_env_var('LOG_PATH', os.path.join(get_env_var('TMPDIR_PATH'), 'logs'))
 
 def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Set the environment varialbes prefixed with `VAGRANT_` that vagrant
@@ -142,13 +172,7 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     if not ctx: # Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
-
-    dir_create(get_env_var('TMPDIR_PATH') + '/logs')
-    # TODO: Better logs.
-    bash('vagrant destroy --force >' + get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log 2>&1')
-    follow_log_file(get_env_var('TMPDIR_PATH') + '/logs/vagrant-destroy-log',
-                    ['Vagrant done with destroy.',
-                     'Print this help'])
+    invoke_shell('vagrant destroy --force')
     file_delete(get_env_var('TMPDIR_PATH') + '/provider')
     file_delete(get_env_var('TMPDIR_PATH') + '/random_tag')
     dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
@@ -254,14 +278,14 @@ def install_plugins(force=None, plugins=('all',)):
         if plugin == 'all':
             click.echo('Installing all default plugins.')
             for plugin in SETTINGS['PLUGINS']:
-                run_cmd('vagrant plugin install %s' % plugin)
+                invoke_shell('vagrant plugin install %s' % plugin)
         elif plugin in SETTINGS['PLUGINS']:
-            run_cmd('vagrant plugin install %s' % plugin)
+            invoke_shell('vagrant plugin install %s' % plugin)
         else:
             if not force:
                 click.confirm('The plugin "%s" is not in our list of plugins. Attempt '
                           'to install anyway?' % plugin, abort=True)
-            run_cmd('vagrant plugin install %s' % plugin)
+            invoke_shell('vagrant plugin install %s' % plugin)
 
 def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Connect to an running VM / container over ssh.
@@ -278,13 +302,6 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
     os.system('vagrant ssh')
-
-def up_thread():
-    '''Make the final call over the shell to `vagrant up`, and redirect
-    all output to log file.
-    '''
-    # TODO: Better logs.
-    bash('vagrant up >' + get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log 2>&1')
 
 def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
@@ -313,37 +330,16 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
                  ' variable, and is not in the providers list. Did you '
                  'have a typo?' % provider)
 
-    if not dir_exists(get_env_var('TMPDIR_PATH')):
-        dir_create(get_env_var('TMPDIR_PATH'))
-    dir_create(get_env_var('TMPDIR_PATH') + '/logs')    # TODO: Better logs.
-    open(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log','w').close() # Create log file. Vagrant will write to it, we'll read it.
-
-    thread = Thread(target = up_thread) # Threaded to write, read, and echo as `up` progresses.
-    thread.start()
-    follow_log_file(get_env_var('TMPDIR_PATH') + '/logs/vagrant-up-log',
-                    ['Total run time:',
-                     'Provisioners marked to run always will still run',
-                     'Print this help',
-                     'try again.',
-                     'Local data directory: /.vagrant',
-    ])
-    click.echo('Up complete.')
+    invoke_shell('vagrant up')
 
 ## Unused defs
-def setup_lastpass_thread(vagrant_cwd=None, vagrant_dotfile_path=None):
-    dir_create(get_user_home() + '/.tmp-common')
-    with open(get_user_home() + '/.tmp-common/install-lastpass.sh', 'w') as file_obj:
-        file_obj.write(install_lastpass)
-    bash('cd ' + get_user_home() + '/.tmp-common; bash install-lastpass.sh > install-lastpass-log')
-    with open(get_user_home() + '/.tmp-common/install-lastpass-log', 'a') as file_obj:
-        file_obj.write('done installing lastpass')
-
 def setup_lastpass():
     dir_create(get_user_home() + '/.tmp-common')
     open(get_user_home() + '/.tmp-common/install-lastpass-log','w')
-    thread = Thread(target = setup_lastpass_thread)
-    thread.start()
-    follow_log_file(get_user_home() + '/.tmp-common/install-lastpass-log', ['one installing lastpass'])
+    dir_create(get_user_home() + '/.tmp-common')
+    with open(get_user_home() + '/.tmp-common/install-lastpass.sh', 'w') as file_obj:
+        file_obj.write(install_lastpass)
+    invoke_shell('cd ' + get_user_home() + '/.tmp-common; bash install-lastpass.sh', ' install-lastpass-log')
 
 
 class Run_app():

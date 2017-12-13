@@ -3,7 +3,6 @@ import sys
 import json
 import click
 import pkg_resources
-from bash import bash
 
 from rambo.app import (
     destroy,
@@ -11,10 +10,12 @@ from rambo.app import (
     init,
     install_auth,
     install_plugins,
+    invoke_shell,
     set_init_vars,
     set_vagrant_vars,
     ssh,
     up,
+    write_to_log,
 )
 
 ## GLOBALS
@@ -69,6 +70,9 @@ def cli(ctx, vagrant_cwd, vagrant_dotfile_path, cwd, tmpdir_path):
     set_init_vars(cwd, tmpdir_path)
     set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
+    write_to_log('\nNEW CMD')
+    write_to_log(' '.join(sys.argv))
+
 ### Catch-all for everything that doesn't hit a subcommand
 @cli.command(name=cmd, context_settings=context_settings)
 def gen():
@@ -79,7 +83,7 @@ def gen():
     click.echo('Vagrant backend says:')
     sys.argv.pop(0)
     vagrant_cmd = 'vagrant ' + ' '.join(sys.argv)
-    click.echo(bash(vagrant_cmd).stdout)
+    invoke_shell(vagrant_cmd)
 
 ### Subcommands
 @cli.command('destroy')
