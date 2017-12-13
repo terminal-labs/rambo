@@ -52,7 +52,7 @@ def write_to_log(data=None, file_name=None):
     fd.write(data)
     fd.close()
     if file_name:
-        fd_custom_path = os.path.join(get_env_var('LOG_PATH'), ''.join(file_name, '.log'))
+        fd_custom_path = os.path.join(get_env_var('LOG_PATH'), ''.join([file_name, '.log']))
         fd_custom = open(fd_custom_path, 'a+')
         fd_custom.write(data)
         fd_custom.close()
