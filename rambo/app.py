@@ -57,18 +57,19 @@ def write_to_log(data=None, file_name=None):
         fd_custom.write(data)
         fd_custom.close()
 
-def invoke_shell(cmd=None):
-    '''Run a command in the shell in a pty. This outputs in near real-time,
+def _invoke_vagrant(cmd=None):
+    '''Pass a command to vagrant. This outputs in near real-time,
     logs both stderr and stdout in a combined file, and detects stderr for
     our own error handling.
 
     Returns returncode (exitcode) of the command.
 
     Args:
-        cmd (str): The cmd string that is passed to the shell and executed.
+        cmd (str): The cmd string that is appended to `vagrant ...`,
+                   passed to the shell and executed.
     '''
     masters, slaves = zip(pty.openpty(), pty.openpty())
-    cmd=cmd.split()
+    cmd = ' '.join(['vagrant', cmd]).split()
     with Popen(cmd, stdin=slaves[0], stdout=slaves[0], stderr=slaves[1]) as p:
         for fd in slaves:
             os.close(fd) # no input
@@ -172,7 +173,7 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     if not ctx: # Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
-    invoke_shell('vagrant destroy --force')
+    _invoke_vagrant('destroy --force')
     file_delete(get_env_var('TMPDIR_PATH') + '/provider')
     file_delete(get_env_var('TMPDIR_PATH') + '/random_tag')
     dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
@@ -278,14 +279,14 @@ def install_plugins(force=None, plugins=('all',)):
         if plugin == 'all':
             click.echo('Installing all default plugins.')
             for plugin in SETTINGS['PLUGINS']:
-                invoke_shell('vagrant plugin install %s' % plugin)
+                _invoke_vagrant('plugin install %s' % plugin)
         elif plugin in SETTINGS['PLUGINS']:
-            invoke_shell('vagrant plugin install %s' % plugin)
+            _invoke_vagrant('plugin install %s' % plugin)
         else:
             if not force:
                 click.confirm('The plugin "%s" is not in our list of plugins. Attempt '
                           'to install anyway?' % plugin, abort=True)
-            invoke_shell('vagrant plugin install %s' % plugin)
+            _invoke_vagrant('plugin install %s' % plugin)
 
 def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Connect to an running VM / container over ssh.
@@ -330,7 +331,16 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
                  ' variable, and is not in the providers list. Did you '
                  'have a typo?' % provider)
 
-    invoke_shell('vagrant up')
+    _invoke_vagrant('up')
+
+def vagrant_general_command(cmd):
+    '''Invoke vagrant with custom command.
+
+    Args:
+        cmd (str): String to append to command `vagrant ...`
+    '''
+    # Modify cmd in private function to keep enforcement of being a vagrant cmd there.
+    _invoke_vagrant(cmd)
 
 ## Unused defs
 def setup_lastpass():
@@ -339,7 +349,8 @@ def setup_lastpass():
     dir_create(get_user_home() + '/.tmp-common')
     with open(get_user_home() + '/.tmp-common/install-lastpass.sh', 'w') as file_obj:
         file_obj.write(install_lastpass)
-    invoke_shell('cd ' + get_user_home() + '/.tmp-common; bash install-lastpass.sh', ' install-lastpass-log')
+    # Not used, and won't work as is because we're now enforcing use of vagrant in private function.
+    _invoke_vagrant('cd ' + get_user_home() + '/.tmp-common; bash install-lastpass.sh', ' install-lastpass-log')
 
 
 class Run_app():

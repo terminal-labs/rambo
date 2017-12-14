@@ -10,11 +10,11 @@ from rambo.app import (
     init,
     install_auth,
     install_plugins,
-    invoke_shell,
     set_init_vars,
     set_vagrant_vars,
     ssh,
     up,
+    vagrant_general_command,
     write_to_log,
 )
 
@@ -81,9 +81,7 @@ def gen():
                "Passing raw commands to Vagrant backend" % PROJECT_NAME.capitalize())
     click.echo('You ran "%s"' % ' '.join(sys.argv))
     click.echo('Vagrant backend says:')
-    sys.argv.pop(0)
-    vagrant_cmd = 'vagrant ' + ' '.join(sys.argv)
-    invoke_shell(vagrant_cmd)
+    vagrant_general_command(sys.argv.pop(0))
 
 ### Subcommands
 @cli.command('destroy')
