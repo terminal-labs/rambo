@@ -7,7 +7,7 @@ import pkg_resources
 from rambo.app import (
     destroy,
     export,
-    init,
+    setup,
     install_auth,
     install_plugins,
     set_init_vars,
@@ -109,14 +109,14 @@ def export_cmd(force, src, output_path):
     '''
     export(force, src, output_path)
 
-@cli.group('init', invoke_without_command=True)
+@cli.group('setup', invoke_without_command=True)
 @click.pass_context
-def init_cmd(ctx):
-    '''Runs any setup commands. None yet implemented.
+def setup_cmd(ctx):
+    '''Create basic auth files and install dependencies (like Vagrant plugins).
     '''
     # If auth and plugins are both not specified, run both.
     if ctx.invoked_subcommand is None:
-        init()
+        setup()
 
 @cli.command('ssh', short_help="Connect with `vagrant ssh`")
 @click.pass_context
@@ -136,8 +136,8 @@ def up_cmd(ctx, provider):
     up(ctx, provider)
 
 ### Sub-subcommands
-## subcommands of init_cmd
-@init_cmd.command('plugins')
+## subcommands of setup_cmd
+@setup_cmd.command('plugins')
 @click.option('-f', '--force', is_flag=True,
               help='Install plugins without confirmation.')
 @click.argument('plugins', nargs=-1, type=str)
@@ -149,7 +149,7 @@ def plugins_cmd(force, plugins):
         plugins = ('all',)
     install_plugins(force, plugins)
 
-@init_cmd.command('auth')
+@setup_cmd.command('auth')
 def auth_cmd():
     '''Install auth directory.
     '''
