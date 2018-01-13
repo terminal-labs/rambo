@@ -234,7 +234,7 @@ def export(force=None, resource=None, export_path=None):
             try:
                 shutil.copy(src, dst) # Copy file with overwrites.
             except FileNotFoundError:
-                os.makedirs(os.path.dirname(dst), exist_ok=True) # Make parent dirs if needed.
+                os.makedirs(os.path.dirname(dst), exist_ok=True) # Make parent dirs if needed. # Py 3.2+
                 shutil.copy(src, dst) # Copy file with overwrites.
 
     click.echo('Done exporting %s code.' % resource)
@@ -259,8 +259,10 @@ def install_auth():
                % license_dir)
 
     for filename in os.listdir(os.path.join(get_env_var('env'), 'auth/env_scripts')):
-        dst = os.path.join(get_env_var('cwd'), 'auth/keys', os.path.splitext(filename)[0])
+        dst_dir = os.path.join(get_env_var('cwd'), 'auth/keys')
+        dst = os.path.join(dst_dir, os.path.splitext(filename)[0])
         if not os.path.isfile(dst):
+            os.makedirs(dst_dir, exist_ok=True) # Make parent dirs if needed. # Py 3.2+
             shutil.copy(os.path.join(get_env_var('env'), 'auth/env_scripts', filename), dst)
             click.echo('Added template key loading scripts to %s.' % dst)
         else:
