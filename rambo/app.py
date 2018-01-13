@@ -239,7 +239,7 @@ def export(force=None, resource=None, export_path=None):
 
     click.echo('Done exporting %s code.' % resource)
 
-def init():
+def setup():
     '''Install all default plugins and setup auth directory.
     '''
     install_auth()
@@ -355,4 +355,4 @@ def setup_lastpass():
 
 class Run_app():
     def __init__(self):
-        print("in run app init")
+        print("in Run_app __init__")
