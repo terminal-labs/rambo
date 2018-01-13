@@ -5,6 +5,7 @@ import click
 import pkg_resources
 
 from rambo.app import (
+    createproject,
     destroy,
     export,
     setup,
@@ -84,6 +85,16 @@ def gen():
     vagrant_general_command(sys.argv.pop(0))
 
 ### Subcommands
+@cli.command('createproject')
+@click.option('-P', '--project-path', type=click.Path(), default=None,
+              help='The project path (optional).')
+@click.argument('project_name')
+@click.pass_context
+def createproject_cmd(ctx, project_name, project_path):
+    '''Create a Rambo project dir with basic setup.
+    '''
+    createproject(ctx, project_name, project_path)
+
 @cli.command('destroy')
 @click.pass_context
 def destroy_cmd(ctx):

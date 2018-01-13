@@ -157,6 +157,16 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd(), '.vagrant')) # default (cwd)
 
 ## Defs for cli subcommands
+def createproject(ctx, project_name, project_path=None):
+    '''C
+    '''
+    if not project_path:
+        project_path = os.getcwd()
+    os.makedirs(os.path.join(project_path, project_name)) # Make parent dirs if needed.
+    click.echo('Created %s project "%s" in %s.'
+               % (PROJECT_NAME.capitalize(), project_name, project_path))
+
+
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
     All str args can also be set as an environment variable; arg takes precedence.
