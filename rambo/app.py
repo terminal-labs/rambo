@@ -16,7 +16,7 @@ from threading import Thread
 
 from rambo.providers import load_provider_keys
 from rambo.scripts import install_lastpass
-from rambo.utils import get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
+from rambo.utils import abort, get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
 
 
 ## GLOBALS
@@ -115,9 +115,8 @@ def set_init_vars(cwd=None, tmpdir_path=None):
         try:
             set_env_var('CWD', os.getcwd())
         except FileNotFoundError:
-            click.echo('Your current working directory no longer exists. '
-                       'Did you delete it? Check for it with `ls ..`', err=True)
-            raise click.Abort()
+            abort('ABORTED - Your current working directory no longer exists. '
+                  'Did you delete it? Check for it with `ls ..`')
 
     # loc of tmpdir_path
     if tmpdir_path: # cli / api
@@ -162,7 +161,12 @@ def createproject(ctx, project_name, project_path=None):
     '''
     if not project_path:
         project_path = os.getcwd()
-    os.makedirs(os.path.join(project_path, project_name)) # Make parent dirs if needed.
+    path = os.path.join(project_path, project_name)
+    try:
+        os.makedirs(path) # Make parent dirs if needed.
+    except FileExistsError:
+        abort('ABORTED - Directory already exists.')
+
     click.echo('Created %s project "%s" in %s.'
                % (PROJECT_NAME.capitalize(), project_name, project_path))
 
@@ -332,16 +336,15 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    # TODO See if there's a better exit / error system
     if provider:
         set_env_var('provider', provider)
         if provider not in PROVIDERS:
-            sys.exit('ABORTED - Target provider "%s" is not in the providers '
-                     'list. Did you have a typo?' % provider)
+            abort('ABORTED - Target provider "%s" is not in the providers '
+                  'list. Did you have a typo?' % provider)
     elif get_env_var('PROVIDER') and get_env_var('PROVIDER') not in PROVIDERS:
-        sys.exit('ABORTED - Target provider "%s" is set as an environment '
-                 ' variable, and is not in the providers list. Did you '
-                 'have a typo?' % provider)
+        abort('ABORTED - Target provider "%s" is set as an environment '
+              'variable, and is not in the providers list. Did you '
+              'have a typo?' % provider)
 
     _invoke_vagrant('up')
 
