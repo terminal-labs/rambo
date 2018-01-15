@@ -115,10 +115,10 @@ def destroy_cmd(ctx):
               help="Export all of %s's project code." % PROJECT_NAME.capitalize())
 @click.option('-O', '--output-path', type=click.Path(), default=None,
               help='The optional output path.')
-def export_cmd(force, src, output_path):
+def export_cmd(src, output_path, force):
     '''Export code to a handy place for the user to view and edit.
     '''
-    export(force, src, output_path)
+    export(src, output_path, force)
 
 @cli.group('setup', invoke_without_command=True)
 @click.pass_context
@@ -161,9 +161,11 @@ def plugins_cmd(force, plugins):
     install_plugins(force, plugins)
 
 @setup_cmd.command('auth')
-def auth_cmd():
+@click.option('-O', '--output-path', type=click.Path(), default=None,
+              help='The optional output path.')
+def auth_cmd(output_path):
     '''Install auth directory.
     '''
-    install_auth()
+    install_auth(output_path)
 
 main = cli

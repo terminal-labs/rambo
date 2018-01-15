@@ -156,9 +156,10 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd(), '.vagrant')) # default (cwd)
 
 ## Defs for cli subcommands
-def createproject(ctx, project_name, project_path=None):
-    '''C
+def createproject(ctx, project_name, project_path=None, config_only=None):
+    '''Create project with basic configuration files.
     '''
+    ## Create project dir
     if not project_path:
         project_path = os.getcwd()
     path = os.path.join(project_path, project_name)
@@ -166,9 +167,12 @@ def createproject(ctx, project_name, project_path=None):
         os.makedirs(path) # Make parent dirs if needed.
     except FileExistsError:
         abort('Directory already exists.')
-
     click.echo('Created %s project "%s" in %s.'
                % (PROJECT_NAME.capitalize(), project_name, project_path))
+    ## Fill project dir with basic configs.
+    if not config_only:
+        export('saltstack', path)
+        install_auth(path)
 
 
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
@@ -194,14 +198,14 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     click.echo('Temporary files removed')
     click.echo('Destroy complete.')
 
-def export(force=None, resource=None, export_path=None):
+def export(resource=None, export_path=None, force=None):
     '''Drop default code in the CWD / user defined space. Operate on saltstack,
     vagrant, or python resources.
 
     Agrs:
-        force (str): Detects if we should overwrite and merge.
         resource (str): Resource to export: saltstack, vagrant, python, or all.
         export_path (str): Dir to export resources to.
+        force (str): Detects if we should overwrite and merge.
     '''
     if export_path:
         output_dir = os.path.normpath(export_path)
@@ -234,12 +238,15 @@ def export(force=None, resource=None, export_path=None):
             dsts.append(os.path.join(output_dir, file))
 
     if not force:
-        for path in dsts:
-            if os.path.exists(path):
-                click.confirm("One or more destination files or directories in "
-                              "'%s' already exists. Attempt to merge and "
-                              "overwrite?" % dsts, abort=True)
-                break # We only need general confirmation of an overwrite once.
+        try:
+            for path in dsts:
+                if os.path.exists(path):
+                    click.confirm("One or more destination files or directories in "
+                                  "'%s' already exists. Attempt to merge and "
+                                  "overwrite?" % dsts, abort=True)
+                    break # We only need general confirmation of an overwrite once.
+        except UnboundLocalError: # dsts referenced before assignement
+            abort("The resource '%s' is not a valid option." % resource)
 
     for src, dst in zip(srcs, dsts):
         try:
@@ -256,29 +263,28 @@ def export(force=None, resource=None, export_path=None):
 def setup():
     '''Install all default plugins and setup auth directory.
     '''
-    install_auth()
     install_plugins()
 
-def install_auth():
+def install_auth(output_path=None):
     '''Install auth directory.
     '''
-    license_dir = os.path.join(get_env_var('cwd'), 'auth/licenses')
+    if not output_path:
+        output_path = get_env_var('cwd')
+    license_dir = os.path.join(output_path, 'auth/licenses')
     try:
         os.makedirs(license_dir)
-        click.echo('The path %s was just created.'
-                   % license_dir)
     except FileExistsError:
         pass # Dir already created. Moving on.
     click.echo('Any (license) files you put in %s will be synced into your VM.'
                % license_dir)
 
     for filename in os.listdir(os.path.join(get_env_var('env'), 'auth/env_scripts')):
-        dst_dir = os.path.join(get_env_var('cwd'), 'auth/keys')
+        dst_dir = os.path.join(output_path, 'auth/keys')
         dst = os.path.join(dst_dir, os.path.splitext(filename)[0])
         if not os.path.isfile(dst):
             os.makedirs(dst_dir, exist_ok=True) # Make parent dirs if needed. # Py 3.2+
             shutil.copy(os.path.join(get_env_var('env'), 'auth/env_scripts', filename), dst)
-            click.echo('Added template key loading scripts to %s.' % dst)
+            click.echo('Added template key loading scripts %s to auth/keys.' % filename)
         else:
             click.echo('File %s exists. Leaving it.' % dst)
 
