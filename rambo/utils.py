@@ -26,7 +26,7 @@ def get_env_var(name):
     return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
 
 def abort(message):
-    sys.exit(colored(message, 'red', attrs=['bold']))
+    sys.exit(colored(''.join(['ABORTED - ', message]), 'red', attrs=['bold']))
 
 def dir_exists(path):
     return os.path.isdir(path)

@@ -115,7 +115,7 @@ def set_init_vars(cwd=None, tmpdir_path=None):
         try:
             set_env_var('CWD', os.getcwd())
         except FileNotFoundError:
-            abort('ABORTED - Your current working directory no longer exists. '
+            abort('Your current working directory no longer exists. '
                   'Did you delete it? Check for it with `ls ..`')
 
     # loc of tmpdir_path
@@ -165,7 +165,7 @@ def createproject(ctx, project_name, project_path=None):
     try:
         os.makedirs(path) # Make parent dirs if needed.
     except FileExistsError:
-        abort('ABORTED - Directory already exists.')
+        abort('Directory already exists.')
 
     click.echo('Created %s project "%s" in %s.'
                % (PROJECT_NAME.capitalize(), project_name, project_path))
@@ -339,10 +339,10 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     if provider:
         set_env_var('provider', provider)
         if provider not in PROVIDERS:
-            abort('ABORTED - Target provider "%s" is not in the providers '
+            abort('Target provider "%s" is not in the providers '
                   'list. Did you have a typo?' % provider)
     elif get_env_var('PROVIDER') and get_env_var('PROVIDER') not in PROVIDERS:
-        abort('ABORTED - Target provider "%s" is set as an environment '
+        abort('Target provider "%s" is set as an environment '
               'variable, and is not in the providers list. Did you '
               'have a typo?' % provider)
 
