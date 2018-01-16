@@ -172,7 +172,7 @@ def createproject(project_name, project_path=None, config_only=None):
     ## Fill project dir with basic configs.
     if not config_only:
         export('saltstack', path)
-        install_auth(path)
+        install_auth(output_path=path)
 
 
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
@@ -188,7 +188,7 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     # TODO (optional) add finding and deleting of all VMs across all installations.
     # TODO add an --all flag to delete the whole .rambo-tmp dir. Default leaves logs.
 
-    if not ctx: # Else handled by cli.
+    if not ctx: # Using API. Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
     _invoke_vagrant('destroy --force')
@@ -265,9 +265,12 @@ def setup():
     '''
     install_plugins()
 
-def install_auth(output_path=None):
+def install_auth(ctx=None, output_path=None):
     '''Install auth directory.
     '''
+    if not ctx: # Using API. Else handled by cli.
+        set_init_vars()
+
     if not output_path:
         output_path = get_env_var('cwd')
     license_dir = os.path.join(output_path, 'auth/licenses')
@@ -320,7 +323,7 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
     '''
     # TODO: Better logs.
-    if not ctx: # Else handled by cli.
+    if not ctx: # Using API. Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
@@ -338,7 +341,7 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''
     # TODO: Add registering of VM for all of this installation to see
 
-    if not ctx: # Else handled by cli.
+    if not ctx: # Using API. Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 

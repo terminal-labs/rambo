@@ -162,9 +162,10 @@ def plugins_cmd(force, plugins):
 @setup_cmd.command('auth')
 @click.option('-O', '--output-path', type=click.Path(), default=None,
               help='The optional output path.')
-def auth_cmd(output_path):
+@click.pass_context
+def auth_cmd(ctx, output_path):
     '''Install auth directory.
     '''
-    install_auth(output_path)
+    install_auth(ctx, output_path)
 
 main = cli
