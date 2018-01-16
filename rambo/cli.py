@@ -89,11 +89,10 @@ def gen():
 @click.option('-P', '--project-path', type=click.Path(), default=None,
               help='The project path (optional).')
 @click.argument('project_name')
-@click.pass_context
-def createproject_cmd(ctx, project_name, project_path):
+def createproject_cmd(project_name, project_path):
     '''Create a Rambo project dir with basic setup.
     '''
-    createproject(ctx, project_name, project_path)
+    createproject(project_name, project_path)
 
 @cli.command('destroy')
 @click.pass_context
