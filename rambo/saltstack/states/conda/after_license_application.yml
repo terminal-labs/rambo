@@ -1,5 +1,0 @@
-name: root
-dependencies:
-  - iopro
-  - mkl
-  - accelerate 

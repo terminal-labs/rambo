@@ -1,6 +1,6 @@
 recursive-include rambo/auth/env_scripts *
-recursive-include rambo/salt_resources *
-recursive-include rambo/vagrant_resources *
+recursive-include rambo/saltstack *
+recursive-include rambo/vagrant *
 recursive-include docs *
 include rambo/Vagrantfile
 include rambo/settings.json

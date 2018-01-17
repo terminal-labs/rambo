@@ -16,7 +16,7 @@ from threading import Thread
 
 from rambo.providers import load_provider_keys
 from rambo.scripts import install_lastpass
-from rambo.utils import get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
+from rambo.utils import abort, get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
 
 
 ## GLOBALS
@@ -115,9 +115,8 @@ def set_init_vars(cwd=None, tmpdir_path=None):
         try:
             set_env_var('CWD', os.getcwd())
         except FileNotFoundError:
-            click.echo('Your current working directory no longer exists. '
-                       'Did you delete it? Check for it with `ls ..`', err=True)
-            raise click.Abort()
+            abort('Your current working directory no longer exists. '
+                  'Did you delete it? Check for it with `ls ..`')
 
     # loc of tmpdir_path
     if tmpdir_path: # cli / api
@@ -157,6 +156,23 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd(), '.vagrant')) # default (cwd)
 
 ## Defs for cli subcommands
+def createproject(project_name, config_only=None):
+    '''Create project with basic configuration files.
+    '''
+    ## Create project dir
+    path = os.path.join(os.getcwd(), project_name)
+    try:
+        os.makedirs(path) # Make parent dirs if needed.
+    except FileExistsError:
+        abort('Directory already exists.')
+    click.echo('Created %s project "%s" in %s.'
+               % (PROJECT_NAME.capitalize(), project_name, project_path))
+    ## Fill project dir with basic configs.
+    if not config_only:
+        export('saltstack', path)
+        install_auth(output_path=path)
+
+
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
     All str args can also be set as an environment variable; arg takes precedence.
@@ -170,7 +186,7 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     # TODO (optional) add finding and deleting of all VMs across all installations.
     # TODO add an --all flag to delete the whole .rambo-tmp dir. Default leaves logs.
 
-    if not ctx: # Else handled by cli.
+    if not ctx: # Using API. Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
     _invoke_vagrant('destroy --force')
@@ -180,14 +196,14 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     click.echo('Temporary files removed')
     click.echo('Destroy complete.')
 
-def export(force=None, resource=None, export_path=None):
+def export(resource=None, export_path=None, force=None):
     '''Drop default code in the CWD / user defined space. Operate on saltstack,
     vagrant, or python resources.
 
     Agrs:
-        force (str): Detects if we should overwrite and merge.
         resource (str): Resource to export: saltstack, vagrant, python, or all.
         export_path (str): Dir to export resources to.
+        force (str): Detects if we should overwrite and merge.
     '''
     if export_path:
         output_dir = os.path.normpath(export_path)
@@ -220,12 +236,15 @@ def export(force=None, resource=None, export_path=None):
             dsts.append(os.path.join(output_dir, file))
 
     if not force:
-        for path in dsts:
-            if os.path.exists(path):
-                click.confirm("One or more destination files or directories in "
-                              "'%s' already exists. Attempt to merge and "
-                              "overwrite?" % dsts, abort=True)
-                break # We only need general confirmation of an overwrite once.
+        try:
+            for path in dsts:
+                if os.path.exists(path):
+                    click.confirm("One or more destination files or directories in "
+                                  "'%s' already exists. Attempt to merge and "
+                                  "overwrite?" % dsts, abort=True)
+                    break # We only need general confirmation of an overwrite once.
+        except UnboundLocalError: # dsts referenced before assignement
+            abort("The resource '%s' is not a valid option." % resource)
 
     for src, dst in zip(srcs, dsts):
         try:
@@ -242,29 +261,31 @@ def export(force=None, resource=None, export_path=None):
 def setup():
     '''Install all default plugins and setup auth directory.
     '''
-    install_auth()
     install_plugins()
 
-def install_auth():
+def install_auth(ctx=None, output_path=None):
     '''Install auth directory.
     '''
-    license_dir = os.path.join(get_env_var('cwd'), 'auth/licenses')
+    if not ctx: # Using API. Else handled by cli.
+        set_init_vars()
+
+    if not output_path:
+        output_path = get_env_var('cwd')
+    license_dir = os.path.join(output_path, 'auth/licenses')
     try:
         os.makedirs(license_dir)
-        click.echo('The path %s was just created.'
-                   % license_dir)
     except FileExistsError:
         pass # Dir already created. Moving on.
     click.echo('Any (license) files you put in %s will be synced into your VM.'
                % license_dir)
 
     for filename in os.listdir(os.path.join(get_env_var('env'), 'auth/env_scripts')):
-        dst_dir = os.path.join(get_env_var('cwd'), 'auth/keys')
+        dst_dir = os.path.join(output_path, 'auth/keys')
         dst = os.path.join(dst_dir, os.path.splitext(filename)[0])
         if not os.path.isfile(dst):
             os.makedirs(dst_dir, exist_ok=True) # Make parent dirs if needed. # Py 3.2+
             shutil.copy(os.path.join(get_env_var('env'), 'auth/env_scripts', filename), dst)
-            click.echo('Added template key loading scripts to %s.' % dst)
+            click.echo('Added template key loading scripts %s to auth/keys.' % filename)
         else:
             click.echo('File %s exists. Leaving it.' % dst)
 
@@ -300,7 +321,7 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
     '''
     # TODO: Better logs.
-    if not ctx: # Else handled by cli.
+    if not ctx: # Using API. Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
@@ -318,20 +339,19 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''
     # TODO: Add registering of VM for all of this installation to see
 
-    if not ctx: # Else handled by cli.
+    if not ctx: # Using API. Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    # TODO See if there's a better exit / error system
     if provider:
         set_env_var('provider', provider)
         if provider not in PROVIDERS:
-            sys.exit('ABORTED - Target provider "%s" is not in the providers '
-                     'list. Did you have a typo?' % provider)
+            abort('Target provider "%s" is not in the providers '
+                  'list. Did you have a typo?' % provider)
     elif get_env_var('PROVIDER') and get_env_var('PROVIDER') not in PROVIDERS:
-        sys.exit('ABORTED - Target provider "%s" is set as an environment '
-                 ' variable, and is not in the providers list. Did you '
-                 'have a typo?' % provider)
+        abort('Target provider "%s" is set as an environment '
+              'variable, and is not in the providers list. Did you '
+              'have a typo?' % provider)
 
     _invoke_vagrant('up')
 

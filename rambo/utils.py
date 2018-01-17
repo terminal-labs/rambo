@@ -1,8 +1,10 @@
-import os
 import json
-
+import os
+import sys
 from pathlib import Path
 from shutil import copyfile, move, rmtree
+
+from termcolor import colored
 
 ## GLOBALS
 # Create env var indicating where this code lives. This will be used latter by
@@ -22,6 +24,9 @@ def get_env_var(name):
     '''Get an environment variable in all caps that is prefixed with the name of the project
     '''
     return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
+
+def abort(message):
+    sys.exit(colored(''.join(['ABORTED - ', message]), 'red', attrs=['bold']))
 
 def dir_exists(path):
     return os.path.isdir(path)
