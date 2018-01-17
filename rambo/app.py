@@ -166,7 +166,7 @@ def createproject(project_name, config_only=None):
     except FileExistsError:
         abort('Directory already exists.')
     click.echo('Created %s project "%s" in %s.'
-               % (PROJECT_NAME.capitalize(), project_name, project_path))
+               % (PROJECT_NAME.capitalize(), project_name, path))
     ## Fill project dir with basic configs.
     if not config_only:
         export('saltstack', path)
