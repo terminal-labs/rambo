@@ -156,13 +156,11 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd(), '.vagrant')) # default (cwd)
 
 ## Defs for cli subcommands
-def createproject(project_name, project_path=None, config_only=None):
+def createproject(project_name, config_only=None):
     '''Create project with basic configuration files.
     '''
     ## Create project dir
-    if not project_path:
-        project_path = os.getcwd()
-    path = os.path.join(project_path, project_name)
+    path = os.path.join(os.getcwd(), project_name)
     try:
         os.makedirs(path) # Make parent dirs if needed.
     except FileExistsError:

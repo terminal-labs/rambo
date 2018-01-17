@@ -86,13 +86,11 @@ def gen():
 
 ### Subcommands
 @cli.command('createproject')
-@click.option('-P', '--project-path', type=click.Path(), default=None,
-              help='The project path (optional).')
 @click.argument('project_name')
-def createproject_cmd(project_name, project_path):
+def createproject_cmd(project_name):
     '''Create a Rambo project dir with basic setup.
     '''
-    createproject(project_name, project_path)
+    createproject(project_name)
 
 @cli.command('destroy')
 @click.pass_context
@@ -160,12 +158,10 @@ def plugins_cmd(force, plugins):
     install_plugins(force, plugins)
 
 @setup_cmd.command('auth')
-@click.option('-O', '--output-path', type=click.Path(), default=None,
-              help='The optional output path.')
 @click.pass_context
-def auth_cmd(ctx, output_path):
+def auth_cmd(ctx):
     '''Install auth directory.
     '''
-    install_auth(ctx, output_path)
+    install_auth(ctx)
 
 main = cli
