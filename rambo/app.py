@@ -261,6 +261,7 @@ def export(resource=None, export_path=None, force=None):
 def setup():
     '''Install all default plugins and setup auth directory.
     '''
+    install_auth()
     install_plugins()
 
 def install_auth(ctx=None, output_path=None):
