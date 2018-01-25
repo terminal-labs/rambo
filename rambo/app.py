@@ -27,7 +27,7 @@ with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
     SETTINGS = json.load(f)
 PROVIDERS = SETTINGS['PROVIDERS']
 PROJECT_NAME = SETTINGS['PROJECT_NAME']
-
+GUEST_OSES = SETTINGS['GUEST_OSES']
 def write_to_log(data=None, file_name=None):
     '''Write data to log files. Will append data to a single combined log.
     Additionally write data to a log with a custom name (such as stderr)
@@ -328,7 +328,7 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     os.system('vagrant ssh')
 
-def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -353,6 +353,23 @@ def up(ctx=None, provider=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         abort('Target provider "%s" is set as an environment '
               'variable, and is not in the providers list. Did you '
               'have a typo?' % provider)
+
+    if guest_os:
+        print(guest_os)
+        set_env_var('guest_os', str(guest_os))
+        if guest_os not in GUEST_OSES:
+            msg = 'Guest OS "{}" is not in the guest OSes list. Did you have a typo? Here is as list of avalible guest OSes:\n'
+            msg = msg.format(guest_os)
+            for os in GUEST_OSES:
+                msg = msg + '{}\n'.format(os)
+            abort(msg)
+    elif get_env_var('GUEST_OS') and get_env_var('GUEST_OS') not in GUEST_OSES:
+        msg = 'Guest OS "{}" is set as an environment variable, and is not in the guest OS list. \nHere is as list of avalible guest OSes:\n'
+        msg = msg.format(guest_os)
+        for os in GUEST_OSES:
+            msg = msg + '{}\n'.format(os)
+        abort(msg)
+
 
     _invoke_vagrant('up')
 

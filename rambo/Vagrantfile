@@ -66,7 +66,7 @@ hosts = ['debian-8',
         ]
 
 unless get_env_var_rb("GUEST_OS")
-  set_env_var_rb("GUEST_OS", "debian-8")
+  set_env_var_rb("GUEST_OS", "ubuntu-1604")
 end
 
 unless (hosts.include? get_env_var_rb("GUEST_OS"))

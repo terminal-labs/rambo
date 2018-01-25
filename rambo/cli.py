@@ -137,11 +137,14 @@ def ssh_cmd(ctx):
 @click.option('-p', '--provider', envvar = PROJECT_NAME.upper() + '_PROVIDER',
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
+@click.option('-o', '--guest-os', envvar = PROJECT_NAME.upper() + '_GUEST_OS',
+              help='Operating System of the guest, inside the virtual machine. '
+              'These guest OSs are supported: %s. Default Debian.' % PROVIDERS)
 @click.pass_context
-def up_cmd(ctx, provider):
+def up_cmd(ctx, provider, guest_os):
     '''Start a VM / container with `vagrant up`.
     '''
-    up(ctx, provider)
+    up(ctx, provider, guest_os)
 
 ### Sub-subcommands
 ## subcommands of setup_cmd
