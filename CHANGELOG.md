@@ -1,4 +1,9 @@
 ## 0.3.4.dev (TBD)
+FEATURES:
+	- Added cli option for guest os
+
+IMPROVEMENTS:
+	- Changed default guest os from Debian 8 to Ubuntu 16.04
 
 ## 0.3.3 (November 28, 2017)
 
