@@ -81,8 +81,9 @@ def gen():
     click.echo("Warning -- you entered a command %s does not understand. "
                "Passing raw commands to Vagrant backend" % PROJECT_NAME.capitalize())
     click.echo('You ran "%s"' % ' '.join(sys.argv))
+    sys.argv.pop(0) # Remove Rambo path from full command
     click.echo('Vagrant backend says:')
-    vagrant_general_command(sys.argv.pop(0))
+    vagrant_general_command(' '.join(sys.argv))
 
 ### Subcommands
 @cli.command('createproject')
