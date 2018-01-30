@@ -344,7 +344,7 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    if provider:
+    if provider: # if none, keep unset
         set_env_var('provider', provider)
         if provider not in PROVIDERS:
             abort('Target provider "%s" is not in the providers '
@@ -354,8 +354,7 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
               'variable, and is not in the providers list. Did you '
               'have a typo?' % provider)
 
-    if guest_os:
-        print(guest_os)
+    if guest_os: # if none, keep unset
         set_env_var('guest_os', str(guest_os))
         if guest_os not in GUEST_OSES:
             msg = 'Guest OS "{}" is not in the guest OSes list. Did you have a typo? Here is as list of avalible guest OSes:\n'

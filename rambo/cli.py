@@ -26,6 +26,7 @@ PROJECT_LOCATION = os.path.dirname(os.path.realpath(__file__))
 with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
     SETTINGS = json.load(f)
 PROVIDERS = SETTINGS['PROVIDERS']
+GUEST_OSES = SETTINGS['GUEST_OSES']
 PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
 version = pkg_resources.get_distribution('rambo-vagrant').version
@@ -140,7 +141,7 @@ def ssh_cmd(ctx):
               'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
 @click.option('-o', '--guest-os', envvar = PROJECT_NAME.upper() + '_GUEST_OS',
               help='Operating System of the guest, inside the virtual machine. '
-              'These guest OSs are supported: %s. Default Debian.' % PROVIDERS)
+              'These guest OSs are supported: %s. Default Ubuntu.' % GUEST_OSES)
 @click.pass_context
 def up_cmd(ctx, provider, guest_os):
     '''Start a VM / container with `vagrant up`.
