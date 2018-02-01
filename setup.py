@@ -1,8 +1,12 @@
+# Before anything else, bail if not Python3
+import sys
+if sys.version_info < (3,0):
+    sys.exit('Python 3 required but lower version found. Aborted.')
+
 import json
 import os
 import shutil
 import urllib.request
-import sys
 from setuptools import setup, find_packages
 from setuptools.command.sdist import sdist
 from setuptools.command.egg_info import egg_info
@@ -106,6 +110,3 @@ setup(
         rambo=rambo.cli:main
      '''
 )
-
-if sys.version_info < (3,0):
-    sys.exit('Python 3 required but lower version found. Aborted.')
