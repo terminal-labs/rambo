@@ -1,8 +1,8 @@
-import click
 import json
 import os
 import shutil
 import urllib.request
+import sys
 from setuptools import setup, find_packages
 from setuptools.command.sdist import sdist
 from setuptools.command.egg_info import egg_info
@@ -23,13 +23,21 @@ def download_sample_states(command_subclass):
 
     def modified_run(self):
         target = os.path.abspath('rambo/saltstack')
+        yes = {'yes','y', 'ye', ''}
+        no = {'no','n'}
+
         ## Special Case of sdist (upload)
         if type(self).__name__ == 'CustomSdistCommand':
             if os.path.exists(target):
-                if click.confirm('%s exists. Delete and redownload before running sdist?' % target):
+                choice = input('%s exists. Delete and redownload before running sdist? (Y/n): ' % target).lower()
+                if choice in yes:
                     shutil.rmtree(target) # Delete.
+                elif choice in no:
+                    pass # Don't delete.
+                else:
+                    print("Please respond with 'yes' or 'no'")
             else:
-                click.echo('%s did not yet exist, so we must download it for packaging.' % target)
+                print('%s did not yet exist, so we must download it for packaging.' % target)
 
         ## Download states and copy if we need to.
         if not os.path.exists(target): # Do not overwrite existing saltstack dir. Installs don't delete!
@@ -98,3 +106,6 @@ setup(
         rambo=rambo.cli:main
      '''
 )
+
+if sys.version_info < (3,0):
+    sys.exit('Python 3 required but lower version found. Aborted.')
