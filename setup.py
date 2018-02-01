@@ -1,6 +1,6 @@
 # Before anything else, bail if not Python3
 import sys
-if sys.version_info < (3,0):
+if sys.version_info.major < 3:
     sys.exit('Python 3 required but lower version found. Aborted.')
 
 import json
