@@ -190,8 +190,8 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
     _invoke_vagrant('destroy --force')
-    file_delete(get_env_var('TMPDIR_PATH') + '/provider')
-    file_delete(get_env_var('TMPDIR_PATH') + '/random_tag')
+    file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/provider'))
+    file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/random_tag'))
     dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
     click.echo('Temporary files removed')
     click.echo('Destroy complete.')
@@ -383,13 +383,13 @@ def vagrant_general_command(cmd):
 
 ## Unused defs
 def setup_lastpass():
-    dir_create(get_user_home() + '/.tmp-common')
-    open(get_user_home() + '/.tmp-common/install-lastpass-log','w')
-    dir_create(get_user_home() + '/.tmp-common')
-    with open(get_user_home() + '/.tmp-common/install-lastpass.sh', 'w') as file_obj:
+    dir_create(os.path.join(get_user_home(), '/.tmp-common'))
+    open(os.path.join(get_user_home(), '/.tmp-common/install-lastpass-log'),'w')
+    dir_create(os.path.join(get_user_home(), '/.tmp-common'))
+    with open(os.path.join(get_user_home(), '/.tmp-common/install-lastpass.sh'), 'w') as file_obj:
         file_obj.write(install_lastpass)
     # Not used, and won't work as is because we're now enforcing use of vagrant in private function.
-    _invoke_vagrant('cd ' + get_user_home() + '/.tmp-common; bash install-lastpass.sh', ' install-lastpass-log')
+    _invoke_vagrant(os.path.join('cd ', get_user_home(), '/.tmp-common; bash install-lastpass.sh'), ' install-lastpass-log')
 
 
 class Run_app():
