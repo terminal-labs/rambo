@@ -349,10 +349,6 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
         if provider not in PROVIDERS:
             abort('Target provider "%s" is not in the providers '
                   'list. Did you have a typo?' % provider)
-    elif get_env_var('PROVIDER') and get_env_var('PROVIDER') not in PROVIDERS:
-        abort('Target provider "%s" is set as an environment '
-              'variable, and is not in the providers list. Did you '
-              'have a typo?' % provider)
 
     if guest_os: # if none, keep unset
         set_env_var('guest_os', str(guest_os))
@@ -362,13 +358,6 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
             for os in GUEST_OSES:
                 msg = msg + '{}\n'.format(os)
             abort(msg)
-    elif get_env_var('GUEST_OS') and get_env_var('GUEST_OS') not in GUEST_OSES:
-        msg = 'Guest OS "{}" is set as an environment variable, and is not in the guest OS list. \nHere is as list of avalible guest OSes:\n'
-        msg = msg.format(guest_os)
-        for os in GUEST_OSES:
-            msg = msg + '{}\n'.format(os)
-        abort(msg)
-
 
     _invoke_vagrant('up')
 
