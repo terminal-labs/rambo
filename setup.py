@@ -90,6 +90,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'click',
+        'click-configfile',
         'termcolor'
     ],
     cmdclass={

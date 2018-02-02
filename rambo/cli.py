@@ -1,9 +1,13 @@
 import os
 import sys
 import json
-import click
 import pkg_resources
 
+from click_configfile import ConfigFileReader, Param, SectionSchema
+from click_configfile import matches_section
+import click
+
+from rambo.utils import abort
 from rambo.app import (
     createproject,
     destroy,
@@ -19,7 +23,7 @@ from rambo.app import (
     write_to_log,
 )
 
-## GLOBALS
+### GLOBALS
 # Create env var indicating where this code lives. This will be used latter by
 # Vagrant as a check that the python cli is being used, as well as being a useful var.
 PROJECT_LOCATION = os.path.dirname(os.path.realpath(__file__))
@@ -30,6 +34,29 @@ GUEST_OSES = SETTINGS['GUEST_OSES']
 PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
 version = pkg_resources.get_distribution('rambo-vagrant').version
+
+### Config file handling
+class ConfigSectionSchema(object):
+    """Describes all config sections of this configuration file."""
+
+    @matches_section("base")
+    class Base(SectionSchema):
+        cwd                   = Param(type=click.Path())
+        tmpdir_path           = Param(type=click.Path())
+        vagrant_cwd           = Param(type=click.Path())
+        vagrant_dotfile_path  = Param(type=click.Path())
+
+    @matches_section("up")
+    class Up(SectionSchema):
+        provider    = Param(type=str)
+        guest_os    = Param(type=str)
+
+class ConfigFileProcessor(ConfigFileReader):
+    config_files = ['rambo.ini', 'rambo.cfg', 'rambo.conf']
+    config_section_schemas = [
+        ConfigSectionSchema.Base,
+        ConfigSectionSchema.Up,
+    ]
 
 ### BASE COMMAND LIST
 cmd = ''
@@ -44,14 +71,20 @@ if len(sys.argv) > 1:
     if cmd in commands_handled_by_click:
         cmd = ''
 
-context_settings = {
+# Only used for the base command and not any subcommands
+BASECMD_CONTEXT_SETTINGS = {
     'ignore_unknown_options': True,
     'allow_extra_args': True,
+}
+
+# Used for all commands and subcommands
+CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],
+    'default_map': ConfigFileProcessor.read_config(),
 }
 
 ### Main command / CLI entry point
-@click.group(context_settings=context_settings)
+@click.group(context_settings=dict(CONTEXT_SETTINGS, **BASECMD_CONTEXT_SETTINGS))
 @click.option('--vagrant-cwd', default=None, type=click.Path(),
               help='Path entry point to the Vagrantfile. Defaults to '
               'the Vagrantfile provided by %s in the installed path.'
@@ -64,11 +97,12 @@ context_settings = {
               'actual CWD, but may be set for customization. Used to look '
               'for optional resources such as custom SaltStack code.')
 @click.option('--tmpdir-path', default=None, type=click.Path(),
-              help='Path location of the .rambo-tmp directory for the virtual'
-              ' machine. Defaults to the current working directory')
+              help='Path location of the .rambo-tmp directory for the virtual '
+              'machine. Defaults to the current working directory')
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
 @click.pass_context
-def cli(ctx, vagrant_cwd, vagrant_dotfile_path, cwd, tmpdir_path):
+def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
+    # These need to be very early because they may change the cwd of this Python or of Vagrant
     set_init_vars(cwd, tmpdir_path)
     set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
@@ -76,7 +110,7 @@ def cli(ctx, vagrant_cwd, vagrant_dotfile_path, cwd, tmpdir_path):
     write_to_log(' '.join(sys.argv))
 
 ### Catch-all for everything that doesn't hit a subcommand
-@cli.command(name=cmd, context_settings=context_settings)
+@cli.command(name=cmd, context_settings=dict(CONTEXT_SETTINGS, **BASECMD_CONTEXT_SETTINGS))
 def gen():
     # TODO: figure out better warning system
     click.echo("Warning -- you entered a command %s does not understand. "
@@ -135,7 +169,7 @@ def ssh_cmd(ctx):
     '''
     ssh(ctx)
 
-@cli.command('up')
+@cli.command('up', context_settings=CONTEXT_SETTINGS)
 @click.option('-p', '--provider', envvar = PROJECT_NAME.upper() + '_PROVIDER',
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
@@ -150,6 +184,20 @@ def up_cmd(ctx, provider, guest_os):
 
 ### Sub-subcommands
 ## subcommands of setup_cmd
+@setup_cmd.command('auth')
+@click.pass_context
+def auth_cmd(ctx):
+    '''Install auth directory.
+    '''
+    install_auth(ctx)
+
+@setup_cmd.command('config')
+@click.pass_context
+def config_cmd(ctx):
+    '''Install config file.
+    '''
+    install_config(ctx)
+
 @setup_cmd.command('plugins')
 @click.option('-f', '--force', is_flag=True,
               help='Install plugins without confirmation.')
@@ -161,12 +209,5 @@ def plugins_cmd(force, plugins):
     if not plugins: # No args means all default plugins.
         plugins = ('all',)
     install_plugins(force, plugins)
-
-@setup_cmd.command('auth')
-@click.pass_context
-def auth_cmd(ctx):
-    '''Install auth directory.
-    '''
-    install_auth(ctx)
 
 main = cli
