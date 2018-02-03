@@ -371,7 +371,8 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
     if guest_os: # if none, keep unset
         set_env_var('guest_os', str(guest_os))
         if guest_os not in GUEST_OSES:
-            msg = 'Guest OS "{}" is not in the guest OSes list. Did you have a typo? Here is as list of avalible guest OSes:\n'
+            msg = ('Guest OS "{}" is not in the guest OSes list.\n'
+                   'Did you have a typo? Here is as list of avalible guest OSes:\n')
             msg = msg.format(guest_os)
             for os in GUEST_OSES:
                 msg = msg + '{}\n'.format(os)
