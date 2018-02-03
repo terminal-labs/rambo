@@ -55,8 +55,14 @@ class ConfigSectionSchema(object):
 class ConfigFileProcessor(ConfigFileReader):
     config_files = ['rambo.conf']
     config_section_schemas = [
+        # Don't move the first line. It brings with it easy use with
+        # CLI > Configuration file > Environment > Default, by default.
+        # This is because it is merged into default_map's top level.
+        # Other section schemas need handled manually. They are added
+        # to default_map[schemaname].
+        ConfigSectionSchema.Up, # PRIMARY SCHEMA
         ConfigSectionSchema.Base,
-        ConfigSectionSchema.Up,
+
     ]
 
 ### BASE COMMAND LIST
@@ -181,11 +187,6 @@ def ssh_cmd(ctx):
 def up_cmd(ctx, provider, guest_os):
     '''Start a VM / container with `vagrant up`.
     '''
-    if ctx.default_map['up']['provider'] and not provider:
-        provider = ctx.default_map['up']['provider']
-    if ctx.default_map['up']['guest_os'] and not guest_os:
-        guest_os = ctx.default_map['up']['guest_os']
-
     up(ctx, provider, guest_os)
 
 ### Sub-subcommands
