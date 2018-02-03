@@ -262,6 +262,7 @@ def setup():
     '''Install all default plugins and setup auth directory.
     '''
     install_auth()
+    install_config()
     install_plugins()
 
 def install_auth(ctx=None, output_path=None):
@@ -295,6 +296,23 @@ def install_auth(ctx=None, output_path=None):
     # in env vars, and set them. This is an avenue for expanding the cli/api's use
     # and not needing the auth key scripts.
     # load_provider_keys()
+
+def install_config(ctx=None, output_path=None):
+    '''Install config file.
+    '''
+    if not ctx: # Using API. Else handled by cli.
+        set_init_vars()
+
+    if not output_path:
+        output_path = get_env_var('cwd')
+    path = os.path.join(output_path, 'rambo.conf')
+
+    if os.path.exists(path):
+        abort('rambo.conf already esists.')
+    else:
+        with open(path, 'w') as f:
+            f.write('[up]\nprovider = virtualboxsadf\nguest_os = ubuntu-1604\n')
+        click.echo('Created config at %s' % path)
 
 def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins

@@ -14,6 +14,7 @@ from rambo.app import (
     export,
     setup,
     install_auth,
+    install_config,
     install_plugins,
     set_init_vars,
     set_vagrant_vars,
@@ -52,7 +53,7 @@ class ConfigSectionSchema(object):
         guest_os    = Param(type=str)
 
 class ConfigFileProcessor(ConfigFileReader):
-    config_files = ['rambo.ini', 'rambo.cfg', 'rambo.conf']
+    config_files = ['rambo.conf']
     config_section_schemas = [
         ConfigSectionSchema.Base,
         ConfigSectionSchema.Up,
