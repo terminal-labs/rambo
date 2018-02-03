@@ -181,6 +181,11 @@ def ssh_cmd(ctx):
 def up_cmd(ctx, provider, guest_os):
     '''Start a VM / container with `vagrant up`.
     '''
+    if ctx.default_map['up']['provider'] and not provider:
+        provider = ctx.default_map['up']['provider']
+    if ctx.default_map['up']['guest_os'] and not guest_os:
+        guest_os = ctx.default_map['up']['guest_os']
+
     up(ctx, provider, guest_os)
 
 ### Sub-subcommands
