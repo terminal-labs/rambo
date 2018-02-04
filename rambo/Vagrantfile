@@ -101,6 +101,9 @@ custom_code_dirs = [
 Vagrant.configure("2") do |config|
   if get_env_var_rb('SYNC') != 'disabled'
     config.vm.synced_folder '.', "/vagrant", type: get_env_var_rb('SYNC')
+    if get_env_var_rb("SECRETS_PATH")
+      config.vm.synced_folder File.join(get_env_var_rb("CWD"), get_env_var_rb("SECRETS_PATH")), "/vagrant/secrets", type: get_env_var_rb('SYNC')
+    end
     for custom_code_dir in custom_code_dirs
       if Dir.exist?(File.join(get_env_var_rb("CWD"), custom_code_dir))
         config.vm.synced_folder File.join(get_env_var_rb("CWD"), custom_code_dir),
@@ -124,6 +127,9 @@ Vagrant.configure("2") do |config|
     $salt = <<-EOS
       mv /etc/salt/minion{,-dist}
       cp /vagrant/saltstack/minions/minion.#{provider}  /etc/salt/minion
+      if [ -f "/vagrant/secrets/grains/grains" ]; then
+          cat /vagrant/secrets/grains/grains >> /vagrant/saltstack/grains/grains
+      fi
       cp /vagrant/saltstack/grains/grains /etc/salt/grains
       mkdir -p /vagrant/saltstack/states/files/licenses
       if [ -d "/vagrant/auth/licenses/" ]; then

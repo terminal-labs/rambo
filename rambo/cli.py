@@ -142,11 +142,13 @@ def ssh_cmd(ctx):
 @click.option('-o', '--guest-os', envvar = PROJECT_NAME.upper() + '_GUEST_OS',
               help='Operating System of the guest, inside the virtual machine. '
               'These guest OSs are supported: %s. Default Ubuntu.' % GUEST_OSES)
+@click.option('-s', '--secrets-path', envvar = PROJECT_NAME.upper() + '_PROVIDER',
+              help='Path location of the secrets directory for the virtual machine.')
 @click.pass_context
-def up_cmd(ctx, provider, guest_os):
+def up_cmd(ctx, provider, guest_os, secrets_path):
     '''Start a VM / container with `vagrant up`.
     '''
-    up(ctx, provider, guest_os)
+    up(ctx, provider, guest_os, secrets_path)
 
 ### Sub-subcommands
 ## subcommands of setup_cmd

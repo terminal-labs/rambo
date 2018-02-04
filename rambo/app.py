@@ -328,7 +328,7 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     os.system('vagrant ssh')
 
-def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def up(ctx=None, provider=None,  guest_os=None, secrets_path=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -358,6 +358,9 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
             for os in GUEST_OSES:
                 msg = msg + '{}\n'.format(os)
             abort(msg)
+
+    if secrets_path: # if none, keep unset
+        set_env_var('secrets_path', secrets_path)
 
     _invoke_vagrant('up')
 
