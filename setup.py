@@ -94,7 +94,7 @@ setup(
         'termcolor'
     ],
     dependency_links=[
-        'https://github.com/terminal-labs/click-configfile/archive/38a0831efff0c37678de595b9fbfd65ed1baba3b.zip#egg=click-configfile-1',
+        'https://github.com/terminal-labs/click-configfile/archive/merge-with-primary-schema.zip#egg=click-configfile-1',
     ],
     cmdclass={
         'install': CustomInstallCommand,
