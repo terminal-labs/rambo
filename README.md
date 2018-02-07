@@ -19,7 +19,7 @@ This project uses Vagrant and Vagrant plugins for some of the heavy lifting, and
 By default Rambo offers a basic provisioning, but you can customize this. See [**Advanced Usage**](#advanced-usage) for that.
 
 ## Basic Usage
-Rambo needs to be installed first. It is a Python package, and can be installed in an Conda or Virtualenv environment with `pip install rambo-vagrant`, or the development version (this repo) can be installed with `pip install -e .`. Some providers will need a more configuration for things like key managment (see: [INSTALL.md](https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md)). Once installed, you can run one of these commands to get your VM:
+Rambo needs to be installed first. It is a Python package, and can be installed in an Conda or Virtualenv environment with `pip install rambo-vagrant`, or the development version (this repo) can be installed with `pip install -e . --process-dependency-links`. Some providers will need a more configuration for things like key managment (see: [INSTALL.md](https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md)). Once installed, you can run one of these commands to get your VM:
 
 for VirtualBox run
 ```
