@@ -90,8 +90,11 @@ setup(
     zip_safe=False,
     install_requires=[
         'click',
-        'click-configfile',
+        'click-configfile<=1'
         'termcolor'
+    ],
+    dependency_links=[
+        'https://github.com/terminal-labs/click-configfile/archive/28c5d53ea7551dac2227d8010f468443864e5aea.zip#egg=click-configfile-1',
     ],
     cmdclass={
         'install': CustomInstallCommand,
