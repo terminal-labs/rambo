@@ -312,7 +312,8 @@ def install_config(ctx=None, output_path=None):
         abort('rambo.conf already esists.')
     else:
         with open(path, 'w') as f:
-            f.write('[up]\nprovider = virtualboxsadf\nguest_os = ubuntu-1604\n')
+            f.write('[up]\nprovider = %s\nguest_os = %s\n'
+                    % (SETTINGS['PROVIDERS_DEFAULT'], SETTINGS['GUEST_OSES_DEFAULT']))
         click.echo('Created config at %s' % path)
 
 def install_plugins(force=None, plugins=('all',)):
