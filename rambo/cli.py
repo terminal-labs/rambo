@@ -53,7 +53,7 @@ class ConfigSectionSchema(object):
         guest_os    = Param(type=str)
 
 class ConfigFileProcessor(ConfigFileReader):
-    config_files = ['rambo.conf']
+    config_files = ['%s.conf' % PROJECT_NAME]
     # Specify additional schemas to merge with the primary so that they
     # are added to the top level of default_map, for easy precedence of
     # CLI > Configuration file > Environment > Default.
@@ -192,6 +192,11 @@ def up_cmd(ctx, provider, guest_os):
     click (CLI or env var) and also with an INI config file.
     Precedence is CLI > Config > Env Var > defaults.
     '''
+    if not os.path.isfile('%s.conf' % PROJECT_NAME):
+        abort("Config file %s.conf must be present in working directory.\n"
+              "You can create one with `%s setup config`." %
+              (PROJECT_NAME, PROJECT_NAME))
+
     up(ctx, provider, guest_os)
 
 ### Sub-subcommands
