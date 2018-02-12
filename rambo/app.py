@@ -25,9 +25,8 @@ from rambo.utils import abort, get_user_home, set_env_var, get_env_var, dir_exis
 PROJECT_LOCATION = os.path.dirname(os.path.realpath(__file__))
 with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
     SETTINGS = json.load(f)
-PROVIDERS = SETTINGS['PROVIDERS']
 PROJECT_NAME = SETTINGS['PROJECT_NAME']
-GUEST_OSES = SETTINGS['GUEST_OSES']
+
 def write_to_log(data=None, file_name=None):
     '''Write data to log files. Will append data to a single combined log.
     Additionally write data to a log with a custom name (such as stderr)
