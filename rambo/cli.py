@@ -54,16 +54,14 @@ class ConfigSectionSchema(object):
 
 class ConfigFileProcessor(ConfigFileReader):
     config_files = ['rambo.conf']
-    config_section_schemas = [
-        # Don't move the first line. It brings with it easy use with
-        # CLI > Configuration file > Environment > Default, by default.
-        # This is because it is merged into default_map's top level.
-        # Other section schemas need handled manually. They are added
-        # to default_map[schemaname].
-        ConfigSectionSchema.Up, # PRIMARY SCHEMA
+    # Specify additional schemas to merge with the primary so that they
+    # are added to the top level of default_map, for easy precedence of
+    # CLI > Configuration file > Environment > Default.
+    config_section_primary_schemas = [
         ConfigSectionSchema.Base,
-
+        ConfigSectionSchema.Up,
     ]
+    config_section_schemas = config_section_primary_schemas
 
 ### BASE COMMAND LIST
 cmd = ''
@@ -109,6 +107,10 @@ CONTEXT_SETTINGS = {
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
 @click.pass_context
 def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
+    '''The main cli entry point. Params can be passed as usual with
+    click (CLI or env var) and also with an INI config file.
+    Precedence is CLI > Config > Env Var > defaults.
+    '''
     # These need to be very early because they may change the cwd of this Python or of Vagrant
     set_init_vars(cwd, tmpdir_path)
     set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
@@ -182,10 +184,13 @@ def ssh_cmd(ctx):
               'These providers are supported: %s. Default virtualbox.' % PROVIDERS)
 @click.option('-o', '--guest-os', envvar = PROJECT_NAME.upper() + '_GUEST_OS',
               help='Operating System of the guest, inside the virtual machine. '
-              'These guest OSs are supported: %s. Default Ubuntu.' % GUEST_OSES)
+              'These guest OSs are supported: %s. Default Ubuntu-1604.' % GUEST_OSES)
 @click.pass_context
 def up_cmd(ctx, provider, guest_os):
     '''Start a VM / container with `vagrant up`.
+    Params can be passed as usual with
+    click (CLI or env var) and also with an INI config file.
+    Precedence is CLI > Config > Env Var > defaults.
     '''
     up(ctx, provider, guest_os)
 
