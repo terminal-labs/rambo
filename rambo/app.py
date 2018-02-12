@@ -362,21 +362,35 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    if provider: # if none, keep unset
+    ## provider
+    if provider: # overwrite possible env var regardless. It gets lowest priority.
         set_env_var('provider', provider)
-        if provider not in PROVIDERS:
-            abort('Target provider "%s" is not in the providers '
-                  'list. Did you have a typo?' % provider)
+    elif get_env_var('provider'):
+        provider = get_env_var('provider')
+    elif provider == "":
+        provider = SETTINGS['PROVIDERS_DEFAULT']
+    if provider not in SETTINGS['PROVIDERS']:
+        msg = ('Provider "%s" is not in the provider list.\n'
+               'Did you have a typo? Here is as list of avalible providers:\n\n'
+               % provider)
+        for supported_provider in SETTINGS['PROVIDERS']:
+            msg = msg + '%s\n' % supported_provider
+        abort(msg)
 
-    if guest_os: # if none, keep unset
+    ## guest_os
+    if guest_os: # overwrite possible env var regardless. It gets lowest priority.
         set_env_var('guest_os', str(guest_os))
-        if guest_os not in GUEST_OSES:
-            msg = ('Guest OS "{}" is not in the guest OSes list.\n'
-                   'Did you have a typo? Here is as list of avalible guest OSes:\n')
-            msg = msg.format(guest_os)
-            for os in GUEST_OSES:
-                msg = msg + '{}\n'.format(os)
-            abort(msg)
+    elif get_env_var('guest_os'):
+        guest_os = get_env_var('guest_os')
+    elif guest_os == "":
+        guest_os = SETTINGS['GUEST_OSES_DEFAULT']
+    if guest_os not in SETTINGS['GUEST_OSES']:
+        msg = ('Guest OS "%s" is not in the guest OSes list.\n'
+               'Did you have a typo? Here is as list of avalible guest OSes:\n\n'
+               % guest_os)
+        for supported_os in SETTINGS['GUEST_OSES']:
+            msg = msg + '%s\n' % supported_os
+        abort(msg)
 
     _invoke_vagrant('up')
 
