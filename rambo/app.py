@@ -306,10 +306,10 @@ def install_config(ctx=None, output_path=None):
 
     if not output_path:
         output_path = get_env_var('cwd')
-    path = os.path.join(output_path, 'rambo.conf')
+    path = os.path.join(output_path, '%s.conf' % PROJECT_NAME)
 
     if os.path.exists(path):
-        abort('rambo.conf already esists.')
+        abort('%s.conf already esists.' % PROJECT_NAME)
     else:
         with open(path, 'w') as f:
             f.write('[up]\nprovider = %s\nguest_os = %s\n'
