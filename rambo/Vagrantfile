@@ -100,7 +100,9 @@ custom_code_dirs = [
 # Provisioning
 Vagrant.configure("2") do |config|
   if get_env_var_rb('SYNC') != 'disabled'
-    config.vm.synced_folder '.', "/vagrant", type: get_env_var_rb('SYNC')
+    config.vm.synced_folder '.', "/vagrant",
+      type: get_env_var_rb('SYNC'),
+      rsync__exclude: ['saltstack/'] # only provisioning code in project dir
     for custom_code_dir in custom_code_dirs
       if Dir.exist?(File.join(get_env_var_rb("CWD"), custom_code_dir))
         config.vm.synced_folder File.join(get_env_var_rb("CWD"), custom_code_dir),
@@ -115,7 +117,7 @@ Vagrant.configure("2") do |config|
       inline: "if [ -f /etc/apt/sources.list ]; then wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + get_env_var_rb("GUEST_OS") + "/official/sources.list; fi",
       keep_color: true
   end
-  if PROVISION_WITH_SALT
+  if PROVISION_WITH_SALT and Dir.exist?(File.join(get_env_var_rb("CWD"), 'saltstack'))
     config.vm.provision :salt do |salt|
       salt.bootstrap_options = "-P"
       salt.verbose = true
@@ -148,6 +150,9 @@ end
 
 # clean up files on the host after the guest is destroyed
 Vagrant.configure("2") do |config|
+  config.trigger.after :up do
+    puts "Vagrant done with up."
+  end
   config.trigger.after :destroy do
     puts "Vagrant done with destroy."
   end
