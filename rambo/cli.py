@@ -84,6 +84,7 @@ BASECMD_CONTEXT_SETTINGS = {
 CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],
     'default_map': ConfigFileProcessor.read_config(),
+    'auto_envvar_prefix': PROJECT_NAME.upper()
 }
 
 ### Main command / CLI entry point
@@ -177,11 +178,11 @@ def ssh_cmd(ctx):
     ssh(ctx)
 
 @cli.command('up', context_settings=CONTEXT_SETTINGS)
-@click.option('-p', '--provider', envvar = PROJECT_NAME.upper() + '_PROVIDER',
+@click.option('-p', '--provider',
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default %s.'
               % (SETTINGS['PROVIDERS'], SETTINGS['PROVIDERS_DEFAULT']))
-@click.option('-o', '--guest-os', envvar = PROJECT_NAME.upper() + '_GUEST_OS',
+@click.option('-o', '--guest-os',
               help='Operating System of the guest, inside the virtual machine. '
               'These guest OSs are supported: %s. Default %s.'
               % (SETTINGS['GUEST_OSES'], SETTINGS['GUEST_OSES_DEFAULT']))

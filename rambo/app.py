@@ -363,12 +363,10 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
     ## provider
-    if provider: # overwrite possible env var regardless. It gets lowest priority.
-        set_env_var('provider', provider)
-    elif get_env_var('provider'):
-        provider = get_env_var('provider')
-    elif provider == "":
+    if not provider:
         provider = SETTINGS['PROVIDERS_DEFAULT']
+    set_env_var('provider', provider)
+
     if provider not in SETTINGS['PROVIDERS']:
         msg = ('Provider "%s" is not in the provider list.\n'
                'Did you have a typo? Here is as list of avalible providers:\n\n'
@@ -378,12 +376,10 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
         abort(msg)
 
     ## guest_os
-    if guest_os: # overwrite possible env var regardless. It gets lowest priority.
-        set_env_var('guest_os', str(guest_os))
-    elif get_env_var('guest_os'):
-        guest_os = get_env_var('guest_os')
-    elif guest_os == "":
+    if not guest_os:
         guest_os = SETTINGS['GUEST_OSES_DEFAULT']
+    set_env_var('guest_os', str(guest_os))
+
     if guest_os not in SETTINGS['GUEST_OSES']:
         msg = ('Guest OS "%s" is not in the guest OSes list.\n'
                'Did you have a typo? Here is as list of avalible guest OSes:\n\n'
