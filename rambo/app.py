@@ -171,6 +171,7 @@ def createproject(project_name, config_only=None):
     if not config_only:
         export('saltstack', path)
         install_auth(output_path=path)
+        install_config(output_path=path)
 
 
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
