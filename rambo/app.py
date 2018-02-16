@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import time
+import platform
 from distutils.dir_util import copy_tree
 from distutils.errors import DistutilsFileError
 from select import select
@@ -299,12 +300,13 @@ def install_auth(ctx=None, output_path=None):
 def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins
     '''
+    host_system = platform.system()
     for plugin in plugins:
         if plugin == 'all':
             click.echo('Installing all default plugins.')
-            for plugin in SETTINGS['PLUGINS']:
+            for plugin in SETTINGS['PLUGINS'][host_system]:
                 _invoke_vagrant('plugin install %s' % plugin)
-        elif plugin in SETTINGS['PLUGINS']:
+        elif plugin in SETTINGS['PLUGINS'][host_system]:
             _invoke_vagrant('plugin install %s' % plugin)
         else:
             if not force:
