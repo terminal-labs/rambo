@@ -90,7 +90,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'click',
-        'click-configfile<=1'
+        'click-configfile<=1',
         'termcolor'
     ],
     dependency_links=[
