@@ -34,8 +34,10 @@ class ConfigSectionSchema(object):
 
     @matches_section("up")
     class Up(SectionSchema):
-        provider    = Param(type=str)
-        guest_os    = Param(type=str)
+        provider      = Param(type=str)
+        guest_os      = Param(type=str)
+        ram_size      = Param(type=int)
+        drive_size    = Param(type=int)
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -179,6 +181,14 @@ def ssh_cmd(ctx):
               help='Operating System of the guest, inside the virtual machine. '
               'These guest OSs are supported: %s. Default %s.'
               % (SETTINGS['GUEST_OSES'], SETTINGS['GUEST_OSES_DEFAULT']))
+@click.option('-r', '--ram-size',
+              help='Amount of RAM of the virtual machine. '
+              'These RAM sizes are supported: %s. Default %s.'
+              % (SETTINGS['SIZES'].keys(), SETTINGS['SIZES_DEFAULT'].keys()))
+@click.option('-d', '--drive-size',
+              help='The drive size of the virtual machine. '
+              'These drive sizes are supported: %s. Default %s.'
+              % (SETTINGS['SIZES'].values(), SETTINGS['SIZES_DEFAULT'].values()))
 @click.pass_context
 def up_cmd(ctx, provider, guest_os):
     '''Start a VM / container with `vagrant up`.
