@@ -1,22 +1,19 @@
 {
-    "PLUGINS": 
-      {
-      "Linux":
-        [
-          "vagrant-aws",
-          "vagrant-digitalocean",
-          "vagrant-lxc",
-          "vagrant-triggers",
-          "vagrant-scp"
+    "PLUGINS": {
+        "Linux": [
+            "vagrant-aws",
+            "vagrant-digitalocean",
+            "vagrant-lxc",
+            "vagrant-triggers",
+            "vagrant-scp"
         ],
-      "Darwin":
-        [
-          "vagrant-aws",
-          "vagrant-digitalocean",
-          "vagrant-triggers",
-          "vagrant-scp"
+        "Darwin": [
+            "vagrant-aws",
+            "vagrant-digitalocean",
+            "vagrant-triggers",
+            "vagrant-scp"
         ]
-      },
+    },
     "PROJECT_NAME": "rambo",
     "PROVIDERS": [
         "digitalocean",
@@ -32,5 +29,15 @@
         "ubuntu-1604",
         "centos-7"
     ],
-    "GUEST_OSES_DEFAULT": "ubuntu-1604"
+    "GUEST_OSES_DEFAULT": "ubuntu-1604",
+    "SIZES": {
+        "512": "20gb",
+        "1024": "30gb",
+        "2048": "40gb",
+        "4096": "60gb",
+        "8192": "80gb"
+    },
+    "SIZES_DEFAULT": {
+        "1024": "30gb"
+    }
 }
