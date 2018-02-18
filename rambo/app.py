@@ -17,7 +17,17 @@ from threading import Thread
 
 from rambo.providers import load_provider_keys
 from rambo.scripts import install_lastpass
-from rambo.utils import abort, get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
+from rambo.utils import (
+    abort,
+    dir_create,
+    dir_delete,
+    dir_exists,
+    file_delete,
+    get_env_var,
+    get_user_home,
+    set_env_var,
+    warn,
+)
 
 
 ## GLOBALS
@@ -327,7 +337,8 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     os.system('vagrant ssh')
 
-def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
+       vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -368,6 +379,45 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
         for supported_os in SETTINGS['GUEST_OSES']:
             msg = msg + '%s\n' % supported_os
         abort(msg)
+
+    ## ram_size and drive_size (coupled)
+    if ram_size and not drive_size:
+        try:
+            drive_size = SETTINGS['SIZES'][ram_size]
+        except KeyError: # Doesn't match, but we'll let them try it.
+            drive_size = next(iter(SETTINGS['SIZES_DEFAULT'].values()))
+    elif drive_size and not ram_size:
+        try:
+            ram_size = list(SETTINGS['SIZES'].keys())[list(SETTINGS['SIZES'].values()).index(drive_size)]
+        except ValueError: # Doesn't match, but we'll let them try it.
+            ram_size = next(iter(SETTINGS['SIZES_DEFAULT']))
+    elif not any((ram_size, drive_size)):
+        print('not either')
+        ram_size = next(iter(SETTINGS['SIZES_DEFAULT']))
+        drive_size = next(iter(SETTINGS['SIZES_DEFAULT'].values()))
+
+    set_env_var('ramsize', ram_size)
+    set_env_var('drivesize', drive_size)
+    print(ram_size)
+    print(drive_size)
+
+    ## ram_size
+    if ram_size not in iter(SETTINGS['SIZES']):
+        msg = ('RAM Size "%s" is not in the RAM sizes list.\n'
+               'Did you have a typo? Here is as list of avalible RAM sizes:\n\n'
+               % ram_size)
+        for supported_ram_size in iter(SETTINGS['SIZES']):
+            msg = msg + '%s\n' % supported_ram_size
+        warn(msg)
+
+    ## drive_size
+    if drive_size not in iter(SETTINGS['SIZES'].values()):
+        msg = ('DRIVE Size "%s" is not in the DRIVE sizes list.\n'
+               'Did you have a typo? Here is as list of avalible DRIVE sizes:\n\n'
+               % drive_size)
+        for supported_drive_size in iter(SETTINGS['SIZES'].values()):
+            msg = msg + '%s\n' % supported_drive_size
+        warn(msg)
 
     _invoke_vagrant('up')
 

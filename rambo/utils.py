@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 from shutil import copyfile, move, rmtree
 
+import click
 from termcolor import colored
 
 ## GLOBALS
@@ -27,6 +28,9 @@ def get_env_var(name):
 
 def abort(message):
     sys.exit(colored(''.join(['ABORTED - ', message]), 'red', attrs=['bold']))
+
+def warn(message):
+    click.secho(''.join(['WARNING - ', message]), fg='yellow')
 
 def dir_exists(path):
     return os.path.isdir(path)

@@ -163,7 +163,7 @@ def install_plugins(force, plugins):
         plugins = ('all',)
     app.install_plugins(force, plugins)
 
-        
+
 @cli.command('ssh', short_help="Connect with `vagrant ssh`")
 @click.pass_context
 def ssh_cmd(ctx):
@@ -190,7 +190,7 @@ def ssh_cmd(ctx):
               'These drive sizes are supported: %s. Default %s.'
               % (SETTINGS['SIZES'].values(), SETTINGS['SIZES_DEFAULT'].values()))
 @click.pass_context
-def up_cmd(ctx, provider, guest_os):
+def up_cmd(ctx, provider, guest_os, ram_size, drive_size):
     '''Start a VM / container with `vagrant up`.
     Params can be passed as usual with
     click (CLI or env var) and also with an INI config file.
