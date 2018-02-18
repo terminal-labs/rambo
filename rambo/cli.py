@@ -173,19 +173,19 @@ def ssh_cmd(ctx):
 
 
 @cli.command('up', context_settings=CONTEXT_SETTINGS)
-@click.option('-p', '--provider',
+@click.option('-p', '--provider', type=str,
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default %s.'
               % (SETTINGS['PROVIDERS'], SETTINGS['PROVIDERS_DEFAULT']))
-@click.option('-o', '--guest-os',
+@click.option('-o', '--guest-os', type=str,
               help='Operating System of the guest, inside the virtual machine. '
               'These guest OSs are supported: %s. Default %s.'
               % (SETTINGS['GUEST_OSES'], SETTINGS['GUEST_OSES_DEFAULT']))
-@click.option('-r', '--ram-size',
+@click.option('-r', '--ram-size', type=int,
               help='Amount of RAM of the virtual machine. '
               'These RAM sizes are supported: %s. Default %s.'
               % (SETTINGS['SIZES'].keys(), SETTINGS['SIZES_DEFAULT'].keys()))
-@click.option('-d', '--drive-size',
+@click.option('-d', '--drive-size', type=int,
               help='The drive size of the virtual machine. '
               'These drive sizes are supported: %s. Default %s.'
               % (SETTINGS['SIZES'].values(), SETTINGS['SIZES_DEFAULT'].values()))

@@ -378,7 +378,7 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
                % guest_os)
         for supported_os in SETTINGS['GUEST_OSES']:
             msg = msg + '%s\n' % supported_os
-        abort(msg)
+        warn(msg)
 
     ## ram_size and drive_size (coupled)
     if ram_size and not drive_size:
@@ -398,8 +398,6 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
 
     set_env_var('ramsize', ram_size)
     set_env_var('drivesize', drive_size)
-    print(ram_size)
-    print(drive_size)
 
     ## ram_size
     if ram_size not in iter(SETTINGS['SIZES']):
