@@ -26,9 +26,8 @@ from rambo.utils import abort, get_user_home, set_env_var, get_env_var, dir_exis
 PROJECT_LOCATION = os.path.dirname(os.path.realpath(__file__))
 with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
     SETTINGS = json.load(f)
-PROVIDERS = SETTINGS['PROVIDERS']
 PROJECT_NAME = SETTINGS['PROJECT_NAME']
-GUEST_OSES = SETTINGS['GUEST_OSES']
+
 def write_to_log(data=None, file_name=None):
     '''Write data to log files. Will append data to a single combined log.
     Additionally write data to a log with a custom name (such as stderr)
@@ -172,6 +171,7 @@ def createproject(project_name, config_only=None):
     if not config_only:
         export('saltstack', path)
         install_auth(output_path=path)
+        install_config(output_path=path)
 
 
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
@@ -263,6 +263,7 @@ def setup():
     '''Install all default plugins and setup auth directory.
     '''
     install_auth()
+    install_config()
     install_plugins()
 
 def install_auth(ctx=None, output_path=None):
@@ -296,6 +297,24 @@ def install_auth(ctx=None, output_path=None):
     # in env vars, and set them. This is an avenue for expanding the cli/api's use
     # and not needing the auth key scripts.
     # load_provider_keys()
+
+def install_config(ctx=None, output_path=None):
+    '''Install config file.
+    '''
+    if not ctx: # Using API. Else handled by cli.
+        set_init_vars()
+
+    if not output_path:
+        output_path = get_env_var('cwd')
+    path = os.path.join(output_path, '%s.conf' % PROJECT_NAME)
+
+    if os.path.exists(path):
+        abort('%s.conf already esists.' % PROJECT_NAME)
+    else:
+        with open(path, 'w') as f:
+            f.write('[up]\nprovider = %s\nguest_os = %s\n'
+                    % (SETTINGS['PROVIDERS_DEFAULT'], SETTINGS['GUEST_OSES_DEFAULT']))
+        click.echo('Created config at %s' % path)
 
 def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins
@@ -346,20 +365,31 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    if provider: # if none, keep unset
-        set_env_var('provider', provider)
-        if provider not in PROVIDERS:
-            abort('Target provider "%s" is not in the providers '
-                  'list. Did you have a typo?' % provider)
+    ## provider
+    if not provider:
+        provider = SETTINGS['PROVIDERS_DEFAULT']
+    set_env_var('provider', provider)
 
-    if guest_os: # if none, keep unset
-        set_env_var('guest_os', str(guest_os))
-        if guest_os not in GUEST_OSES:
-            msg = 'Guest OS "{}" is not in the guest OSes list. Did you have a typo? Here is as list of avalible guest OSes:\n'
-            msg = msg.format(guest_os)
-            for os in GUEST_OSES:
-                msg = msg + '{}\n'.format(os)
-            abort(msg)
+    if provider not in SETTINGS['PROVIDERS']:
+        msg = ('Provider "%s" is not in the provider list.\n'
+               'Did you have a typo? Here is as list of avalible providers:\n\n'
+               % provider)
+        for supported_provider in SETTINGS['PROVIDERS']:
+            msg = msg + '%s\n' % supported_provider
+        abort(msg)
+
+    ## guest_os
+    if not guest_os:
+        guest_os = SETTINGS['GUEST_OSES_DEFAULT']
+    set_env_var('guest_os', str(guest_os))
+
+    if guest_os not in SETTINGS['GUEST_OSES']:
+        msg = ('Guest OS "%s" is not in the guest OSes list.\n'
+               'Did you have a typo? Here is as list of avalible guest OSes:\n\n'
+               % guest_os)
+        for supported_os in SETTINGS['GUEST_OSES']:
+            msg = msg + '%s\n' % supported_os
+        abort(msg)
 
     _invoke_vagrant('up')
 
