@@ -182,11 +182,11 @@ def ssh_cmd(ctx):
               'These guest OSs are supported: %s. Default %s.'
               % (SETTINGS['GUEST_OSES'], SETTINGS['GUEST_OSES_DEFAULT']))
 @click.option('-r', '--ram-size', type=int,
-              help='Amount of RAM of the virtual machine. '
+              help='Amount of RAM of the virtual machine in MB. '
               'These RAM sizes are supported: %s. Default %s.'
               % (SETTINGS['SIZES'].keys(), SETTINGS['SIZES_DEFAULT'].keys()))
 @click.option('-d', '--drive-size', type=int,
-              help='The drive size of the virtual machine. '
+              help='The drive size of the virtual machine in GB. '
               'These drive sizes are supported: %s. Default %s.'
               % (SETTINGS['SIZES'].values(), SETTINGS['SIZES_DEFAULT'].values()))
 @click.pass_context

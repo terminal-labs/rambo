@@ -392,7 +392,6 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         except ValueError: # Doesn't match, but we'll let them try it.
             ram_size = next(iter(SETTINGS['SIZES_DEFAULT']))
     elif not any((ram_size, drive_size)):
-        print('not either')
         ram_size = next(iter(SETTINGS['SIZES_DEFAULT']))
         drive_size = next(iter(SETTINGS['SIZES_DEFAULT'].values()))
 

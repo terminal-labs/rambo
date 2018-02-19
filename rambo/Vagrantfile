@@ -59,33 +59,15 @@ else # Bad arg - we don't have this provider.
   abort("ABORTED - Provider not in providers list. Did you have a typo?")
 end
 
-hosts = ['debian-8',
-         'ubuntu-1404',
-         'ubuntu-1604',
-         'centos-7',
-        ]
-
-unless get_env_var_rb("GUEST_OS")
-  set_env_var_rb("GUEST_OS", "ubuntu-1604")
+# Set defaults if values not set, otherwise
+unless get_env_var_rb('GUEST_OS')
+  set_env_var_rb('GUEST_OS', SETTINGS['GUEST_OSES_DEFAULT'])
 end
-
-unless (hosts.include? get_env_var_rb("GUEST_OS"))
-   abort("ABORTED - VM host not in host list. Did you have a typo?")
+unless get_env_var_rb('RAMSIZE')
+  set_env_var_rb('RAMSIZE', SETTINGS['SIZES_DEFAULT'].keys[0])
 end
-
-sizes = {'512' => '20gb',
-         '1024' => '30gb',
-         '2048' => '40gb',
-        }
-
-unless get_env_var_rb("RAM")
-  set_env_var_rb("RAM", "1024")
-end
-
-set_env_var_rb("DRIVESIZE",sizes[get_env_var_rb("RAM")])
-
-unless (sizes.include? get_env_var_rb("RAM"))
-   abort("ABORTED - VM size not in sizes list. Did you have a typo?")
+unless get_env_var_rb('DRIVESIZE')
+  set_env_var_rb('DRIVESIZE', SETTINGS['SIZES_DEFAULT'].values[0])
 end
 
 custom_code_dirs = [
