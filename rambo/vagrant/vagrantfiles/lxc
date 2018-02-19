@@ -4,22 +4,8 @@
 Vagrant.configure("2") do |config|
   config.vm.provider :lxc do |provider|
     provider.backingstore = "loop"
-    if get_env_var_rb("RAM") == "512"
-      provider.customize "cgroup.memory.limit_in_bytes",
-        "512M"
-      provider.backingstore_option "--fssize",
-        "20G"
-    elsif get_env_var_rb("RAM") == "1024"
-      provider.customize "cgroup.memory.limit_in_bytes",
-        "1024M"
-      provider.backingstore_option "--fssize",
-        "30G"
-    elsif get_env_var_rb("RAM") == "2048"
-      provider.customize "cgroup.memory.limit_in_bytes",
-        "2048M"
-      provider.backingstore_option "--fssize",
-        "40G"
-    end
+    provider.customize "cgroup.memory.limit_in_bytes", get_env_var_rb("RAMSIZE") + 'M'
+    provider.backingstore_option "--fssize", get_env_var_rb("DRIVESIZE") + 'G'
   end
   config.ssh.username = "vagrant"
   config.ssh.forward_agent = FORWARD_SSH
@@ -32,6 +18,7 @@ Vagrant.configure("2") do |config|
     :guest => 80,
     :host => 8080,
     auto_correct: true
-  config.vm.box = "terminal-labs/tl-" + get_env_var_rb("GUEST_OS") + "-64bit-lxc"
-  config.vm.box_url = "terminal-labs/tl-" + get_env_var_rb("GUEST_OS") + "-64bit-lxc"
+  box =  "terminal-labs/tl-debian-8-64bit-lxc"
+  config.vm.box = box
+  config.vm.box_url = box
 end
