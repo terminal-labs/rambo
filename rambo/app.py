@@ -221,21 +221,6 @@ def export(resource=None, export_path=None, force=None):
         dsts.append(os.path.join(output_dir, 'settings.json'))
         dsts.append(os.path.join(output_dir, 'Vagrantfile'))
 
-    if resource == 'python':
-        srcs = [os.path.normpath(os.path.join(PROJECT_LOCATION, 'settings.json'))]
-        dsts = [os.path.join(output_dir, 'settings.json')]
-        for file in os.listdir(os.path.normpath(os.path.join(PROJECT_LOCATION))):
-            if file.endswith('.py'):
-                srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, file)))
-                dsts.append(os.path.join(output_dir, file))
-
-    if resource == 'all':
-        srcs = []
-        dsts = []
-        for file in os.listdir(os.path.normpath(os.path.join(PROJECT_LOCATION))):
-            srcs.append(os.path.normpath(os.path.join(PROJECT_LOCATION, file)))
-            dsts.append(os.path.join(output_dir, file))
-
     if not force:
         try:
             for path in dsts:
