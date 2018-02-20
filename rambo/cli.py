@@ -8,21 +8,7 @@ from click_configfile import matches_section
 import click
 
 from rambo.utils import abort
-from rambo.app import (
-    createproject,
-    destroy,
-    export,
-    setup,
-    install_auth,
-    install_config,
-    install_plugins,
-    set_init_vars,
-    set_vagrant_vars,
-    ssh,
-    up,
-    vagrant_general_command,
-    write_to_log,
-)
+import rambo.app as app
 
 ### GLOBALS
 # Create env var indicating where this code lives. This will be used latter by
@@ -111,11 +97,11 @@ def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
     Precedence is CLI > Config > Env Var > defaults.
     '''
     # These need to be very early because they may change the cwd of this Python or of Vagrant
-    set_init_vars(cwd, tmpdir_path)
-    set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+    app.set_init_vars(cwd, tmpdir_path)
+    app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    write_to_log('\nNEW CMD')
-    write_to_log(' '.join(sys.argv))
+    app.write_to_log('\nNEW CMD')
+    app.write_to_log(' '.join(sys.argv))
 
 ### Catch-all for everything that doesn't hit a subcommand
 @cli.command(name=cmd, context_settings=dict(CONTEXT_SETTINGS, **BASECMD_CONTEXT_SETTINGS))
@@ -126,7 +112,7 @@ def gen():
     click.echo('You ran "%s"' % ' '.join(sys.argv))
     sys.argv.pop(0) # Remove Rambo path from full command
     click.echo('Vagrant backend says:')
-    vagrant_general_command(' '.join(sys.argv))
+    app.vagrant_general_command(' '.join(sys.argv))
 
 ### Subcommands
 @cli.command('createproject')
@@ -134,14 +120,14 @@ def gen():
 def createproject_cmd(project_name):
     '''Create a Rambo project dir with basic setup.
     '''
-    createproject(project_name)
+    app.createproject(project_name)
 
 @cli.command('destroy')
 @click.pass_context
 def destroy_cmd(ctx):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
     '''
-    destroy(ctx)
+    app.destroy(ctx)
 
 @cli.command('export', short_help="Export %s's source code." % PROJECT_NAME.capitalize())
 @click.option('-f', '--force', is_flag=True,
@@ -159,7 +145,7 @@ def destroy_cmd(ctx):
 def export_cmd(src, output_path, force):
     '''Export code to a handy place for the user to view and edit.
     '''
-    export(src, output_path, force)
+    app.export(src, output_path, force)
 
 @cli.group('setup', invoke_without_command=True)
 @click.pass_context
@@ -168,14 +154,14 @@ def setup_cmd(ctx):
     '''
     # If auth and plugins are both not specified, run both.
     if ctx.invoked_subcommand is None:
-        setup()
+        app.setup()
 
 @cli.command('ssh', short_help="Connect with `vagrant ssh`")
 @click.pass_context
 def ssh_cmd(ctx):
     '''Connect to an running VM / container over ssh with `vagrant ssh`.
     '''
-    ssh(ctx)
+    app.ssh(ctx)
 
 @cli.command('up', context_settings=CONTEXT_SETTINGS)
 @click.option('-p', '--provider',
@@ -198,24 +184,9 @@ def up_cmd(ctx, provider, guest_os):
               "You can create one with `%s setup config`." %
               (PROJECT_NAME, PROJECT_NAME))
 
-    up(ctx, provider, guest_os)
+    app.up(ctx, provider, guest_os)
 
-### Sub-subcommands
-## subcommands of setup_cmd
-@setup_cmd.command('auth')
-@click.pass_context
-def auth_cmd(ctx):
-    '''Install auth directory.
-    '''
-    install_auth(ctx)
-
-@setup_cmd.command('config')
-@click.pass_context
-def config_cmd(ctx):
-    '''Install config file.
-    '''
-    install_config(ctx)
-
+#setup subs
 @setup_cmd.command('plugins')
 @click.option('-f', '--force', is_flag=True,
               help='Install plugins without confirmation.')
@@ -226,6 +197,6 @@ def plugins_cmd(force, plugins):
     '''
     if not plugins: # No args means all default plugins.
         plugins = ('all',)
-    install_plugins(force, plugins)
+    app.install_plugins(force, plugins)
 
 main = cli
