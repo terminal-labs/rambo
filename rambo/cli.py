@@ -20,6 +20,7 @@ PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
 version = pkg_resources.get_distribution('rambo-vagrant').version
 
+
 ### Config file handling
 class ConfigSectionSchema(object):
     """Describes all config sections of this configuration file."""
@@ -36,6 +37,7 @@ class ConfigSectionSchema(object):
         provider    = Param(type=str)
         guest_os    = Param(type=str)
 
+
 class ConfigFileProcessor(ConfigFileReader):
     config_files = ['%s.conf' % PROJECT_NAME]
     # Specify additional schemas to merge with the primary so that they
@@ -46,6 +48,7 @@ class ConfigFileProcessor(ConfigFileReader):
         ConfigSectionSchema.Up,
     ]
     config_section_schemas = config_section_primary_schemas
+
 
 ### BASE COMMAND LIST
 cmd = ''
@@ -72,6 +75,7 @@ CONTEXT_SETTINGS = {
     'default_map': ConfigFileProcessor.read_config(),
     'auto_envvar_prefix': PROJECT_NAME.upper()
 }
+
 
 ### Main command / CLI entry point
 @click.group(context_settings=dict(CONTEXT_SETTINGS, **BASECMD_CONTEXT_SETTINGS))
@@ -103,6 +107,7 @@ def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
     app.write_to_log('\nNEW CMD')
     app.write_to_log(' '.join(sys.argv))
 
+
 ### Catch-all for everything that doesn't hit a subcommand
 @cli.command(name=cmd, context_settings=dict(CONTEXT_SETTINGS, **BASECMD_CONTEXT_SETTINGS))
 def gen():
@@ -114,6 +119,7 @@ def gen():
     click.echo('Vagrant backend says:')
     app.vagrant_general_command(' '.join(sys.argv))
 
+
 ### Subcommands
 @cli.command('createproject')
 @click.argument('project_name')
@@ -122,6 +128,7 @@ def createproject_cmd(project_name):
     '''
     app.createproject(project_name)
 
+
 @cli.command('destroy')
 @click.pass_context
 def destroy_cmd(ctx):
@@ -129,39 +136,39 @@ def destroy_cmd(ctx):
     '''
     app.destroy(ctx)
 
-@cli.command('export', short_help="Export %s's source code." % PROJECT_NAME.capitalize())
+
+@cli.command('export-vagrant-conf', short_help="Get Vagrant configuration")
 @click.option('-f', '--force', is_flag=True,
               help='Accept attempts to overwrite and merge.')
-@click.option('-s', '--salt', '--saltstack', 'src', flag_value='saltstack',
-              default=True, help='Export SaltStack code.' )
-@click.option('-V', '--vagrant', 'src', flag_value='vagrant',
-              help='Export Vagrant code.')
-@click.option('-p', '--python', 'src', flag_value='python',
-              help='Export Python code.')
-@click.option('-a', '--all', 'src', flag_value='all',
-              help="Export all of %s's project code." % PROJECT_NAME.capitalize())
 @click.option('-O', '--output-path', type=click.Path(), default=None,
               help='The optional output path.')
-def export_cmd(src, output_path, force):
-    '''Export code to a handy place for the user to view and edit.
+def export_vagrant_conf(output_path, force):
+    '''Export Vagrant configuration to your project for customization.
     '''
-    app.export(src, output_path, force)
+    app.export('vagrant', output_path, force)
 
-@cli.group('setup', invoke_without_command=True)
-@click.pass_context
-def setup_cmd(ctx):
-    '''Create basic auth files and install dependencies (like Vagrant plugins).
+
+@cli.command('install-plugins', context_settings=CONTEXT_SETTINGS)
+@click.option('-f', '--force', is_flag=True,
+              help='Install plugins without confirmation.')
+@click.argument('plugins', nargs=-1, type=str)
+def install_plugins(force, plugins):
+    '''Install passed args as vagrant plugins. `all` or no args installs
+    all default vagrant plugins.
     '''
     # If auth and plugins are both not specified, run both.
-    if ctx.invoked_subcommand is None:
-        app.setup()
+    if not plugins: # No args means all default plugins.
+        plugins = ('all',)
+    app.install_plugins(force, plugins)
 
+        
 @cli.command('ssh', short_help="Connect with `vagrant ssh`")
 @click.pass_context
 def ssh_cmd(ctx):
     '''Connect to an running VM / container over ssh with `vagrant ssh`.
     '''
     app.ssh(ctx)
+
 
 @cli.command('up', context_settings=CONTEXT_SETTINGS)
 @click.option('-p', '--provider',
@@ -185,18 +192,5 @@ def up_cmd(ctx, provider, guest_os):
               (PROJECT_NAME, PROJECT_NAME))
 
     app.up(ctx, provider, guest_os)
-
-#setup subs
-@setup_cmd.command('plugins')
-@click.option('-f', '--force', is_flag=True,
-              help='Install plugins without confirmation.')
-@click.argument('plugins', nargs=-1, type=str)
-def plugins_cmd(force, plugins):
-    '''Install passed args as vagrant plugins. `all` or no args installs
-    all default vagrant plugins.
-    '''
-    if not plugins: # No args means all default plugins.
-        plugins = ('all',)
-    app.install_plugins(force, plugins)
 
 main = cli
