@@ -1,0 +1,173 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Setup and Installation &#8212; Rambo 0.3.2.dev documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="setup-and-installation">
+<span id="setup-and-installation"></span><h1>Setup and Installation<a class="headerlink" href="#setup-and-installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="hardware-recommendations">
+<span id="hardware-recommendations"></span><h2>Hardware Recommendations<a class="headerlink" href="#hardware-recommendations" title="Permalink to this headline">¶</a></h2>
+<p>For running VMs locally in VirtualBox, we suggest a minimum of:</p>
+<ul class="simple">
+<li>Reasonably fast cpu with 2 cores and VT-x (e.g. an Intel i7-3612QM 2.1GHz, 4 core chip)</li>
+<li>8GB ram</li>
+<li>16GB free drive space</li>
+</ul>
+<p>For running containers in LXC locally or spawning machine in AWS EC2/DigitalOcean you can get away with comparatively slow computer and you don’t need VT-x. In fact, the LXC/EC2/DigitalOcean providers can be managed from a Raspberry Pi. See: https://www.raspberrypi.org/</p>
+</div>
+<div class="section" id="summary-of-setup">
+<span id="summary-of-setup"></span><h2>Summary of Setup:<a class="headerlink" href="#summary-of-setup" title="Permalink to this headline">¶</a></h2>
+<p>You need to install some programs into your host for certain providers, then you will need to install some Vagrant plugins. You also need to setup full accounts (or login into existing accounts) at any cloud provider you want to use.</p>
+</div>
+<div class="section" id="supported-host-os">
+<span id="supported-host-os"></span><h2>Supported Host OS:<a class="headerlink" href="#supported-host-os" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://www.ubuntu.com/download/desktop">Ubuntu 16.04 or newer</a></p>
+<p><a class="reference external" href="http://www.apple.com/mac-mini/">OSX</a></p>
+<p>We expect it’s likely you can get Rambo to work on any Unix-like system, but your milleage may vary. We have made no effort to get this working with Windows. Contributions are welcome.</p>
+</div>
+<div class="section" id="dependencies">
+<span id="dependencies"></span><h2>Dependencies:<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Download and install VirtualBox, Vagrant, and some Vagrant Plugins.</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.virtualbox.org/">VirtualBox 5.1 or newer</a></li>
+<li><a class="reference external" href="http://www.vagrantup.com/">Vagrant</a></li>
+<li><a class="reference external" href="https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md#install-vagrant-plugins">Vagrant Plugins</a></li>
+</ul>
+<p>Note: Vagrant and VirtualBox update frequently, and sometimes with breaking changes. Additionally there are host OS specific dependencies below.</p>
+<div class="section" id="dependencies-ubuntu">
+<span id="dependencies-ubuntu"></span><h3>Dependencies (Ubuntu):<a class="headerlink" href="#dependencies-ubuntu" title="Permalink to this headline">¶</a></h3>
+<p>You first need to install some dependencies for your host OS. For Ubuntu based systems, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>sudo apt install -y build-essential linux-headers-$(uname -r) lxc lxc-templates cgroup-lite redir xclip
+</pre></div>
+</div>
+</div>
+<div class="section" id="dependencies-mac">
+<span id="dependencies-mac"></span><h3>Dependencies (Mac):<a class="headerlink" href="#dependencies-mac" title="Permalink to this headline">¶</a></h3>
+<p>There are no additional dependencies for Mac, however, LXC cannot be used as a provider at this time.</p>
+</div>
+<div class="section" id="install-vagrant-plugins">
+<span id="install-vagrant-plugins"></span><h3>Install Vagrant Plugins:<a class="headerlink" href="#install-vagrant-plugins" title="Permalink to this headline">¶</a></h3>
+<p>Run the setup bash script. Download it from https://raw.githubusercontent.com/terminal-labs/rambo/0.3.3/rambo/setup.sh and run it, or run it from your installed Rambo source (in <code class="docutils literal notranslate"><span class="pre">rambo/setup.sh</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">bash</span> <span class="n">setup</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="providers">
+<span id="providers"></span><h1>Providers<a class="headerlink" href="#providers" title="Permalink to this headline">¶</a></h1>
+<p>Rambo supports various providers, and aims to let you switch between them as easily as possible. Nevertheless, some providers do have particular considerations, such as setting up keys and payment for cloud services, or specific dependencies for the host OS. This is a list of Rambo’s supported providers, with links to specific documentation pages for each.</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/terminal-labs/rambo/blob/master/docs/providers/aws-ec2.md">AWS EC2</a></li>
+<li><a class="reference external" href="https://github.com/terminal-labs/rambo/blob/master/docs/providers/digitalocean.md">DigitalOcean</a></li>
+<li><a class="reference external" href="https://github.com/terminal-labs/rambo/blob/master/docs/providers/docker.md">Docker</a></li>
+<li><a class="reference external" href="https://github.com/terminal-labs/rambo/blob/master/docs/providers/lxc.md">LXC</a></li>
+<li><a class="reference external" href="https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md#virtualbox-provider">VirtualBox</a></li>
+</ul>
+<div class="section" id="virtualbox-provider">
+<span id="virtualbox-provider"></span><h2>VirtualBox Provider:<a class="headerlink" href="#virtualbox-provider" title="Permalink to this headline">¶</a></h2>
+<p>Assuming that you installed the dependencies you should be able to run</p>
+<p><code class="docutils literal notranslate"><span class="pre">rambo</span> <span class="pre">up</span></code></p>
+<p>or the more verbose command</p>
+<p><code class="docutils literal notranslate"><span class="pre">rambo</span> <span class="pre">up</span> <span class="pre">-p</span> <span class="pre">virtualbox</span></code></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Setup and Installation</a><ul>
+<li><a class="reference internal" href="#hardware-recommendations">Hardware Recommendations</a></li>
+<li><a class="reference internal" href="#summary-of-setup">Summary of Setup:</a></li>
+<li><a class="reference internal" href="#supported-host-os">Supported Host OS:</a></li>
+<li><a class="reference internal" href="#dependencies">Dependencies:</a><ul>
+<li><a class="reference internal" href="#dependencies-ubuntu">Dependencies (Ubuntu):</a></li>
+<li><a class="reference internal" href="#dependencies-mac">Dependencies (Mac):</a></li>
+<li><a class="reference internal" href="#install-vagrant-plugins">Install Vagrant Plugins:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#providers">Providers</a><ul>
+<li><a class="reference internal" href="#virtualbox-provider">VirtualBox Provider:</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/INSTALL.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Michael Verhulst, Joseph Nix, Christopher Smith.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/INSTALL.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
