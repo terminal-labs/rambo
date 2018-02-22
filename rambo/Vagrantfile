@@ -64,10 +64,10 @@ unless get_env_var_rb('GUEST_OS')
   set_env_var_rb('GUEST_OS', SETTINGS['GUEST_OSES_DEFAULT'])
 end
 unless get_env_var_rb('RAMSIZE')
-  set_env_var_rb('RAMSIZE', SETTINGS['SIZES_DEFAULT'].keys[0])
+  set_env_var_rb('RAMSIZE', SETTINGS['RAMSIZE_DEFAULT'])
 end
 unless get_env_var_rb('DRIVESIZE')
-  set_env_var_rb('DRIVESIZE', SETTINGS['SIZES_DEFAULT'].values[0])
+  set_env_var_rb('DRIVESIZE', SETTINGS['DRIVESIZE_DEFAULT'])
 end
 
 custom_code_dirs = [

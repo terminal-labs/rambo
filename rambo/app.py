@@ -15,8 +15,9 @@ from select import select
 from subprocess import Popen
 from threading import Thread
 
-from rambo.providers import load_provider_keys
+import rambo.providers as providers
 from rambo.scripts import install_lastpass
+from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import (
     abort,
     dir_create,
@@ -29,14 +30,6 @@ from rambo.utils import (
     warn,
 )
 
-
-## GLOBALS
-# Create env var indicating where this code lives. This will be used latter by
-# Vagrant as a check that the python cli is being used, as well as being a useful var.
-PROJECT_LOCATION = os.path.dirname(os.path.realpath(__file__))
-with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
-    SETTINGS = json.load(f)
-PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
 def write_to_log(data=None, file_name=None):
     '''Write data to log files. Will append data to a single combined log.
@@ -200,6 +193,7 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     if not ctx: # Using API. Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+
     _invoke_vagrant('destroy --force')
     file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/provider'))
     file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/random_tag'))
@@ -354,7 +348,60 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    ## provider
+    ## guest_os
+    if not guest_os:
+        guest_os = SETTINGS['GUEST_OSES_DEFAULT']
+    set_env_var('guest_os', str(guest_os))
+
+    if guest_os not in SETTINGS['GUEST_OSES']:
+        msg = ('Guest OS "%s" is not in the guest OSes whitelist.\n'
+               'Did you have a typo? We\'ll try anyway.\n'
+               'Here is as list of avalible guest OSes:\n\n'
+               % guest_os)
+        for supported_os in SETTINGS['GUEST_OSES']:
+            msg = msg + '%s\n' % supported_os
+        warn(msg)
+
+    ## ram_size and drive_size (coupled)
+    if ram_size and not drive_size:
+        try:
+            drive_size = SETTINGS['SIZES'][ram_size]
+        except KeyError: # Doesn't match, but we'll let them try it.
+            drive_size = SETTINGS['DRIVESIZE_DEFAULT']
+    elif drive_size and not ram_size:
+        try:
+            ram_size = list(SETTINGS['SIZES'].keys())[list(SETTINGS['SIZES'].values()).index(drive_size)]
+        except ValueError: # Doesn't match, but we'll let them try it.
+            ram_size = SETTINGS['RAMSIZE_DEFAULT']
+    elif not any((ram_size, drive_size)):
+        ram_size = SETTINGS['RAMSIZE_DEFAULT']
+        drive_size = SETTINGS['DRIVESIZE_DEFAULT']
+
+    set_env_var('ramsize', ram_size)
+    set_env_var('drivesize', drive_size)
+
+    ## ram_size
+    if ram_size not in iter(SETTINGS['SIZES']):
+        msg = ('RAM Size "%s" is not in the RAM sizes list.\n'
+               'Did you have a typo? We\'ll try anyway.\n'
+               'Here is as list of avalible RAM sizes:\n\n'
+               % ram_size)
+        for supported_ram_size in iter(SETTINGS['SIZES']):
+            msg = msg + '%s\n' % supported_ram_size
+        warn(msg)
+
+    ## drive_size
+    if drive_size not in iter(SETTINGS['SIZES'].values()):
+        msg = ('DRIVE Size "%s" is not in the DRIVE sizes list.\n'
+               'Did you have a typo? We\'ll try anyway.\n'
+               'Here is as list of avalible DRIVE sizes:\n\n'
+               % drive_size)
+        for supported_drive_size in iter(SETTINGS['SIZES'].values()):
+            msg = msg + '%s\n' % supported_drive_size
+        warn(msg)
+
+
+    ## provider. Make this be last.
     if not provider:
         provider = SETTINGS['PROVIDERS_DEFAULT']
     set_env_var('provider', provider)
@@ -366,55 +413,8 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         for supported_provider in SETTINGS['PROVIDERS']:
             msg = msg + '%s\n' % supported_provider
         abort(msg)
-
-    ## guest_os
-    if not guest_os:
-        guest_os = SETTINGS['GUEST_OSES_DEFAULT']
-    set_env_var('guest_os', str(guest_os))
-
-    if guest_os not in SETTINGS['GUEST_OSES']:
-        msg = ('Guest OS "%s" is not in the guest OSes list.\n'
-               'Did you have a typo? Here is as list of avalible guest OSes:\n\n'
-               % guest_os)
-        for supported_os in SETTINGS['GUEST_OSES']:
-            msg = msg + '%s\n' % supported_os
-        warn(msg)
-
-    ## ram_size and drive_size (coupled)
-    if ram_size and not drive_size:
-        try:
-            drive_size = SETTINGS['SIZES'][ram_size]
-        except KeyError: # Doesn't match, but we'll let them try it.
-            drive_size = next(iter(SETTINGS['SIZES_DEFAULT'].values()))
-    elif drive_size and not ram_size:
-        try:
-            ram_size = list(SETTINGS['SIZES'].keys())[list(SETTINGS['SIZES'].values()).index(drive_size)]
-        except ValueError: # Doesn't match, but we'll let them try it.
-            ram_size = next(iter(SETTINGS['SIZES_DEFAULT']))
-    elif not any((ram_size, drive_size)):
-        ram_size = next(iter(SETTINGS['SIZES_DEFAULT']))
-        drive_size = next(iter(SETTINGS['SIZES_DEFAULT'].values()))
-
-    set_env_var('ramsize', ram_size)
-    set_env_var('drivesize', drive_size)
-
-    ## ram_size
-    if ram_size not in iter(SETTINGS['SIZES']):
-        msg = ('RAM Size "%s" is not in the RAM sizes list.\n'
-               'Did you have a typo? Here is as list of avalible RAM sizes:\n\n'
-               % ram_size)
-        for supported_ram_size in iter(SETTINGS['SIZES']):
-            msg = msg + '%s\n' % supported_ram_size
-        warn(msg)
-
-    ## drive_size
-    if drive_size not in iter(SETTINGS['SIZES'].values()):
-        msg = ('DRIVE Size "%s" is not in the DRIVE sizes list.\n'
-               'Did you have a typo? Here is as list of avalible DRIVE sizes:\n\n'
-               % drive_size)
-        for supported_drive_size in iter(SETTINGS['SIZES'].values()):
-            msg = msg + '%s\n' % supported_drive_size
-        warn(msg)
+    if provider == 'ec2':
+        providers.aws_ec2()
 
     _invoke_vagrant('up')
 
