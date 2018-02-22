@@ -19,8 +19,13 @@ Vagrant.configure("2") do |config|
       provider.size = "1gb"
     elsif get_env_var_rb("RAMSIZE") == "2048"
       provider.size = "2gb"
+    elsif get_env_var_rb("RAMSIZE") == "4096"
+      provider.size = "4gb"
+    elsif get_env_var_rb("RAMSIZE") == "8192"
+      provider.size = "8gb"
     end
   end
+
   config.ssh.username = "vagrant"
   config.ssh.private_key_path = ENV["DIGITALOCEAN_PRIVATE_KEY_PATH"]
   config.ssh.forward_agent = FORWARD_SSH

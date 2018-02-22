@@ -416,6 +416,8 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         abort(msg)
     if provider == 'ec2':
         providers.aws_ec2()
+    elif provider == 'digitalocean':
+        providers.digitalocean()
 
     _invoke_vagrant('up')
 
