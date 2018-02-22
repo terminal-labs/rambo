@@ -5,7 +5,6 @@ from pathlib import Path
 from shutil import copyfile, move, rmtree
 
 import click
-from termcolor import colored
 
 from rambo.settings import PROJECT_NAME
 
@@ -21,7 +20,7 @@ def get_env_var(name):
     return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
 
 def abort(message):
-    sys.exit(colored(''.join(['ABORTED - ', message]), 'red', attrs=['bold']))
+    sys.exit(click.style(''.join(['ABORTED - ', message]), fg='red', bold=True))
 
 def warn(message):
     click.secho(''.join(['WARNING - ', message]), fg='yellow')

@@ -23,6 +23,10 @@ Vagrant.configure("2") do |config|
       provider.instance_type = "t2.micro"
     elsif get_env_var_rb('ramsize') == "2048"
       provider.instance_type = "t2.small"
+    elsif get_env_var_rb('ramsize') == "4096"
+      provider.instance_type = "t2.medium"
+    elsif get_env_var_rb('ramsize') == "8192"
+      provider.instance_type = "t2.large"
     end
 
     if get_env_var_rb('GUEST_OS') != 'debian-8'
