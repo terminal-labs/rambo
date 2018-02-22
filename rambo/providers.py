@@ -13,6 +13,8 @@ def aws_ec2():
               'a machine-type like m3.medium.')
 
 def digitalocean():
+    if get_env_var('guest_os'): # only set during `up`
+        set_env_var('do_image', SETTINGS['GUEST_OSES'][get_env_var('guest_os')]['do'])
     if get_env_var('ramsize') not in SETTINGS['SIZES']:
         abort('Sorry, we really need a RAM size from our whitelist for '
               'digitalocean. \nThe only way around that is if you specify '
