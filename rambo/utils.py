@@ -13,7 +13,7 @@ from rambo.settings import PROJECT_NAME
 def set_env_var(name, value):
     '''Set an environment variable in all caps that is prefixed with the name of the project
     '''
-    os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = value
+    os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = str(value)
 
 def get_env_var(name):
     '''Get an environment variable in all caps that is prefixed with the name of the project

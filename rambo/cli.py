@@ -198,6 +198,14 @@ def up_cmd(ctx, provider, guest_os, ram_size, drive_size):
               "You can create one with `%s setup config`." %
               (PROJECT_NAME, PROJECT_NAME))
 
-    app.up(ctx, provider, guest_os)
+    # Cast non string cli params to strings. Strings are necessary
+    # to pass things over env vars to vagrant, but we still want
+    # clicks input sanitation. Keep None values (thus the ifs).
+    if ram_size:
+        ram_size = str(ram_size)
+    if drive_size:
+        drive_size = str(drive_size)
+
+    app.up(ctx, provider, guest_os, ram_size, drive_size)
 
 main = cli

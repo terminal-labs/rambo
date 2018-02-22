@@ -373,9 +373,10 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
             ram_size = list(SETTINGS['SIZES'].keys())[list(SETTINGS['SIZES'].values()).index(drive_size)]
         except ValueError: # Doesn't match, but we'll let them try it.
             ram_size = SETTINGS['RAMSIZE_DEFAULT']
-    elif not any((ram_size, drive_size)):
+    elif not ram_size and not drive_size:
         ram_size = SETTINGS['RAMSIZE_DEFAULT']
         drive_size = SETTINGS['DRIVESIZE_DEFAULT']
+    # else both exist, just try using them
 
     set_env_var('ramsize', ram_size)
     set_env_var('drivesize', drive_size)
