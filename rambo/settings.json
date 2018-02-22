@@ -28,6 +28,10 @@
             "do": "debian-8-x64",
             "ec2": "ami-a5d621e1"
         },
+        "centos-7": {
+            "do": "centos-7-x64",
+            "ec2": "ami-65e0e305"
+        },
         "ubuntu-1404": {
             "do": "ubuntu-14-04-x64",
             "ec2": "ami-48030c28"
@@ -35,10 +39,6 @@
         "ubuntu-1604": {
             "do": "ubuntu-16-04-x64",
             "ec2": "ami-07585467"
-        },
-        "centos-7": {
-            "do": "centos-7-x64",
-            "ec2": "ami-65e0e305"
         }
     },
     "GUEST_OSES_DEFAULT": "ubuntu-1604",
