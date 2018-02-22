@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
     }]
 
     provider.user_data = '#!/bin/bash
-      oldusers=( admin root ubuntu )
+      oldusers=( admin root ubuntu centos )
       for olduser in "${oldusers[@]}"; do
         if grep -q $olduser "/etc/sudoers.d/90-cloud-init-users"; then
           user=vagrant
