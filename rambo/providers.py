@@ -8,6 +8,8 @@ def digitalocean():
     '''DigitalOcean specific preparation for Vagrant. Setting and validating env vars.
 
     Set env vars: do_image
+
+    Sanitize against non-whitelist ramsize and drivesize.
     '''
     if get_env_var('guest_os'): # only set during `up`
         set_env_var('do_image', SETTINGS['GUEST_OSES'][get_env_var('guest_os')]['do'])
@@ -31,6 +33,8 @@ def ec2():
     '''EC2 specific preparation for Vagrant. Setting and validating env vars.
 
     Set env vars: ami
+
+    Sanitize against non-whitelist ramsize.
     '''
     if get_env_var('guest_os'): # only set during `up`
         set_env_var('ami', SETTINGS['GUEST_OSES'][get_env_var('guest_os')]['ec2'])
