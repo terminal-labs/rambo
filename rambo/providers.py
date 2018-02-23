@@ -23,6 +23,9 @@ def digitalocean():
         abort('Sorry, we really need a drive size from our whitelist for '
               'digitalocean. \nThe only way around that is if you specify '
               'a machine-type like s-8vcpu-32gb.')
+def docker():
+    if get_env_var('guest_os'): # only set during `up`
+        set_env_var('docker_box', SETTINGS['GUEST_OSES'][get_env_var('guest_os')]['docker'])
 
 def load_provider_keys():
     aws_ec2()

@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
     :guest => 80,
     :host => 8080,
     auto_correct: true
-  box =  "terminal-labs/tl-debian-8-64bit-lxc"
+  box =  'terminal-labs/tl-' + get_env_var_rb("GUEST_OS") + '-64bit-lxc'
   config.vm.box = box
   config.vm.box_url = box
 end
