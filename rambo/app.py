@@ -361,6 +361,19 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
+    ## provider. Make this be last.
+    if not provider:
+        provider = SETTINGS['PROVIDERS_DEFAULT']
+    set_env_var('provider', provider)
+
+    if provider not in SETTINGS['PROVIDERS']:
+        msg = ('Provider "%s" is not in the provider list.\n'
+               'Did you have a typo? Here is as list of avalible providers:\n\n'
+               % provider)
+        for supported_provider in SETTINGS['PROVIDERS']:
+            msg = msg + '%s\n' % supported_provider
+        utils.abort(msg)
+
     ## guest_os
     if not guest_os:
         guest_os = SETTINGS['GUEST_OSES_DEFAULT']
@@ -420,20 +433,8 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
             msg = msg + '%s\n' % supported_drive_size
         utils.warn(msg)
 
-
-    ## provider. Make this be last.
-    if not provider:
-        provider = SETTINGS['PROVIDERS_DEFAULT']
-    set_env_var('provider', provider)
-
-    if provider not in SETTINGS['PROVIDERS']:
-        msg = ('Provider "%s" is not in the provider list.\n'
-               'Did you have a typo? Here is as list of avalible providers:\n\n'
-               % provider)
-        for supported_provider in SETTINGS['PROVIDERS']:
-            msg = msg + '%s\n' % supported_provider
-        utils.abort(msg)
-
+    ## Provider specific handling.
+    ## Must come after all else, because logic may be done on env vars set above.
     if provider == 'digitalocean':
         providers.digitalocean()
     elif provider == 'docker':
