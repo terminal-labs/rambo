@@ -170,11 +170,10 @@ def createproject(project_name, config_only=None):
     click.echo('Created %s project "%s" in %s.'
                % (PROJECT_NAME.capitalize(), project_name, path))
     ## Fill project dir with basic configs.
+    install_config(output_path=path)
     if not config_only:
         export('saltstack', path)
         install_auth(output_path=path)
-    install_config(output_path=path)
-
 
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
