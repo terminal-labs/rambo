@@ -17,17 +17,19 @@ version = pkg_resources.get_distribution('rambo-vagrant').version
 
 ### Config file handling
 class ConfigSectionSchema(object):
-    """Describes all config sections of this configuration file."""
+    '''Describes all config sections of this configuration file.'''
 
-    @matches_section("base")
+    @matches_section('base')
     class Base(SectionSchema):
+        '''Corresponds to the main CLI entry point.'''
         cwd                   = Param(type=click.Path())
         tmpdir_path           = Param(type=click.Path())
         vagrant_cwd           = Param(type=click.Path())
         vagrant_dotfile_path  = Param(type=click.Path())
 
-    @matches_section("up")
+    @matches_section('up')
     class Up(SectionSchema):
+        '''Corresponds to the `up` command group.'''
         provider      = Param(type=str)
         guest_os      = Param(type=str)
         ram_size      = Param(type=int)
@@ -197,14 +199,6 @@ def up_cmd(ctx, provider, guest_os, ram_size, drive_size):
         abort("Config file %s.conf must be present in working directory.\n"
               "You can create one with `%s setup config`." %
               (PROJECT_NAME, PROJECT_NAME))
-
-    # Cast non string cli params to strings. Strings are necessary
-    # to pass things over env vars to vagrant, but we still want
-    # click's input sanitation. Keep None values (thus the ifs).
-    if ram_size:
-        ram_size = str(ram_size)
-    if drive_size:
-        drive_size = str(drive_size)
 
     app.up(ctx, provider, guest_os, ram_size, drive_size)
 

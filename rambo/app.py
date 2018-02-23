@@ -98,6 +98,10 @@ def _invoke_vagrant(cmd=None):
 def set_init_vars(cwd=None, tmpdir_path=None):
     '''Set custom environment variables that are always going to be needed by
     our custom Ruby code in the Vagrantfile chain.
+
+    Args:
+        cwd (path): Location of project (conf file, provisioning scripts, etc.).
+        tmpdir_path (path): Location of project's tmp dir.
     '''
     # env vars available to Python and Ruby
     set_env_var('ENV', PROJECT_LOCATION) # installed location of this code
@@ -131,8 +135,8 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     expects, and that we use, to modify some use paths.
 
     Agrs:
-        vagrant_cwd (str): Location of `Vagrantfile`.
-        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+        vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
+        vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     # loc of Vagrantfile
     if vagrant_cwd: # cli / api
@@ -152,6 +156,10 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
 ## Defs for cli subcommands
 def createproject(project_name, config_only=None):
     '''Create project with basic configuration files.
+
+    Agrs:
+        project_name (path): Place to create a new project. Must be non-existing dir.
+        config_only (bool): Determins if we should only place a conf file in the new project.
     '''
     ## Create project dir
     path = os.path.join(os.getcwd(), project_name)
@@ -165,7 +173,7 @@ def createproject(project_name, config_only=None):
     if not config_only:
         export('saltstack', path)
         install_auth(output_path=path)
-        install_config(output_path=path)
+    install_config(output_path=path)
 
 
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
@@ -174,8 +182,8 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     Agrs:
         ctx (object): Click Context object.
-        vagrant_cwd (str): Location of `Vagrantfile`.
-        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+        vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
+        vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     # TODO add finding and deleting of all VMs registered to this installation.
     # TODO (optional) add finding and deleting of all VMs across all installations.
@@ -193,13 +201,13 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     click.echo('Destroy complete.')
 
 def export(resource=None, export_path=None, force=None):
-    '''Drop default code in the CWD / user defined space. Operate on saltstack,
-    vagrant, or python resources.
+    '''Drop default code in the CWD / user defined space. Operate on saltstack
+    and vagrant resources.
 
     Agrs:
-        resource (str): Resource to export: saltstack, vagrant, python, or all.
-        export_path (str): Dir to export resources to.
-        force (str): Detects if we should overwrite and merge.
+        resource (str): Resource to export: saltstack or vagrant.
+        export_path (path): Dir to export resources to.
+        force (bool): Determins if we should overwrite and merge conflicting files in the target path.
     '''
     if export_path:
         output_dir = os.path.normpath(export_path)
@@ -241,6 +249,10 @@ def export(resource=None, export_path=None, force=None):
 
 def install_auth(ctx=None, output_path=None):
     '''Install auth directory.
+
+    Agrs:
+        ctx (object): Click Context object.
+        output_path (path): Path to place auth dir.
     '''
     if not ctx: # Using API. Else handled by cli.
         set_init_vars()
@@ -273,6 +285,10 @@ def install_auth(ctx=None, output_path=None):
 
 def install_config(ctx=None, output_path=None):
     '''Install config file.
+
+    Agrs:
+        ctx (object): Click Context object.
+        output_path (path): Path to place conf file.
     '''
     if not ctx: # Using API. Else handled by cli.
         set_init_vars()
@@ -291,6 +307,10 @@ def install_config(ctx=None, output_path=None):
 
 def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins
+
+    Agrs:
+        force (bool): Forces bypassing of reinstallation prompt.
+        plugins (tuple): Names of vagrant plugins to install.
     '''
     host_system = platform.system()
     for plugin in plugins:
@@ -312,8 +332,8 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     Agrs:
         ctx (object): Click Context object.
-        vagrant_cwd (str): Location of `Vagrantfile`.
-        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+        vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
+        vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     # TODO: Better logs.
     if not ctx: # Using API. Else handled by cli.
@@ -329,9 +349,12 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
 
     Agrs:
         ctx (object): Click Context object. Used to detect if CLI is used.
-        provider (str): Sets provider used.
-        vagrant_cwd (str): Location of `Vagrantfile`.
-        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+        provider (str): Provider to use.
+        guest_os (str): Guest OS to use.
+        ram_size (int): RAM in MB to use.
+        drive_size (int): Drive size in GB to use.
+        vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
+        vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     # TODO: Add registering of VM for all of this installation to see
 
@@ -354,6 +377,12 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         utils.warn(msg)
 
     ## ram_size and drive_size (coupled)
+    # Cast to strings if they exist so they can stored as env vars.
+    if ram_size:
+        ram_size = str(ram_size)
+    if drive_size:
+        drive_size = str(drive_size)
+
     if ram_size and not drive_size:
         try:
             drive_size = SETTINGS['SIZES'][ram_size]
