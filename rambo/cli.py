@@ -188,8 +188,11 @@ def ssh_cmd(ctx):
               'These drive sizes are supported: %s. Default %s.'
               % (list(SETTINGS['SIZES'].values()),
                  SETTINGS['DRIVESIZE_DEFAULT']))
+@click.option('-m', '--machine-type', type=str,
+              help='Machine type for cloud providers.\n'
+              'E.g. m5.medium for ec2, or s-8vcpu-32gb for digitalocean.\n')
 @click.pass_context
-def up_cmd(ctx, provider, guest_os, ram_size, drive_size):
+def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type):
     '''Start a VM / container with `vagrant up`.
     Params can be passed as usual with
     click (CLI or env var) and also with an INI config file.
@@ -200,6 +203,6 @@ def up_cmd(ctx, provider, guest_os, ram_size, drive_size):
               "You can create one with `%s setup config`." %
               (PROJECT_NAME, PROJECT_NAME))
 
-    app.up(ctx, provider, guest_os, ram_size, drive_size)
+    app.up(ctx, provider, guest_os, ram_size, drive_size, machine_type)
 
 main = cli

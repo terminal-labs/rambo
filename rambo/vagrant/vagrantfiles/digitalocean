@@ -1,32 +1,34 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.configure("2") do |config|
+Vagrant.configure('2') do |config|
   config.vm.provider :digital_ocean do |provider, config|
     # set unique vm name
     config.vm.hostname = VM_NAME
-    provider.token = ENV["DIGITALOCEAN_TOKEN"]
-    provider.ssh_key_name = File.basename(ENV["DIGITALOCEAN_PRIVATE_KEY_PATH"], ".*")
+    provider.token = ENV['DIGITALOCEAN_TOKEN']
+    provider.ssh_key_name = File.basename(ENV['DIGITALOCEAN_PRIVATE_KEY_PATH'], '.*')
     provider.image = get_env_var_rb('do_image') ? get_env_var_rb('do_image') :
                        SETTINGS['GUEST_OSES'][SETTINGS['GUEST_OSES_DEFAULT']]['do']
-    provider.region = "nyc1"
+    provider.region = 'nyc1'
 
-    if get_env_var_rb("RAMSIZE") == "512"
-      provider.size = "512mb"
-    elsif get_env_var_rb("RAMSIZE") == "1024"
-      provider.size = "1gb"
-    elsif get_env_var_rb("RAMSIZE") == "2048"
-      provider.size = "2gb"
-    elsif get_env_var_rb("RAMSIZE") == "4096"
-      provider.size = "4gb"
-    elsif get_env_var_rb("RAMSIZE") == "8192"
-      provider.size = "8gb"
+    if get_env_var_rb('machinetype')
+      provider.size = get_env_var_rb('machinetype')
+    elsif get_env_var_rb('ramsize') == '512'
+      provider.size = '512mb'
+    elsif get_env_var_rb('ramsize') == '1024'
+      provider.size = '1gb'
+    elsif get_env_var_rb('ramsize') == '2048'
+      provider.size = '2gb'
+    elsif get_env_var_rb('ramsize') == '4096'
+      provider.size = '4gb'
+    elsif get_env_var_rb('ramsize') == '8192'
+      provider.size = '8gb'
     end
   end
 
-  config.ssh.username = "vagrant"
-  config.ssh.private_key_path = ENV["DIGITALOCEAN_PRIVATE_KEY_PATH"]
+  config.ssh.username = 'vagrant'
+  config.ssh.private_key_path = ENV['DIGITALOCEAN_PRIVATE_KEY_PATH']
   config.ssh.forward_agent = FORWARD_SSH
-  config.vm.box = "digital_ocean"
-  config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+  config.vm.box = 'digital_ocean'
+  config.vm.box_url = 'https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box'
 end
