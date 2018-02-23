@@ -7,16 +7,10 @@ from click_configfile import ConfigFileReader, Param, SectionSchema
 from click_configfile import matches_section
 import click
 
-from rambo.utils import abort
 import rambo.app as app
+from rambo.settings import SETTINGS, PROJECT_NAME
+from rambo.utils import abort
 
-### GLOBALS
-# Create env var indicating where this code lives. This will be used latter by
-# Vagrant as a check that the python cli is being used, as well as being a useful var.
-PROJECT_LOCATION = os.path.dirname(os.path.realpath(__file__))
-with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
-    SETTINGS = json.load(f)
-PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
 version = pkg_resources.get_distribution('rambo-vagrant').version
 
@@ -34,8 +28,10 @@ class ConfigSectionSchema(object):
 
     @matches_section("up")
     class Up(SectionSchema):
-        provider    = Param(type=str)
-        guest_os    = Param(type=str)
+        provider      = Param(type=str)
+        guest_os      = Param(type=str)
+        ram_size      = Param(type=int)
+        drive_size    = Param(type=int)
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -161,7 +157,7 @@ def install_plugins(force, plugins):
         plugins = ('all',)
     app.install_plugins(force, plugins)
 
-        
+
 @cli.command('ssh', short_help="Connect with `vagrant ssh`")
 @click.pass_context
 def ssh_cmd(ctx):
@@ -171,16 +167,27 @@ def ssh_cmd(ctx):
 
 
 @cli.command('up', context_settings=CONTEXT_SETTINGS)
-@click.option('-p', '--provider',
+@click.option('-p', '--provider', type=str,
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default %s.'
               % (SETTINGS['PROVIDERS'], SETTINGS['PROVIDERS_DEFAULT']))
-@click.option('-o', '--guest-os',
+@click.option('-o', '--guest-os', type=str,
               help='Operating System of the guest, inside the virtual machine. '
               'These guest OSs are supported: %s. Default %s.'
-              % (SETTINGS['GUEST_OSES'], SETTINGS['GUEST_OSES_DEFAULT']))
+              % (list(SETTINGS['GUEST_OSES'].keys()),
+                 SETTINGS['GUEST_OSES_DEFAULT']))
+@click.option('-r', '--ram-size', type=int,
+              help='Amount of RAM of the virtual machine in MB. '
+              'These RAM sizes are supported: %s. Default %s.'
+              % (list(SETTINGS['SIZES'].keys()),
+                 SETTINGS['RAMSIZE_DEFAULT']))
+@click.option('-d', '--drive-size', type=int,
+              help='The drive size of the virtual machine in GB. '
+              'These drive sizes are supported: %s. Default %s.'
+              % (list(SETTINGS['SIZES'].values()),
+                 SETTINGS['DRIVESIZE_DEFAULT']))
 @click.pass_context
-def up_cmd(ctx, provider, guest_os):
+def up_cmd(ctx, provider, guest_os, ram_size, drive_size):
     '''Start a VM / container with `vagrant up`.
     Params can be passed as usual with
     click (CLI or env var) and also with an INI config file.
@@ -191,6 +198,14 @@ def up_cmd(ctx, provider, guest_os):
               "You can create one with `%s setup config`." %
               (PROJECT_NAME, PROJECT_NAME))
 
-    app.up(ctx, provider, guest_os)
+    # Cast non string cli params to strings. Strings are necessary
+    # to pass things over env vars to vagrant, but we still want
+    # click's input sanitation. Keep None values (thus the ifs).
+    if ram_size:
+        ram_size = str(ram_size)
+    if drive_size:
+        drive_size = str(drive_size)
+
+    app.up(ctx, provider, guest_os, ram_size, drive_size)
 
 main = cli
