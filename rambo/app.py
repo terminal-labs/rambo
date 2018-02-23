@@ -433,10 +433,13 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         for supported_provider in SETTINGS['PROVIDERS']:
             msg = msg + '%s\n' % supported_provider
         utils.abort(msg)
-    if provider == 'ec2':
-        providers.ec2()
-    elif provider == 'digitalocean':
+
+    if provider == 'digitalocean':
         providers.digitalocean()
+    elif provider == 'docker':
+        providers.docker()
+    elif provider == 'ec2':
+        providers.ec2()
 
     _invoke_vagrant('up')
 
