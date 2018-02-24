@@ -342,7 +342,7 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     os.system('vagrant ssh')
 
 def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
-       vagrant_cwd=None, vagrant_dotfile_path=None):
+       machine_type=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -352,6 +352,7 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         guest_os (str): Guest OS to use.
         ram_size (int): RAM in MB to use.
         drive_size (int): Drive size in GB to use.
+        machine_type (str): Machine type to use for cloud providers.
         vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
@@ -432,6 +433,14 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         for supported_drive_size in iter(SETTINGS['SIZES'].values()):
             msg = msg + '%s\n' % supported_drive_size
         utils.warn(msg)
+
+    if machine_type:
+        if provider in ('docker', 'lxc', 'virtualbox'):
+            msg = ('You have selected a machine-type, but are not using\n'
+                   'a cloud provider. You selected %s with %s.\n'
+                   % (machine_type, provider))
+            utils.abort(msg)
+        set_env_var('machinetype', machine_type)
 
     ## Provider specific handling.
     ## Must come after all else, because logic may be done on env vars set above.
