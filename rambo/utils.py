@@ -4,21 +4,15 @@ import sys
 from pathlib import Path
 from shutil import copyfile, move, rmtree
 
-from termcolor import colored
+import click
 
-## GLOBALS
-# Create env var indicating where this code lives. This will be used latter by
-# Vagrant as a check that the python cli is being used, as well as being a useful var.
-PROJECT_LOCATION = os.path.dirname(os.path.realpath(__file__))
-with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
-    SETTINGS = json.load(f)
-PROVIDERS = SETTINGS['PROVIDERS']
-PROJECT_NAME = SETTINGS['PROJECT_NAME']
+from rambo.settings import PROJECT_NAME
+
 
 def set_env_var(name, value):
     '''Set an environment variable in all caps that is prefixed with the name of the project
     '''
-    os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = value
+    os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = str(value)
 
 def get_env_var(name):
     '''Get an environment variable in all caps that is prefixed with the name of the project
@@ -26,7 +20,10 @@ def get_env_var(name):
     return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
 
 def abort(message):
-    sys.exit(colored(''.join(['ABORTED - ', message]), 'red', attrs=['bold']))
+    sys.exit(click.style(''.join(['ABORTED - ', message]), fg='red', bold=True))
+
+def warn(message):
+    click.secho(''.join(['WARNING - ', message]), fg='yellow')
 
 def dir_exists(path):
     return os.path.isdir(path)

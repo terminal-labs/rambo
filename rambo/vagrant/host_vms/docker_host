@@ -6,13 +6,14 @@ btrfs_volume = 'vagrant/host_vms/auxiliary_disks/docker_host_btrfs_volume.vdi'
 Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |provider, override|
     provider.name = "docker_host"
-    override.vm.box = "ubuntu/xenial64"
+    override.vm.box = get_env_var_rb('docker_box') ? get_env_var_rb('docker_box') :
+                     SETTINGS['GUEST_OSES'][SETTINGS['GUEST_OSES_DEFAULT']]['docker']
     provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
     provider.customize ['modifyvm', :id, '--nictype2', 'virtio']
-    provider.memory = 2048
+    provider.memory = get_env_var_rb('ramsize').to_i
     provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
     unless File.exist?(btrfs_volume)
-      provider.customize ['createhd', '--filename', btrfs_volume, '--size', 120 * 1024]
+      provider.customize ['createhd', '--filename', btrfs_volume, '--size', get_env_var_rb('drivesize').to_i * 1024]
     end
     provider.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', btrfs_volume]
   end

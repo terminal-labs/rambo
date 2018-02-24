@@ -15,18 +15,12 @@ from select import select
 from subprocess import Popen
 from threading import Thread
 
-from rambo.providers import load_provider_keys
+import rambo.providers as providers
+import rambo.utils as utils
 from rambo.scripts import install_lastpass
-from rambo.utils import abort, get_user_home, set_env_var, get_env_var, dir_exists, dir_create, dir_delete, file_delete
+from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
+from rambo.utils import get_env_var, set_env_var
 
-
-## GLOBALS
-# Create env var indicating where this code lives. This will be used latter by
-# Vagrant as a check that the python cli is being used, as well as being a useful var.
-PROJECT_LOCATION = os.path.dirname(os.path.realpath(__file__))
-with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
-    SETTINGS = json.load(f)
-PROJECT_NAME = SETTINGS['PROJECT_NAME']
 
 def write_to_log(data=None, file_name=None):
     '''Write data to log files. Will append data to a single combined log.
@@ -46,7 +40,7 @@ def write_to_log(data=None, file_name=None):
 
     data = ''.join([data.rstrip(), '\n']) # strip possible eol chars and add back exactly one
 
-    dir_create(get_env_var('LOG_PATH'))
+    utils.dir_create(get_env_var('LOG_PATH'))
     fd_path = os.path.join(get_env_var('LOG_PATH'), 'history.log')
     fd = open(fd_path, 'a+')
     fd.write(data)
@@ -104,6 +98,10 @@ def _invoke_vagrant(cmd=None):
 def set_init_vars(cwd=None, tmpdir_path=None):
     '''Set custom environment variables that are always going to be needed by
     our custom Ruby code in the Vagrantfile chain.
+
+    Args:
+        cwd (path): Location of project (conf file, provisioning scripts, etc.).
+        tmpdir_path (path): Location of project's tmp dir.
     '''
     # env vars available to Python and Ruby
     set_env_var('ENV', PROJECT_LOCATION) # installed location of this code
@@ -115,7 +113,7 @@ def set_init_vars(cwd=None, tmpdir_path=None):
         try:
             set_env_var('CWD', os.getcwd())
         except FileNotFoundError:
-            abort('Your current working directory no longer exists. '
+            utils.abort('Your current working directory no longer exists. '
                   'Did you delete it? Check for it with `ls ..`')
 
     # loc of tmpdir_path
@@ -137,8 +135,8 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     expects, and that we use, to modify some use paths.
 
     Agrs:
-        vagrant_cwd (str): Location of `Vagrantfile`.
-        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+        vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
+        vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     # loc of Vagrantfile
     if vagrant_cwd: # cli / api
@@ -158,21 +156,24 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
 ## Defs for cli subcommands
 def createproject(project_name, config_only=None):
     '''Create project with basic configuration files.
+
+    Agrs:
+        project_name (path): Place to create a new project. Must be non-existing dir.
+        config_only (bool): Determins if we should only place a conf file in the new project.
     '''
     ## Create project dir
     path = os.path.join(os.getcwd(), project_name)
     try:
         os.makedirs(path) # Make parent dirs if needed.
     except FileExistsError:
-        abort('Directory already exists.')
+        utils.abort('Directory already exists.')
     click.echo('Created %s project "%s" in %s.'
                % (PROJECT_NAME.capitalize(), project_name, path))
     ## Fill project dir with basic configs.
+    install_config(output_path=path)
     if not config_only:
         export('saltstack', path)
         install_auth(output_path=path)
-        install_config(output_path=path)
-
 
 def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
@@ -180,8 +181,8 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     Agrs:
         ctx (object): Click Context object.
-        vagrant_cwd (str): Location of `Vagrantfile`.
-        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+        vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
+        vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     # TODO add finding and deleting of all VMs registered to this installation.
     # TODO (optional) add finding and deleting of all VMs across all installations.
@@ -190,21 +191,22 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     if not ctx: # Using API. Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+
     _invoke_vagrant('destroy --force')
-    file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/provider'))
-    file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/random_tag'))
-    dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
+    utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/provider'))
+    utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/random_tag'))
+    utils.dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
     click.echo('Temporary files removed')
     click.echo('Destroy complete.')
 
 def export(resource=None, export_path=None, force=None):
-    '''Drop default code in the CWD / user defined space. Operate on saltstack,
-    vagrant, or python resources.
+    '''Drop default code in the CWD / user defined space. Operate on saltstack
+    and vagrant resources.
 
     Agrs:
-        resource (str): Resource to export: saltstack, vagrant, python, or all.
-        export_path (str): Dir to export resources to.
-        force (str): Detects if we should overwrite and merge.
+        resource (str): Resource to export: saltstack or vagrant.
+        export_path (path): Dir to export resources to.
+        force (bool): Determins if we should overwrite and merge conflicting files in the target path.
     '''
     if export_path:
         output_dir = os.path.normpath(export_path)
@@ -230,7 +232,7 @@ def export(resource=None, export_path=None, force=None):
                                   "overwrite?" % dsts, abort=True)
                     break # We only need general confirmation of an overwrite once.
         except UnboundLocalError: # dsts referenced before assignement
-            abort("The resource '%s' is not a valid option." % resource)
+            utils.abort("The resource '%s' is not a valid option." % resource)
 
     for src, dst in zip(srcs, dsts):
         try:
@@ -246,6 +248,10 @@ def export(resource=None, export_path=None, force=None):
 
 def install_auth(ctx=None, output_path=None):
     '''Install auth directory.
+
+    Agrs:
+        ctx (object): Click Context object.
+        output_path (path): Path to place auth dir.
     '''
     if not ctx: # Using API. Else handled by cli.
         set_init_vars()
@@ -278,6 +284,10 @@ def install_auth(ctx=None, output_path=None):
 
 def install_config(ctx=None, output_path=None):
     '''Install config file.
+
+    Agrs:
+        ctx (object): Click Context object.
+        output_path (path): Path to place conf file.
     '''
     if not ctx: # Using API. Else handled by cli.
         set_init_vars()
@@ -287,7 +297,7 @@ def install_config(ctx=None, output_path=None):
     path = os.path.join(output_path, '%s.conf' % PROJECT_NAME)
 
     if os.path.exists(path):
-        abort('%s.conf already esists.' % PROJECT_NAME)
+        utils.abort('%s.conf already esists.' % PROJECT_NAME)
     else:
         with open(path, 'w') as f:
             f.write('[up]\nprovider = %s\nguest_os = %s\n'
@@ -296,6 +306,10 @@ def install_config(ctx=None, output_path=None):
 
 def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins
+
+    Agrs:
+        force (bool): Forces bypassing of reinstallation prompt.
+        plugins (tuple): Names of vagrant plugins to install.
     '''
     host_system = platform.system()
     for plugin in plugins:
@@ -317,8 +331,8 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     Agrs:
         ctx (object): Click Context object.
-        vagrant_cwd (str): Location of `Vagrantfile`.
-        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+        vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
+        vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     # TODO: Better logs.
     if not ctx: # Using API. Else handled by cli.
@@ -327,15 +341,19 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
 
     os.system('vagrant ssh')
 
-def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
+       vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
     All str args can also be set as an environment variable; arg takes precedence.
 
     Agrs:
         ctx (object): Click Context object. Used to detect if CLI is used.
-        provider (str): Sets provider used.
-        vagrant_cwd (str): Location of `Vagrantfile`.
-        vagrant_dotfile_path (str): Location of `.vagrant` metadata directory.
+        provider (str): Provider to use.
+        guest_os (str): Guest OS to use.
+        ram_size (int): RAM in MB to use.
+        drive_size (int): Drive size in GB to use.
+        vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
+        vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     # TODO: Add registering of VM for all of this installation to see
 
@@ -343,7 +361,7 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    ## provider
+    ## provider. Make this be last.
     if not provider:
         provider = SETTINGS['PROVIDERS_DEFAULT']
     set_env_var('provider', provider)
@@ -354,7 +372,7 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
                % provider)
         for supported_provider in SETTINGS['PROVIDERS']:
             msg = msg + '%s\n' % supported_provider
-        abort(msg)
+        utils.abort(msg)
 
     ## guest_os
     if not guest_os:
@@ -362,12 +380,67 @@ def up(ctx=None, provider=None,  guest_os=None, vagrant_cwd=None, vagrant_dotfil
     set_env_var('guest_os', str(guest_os))
 
     if guest_os not in SETTINGS['GUEST_OSES']:
-        msg = ('Guest OS "%s" is not in the guest OSes list.\n'
-               'Did you have a typo? Here is as list of avalible guest OSes:\n\n'
+        msg = ('Guest OS "%s" is not in the guest OSes whitelist.\n'
+               'Did you have a typo? We\'ll try anyway.\n'
+               'Here is as list of avalible guest OSes:\n\n'
                % guest_os)
         for supported_os in SETTINGS['GUEST_OSES']:
             msg = msg + '%s\n' % supported_os
-        abort(msg)
+        utils.warn(msg)
+
+    ## ram_size and drive_size (coupled)
+    # Cast to strings if they exist so they can stored as env vars.
+    if ram_size:
+        ram_size = str(ram_size)
+    if drive_size:
+        drive_size = str(drive_size)
+
+    if ram_size and not drive_size:
+        try:
+            drive_size = SETTINGS['SIZES'][ram_size]
+        except KeyError: # Doesn't match, but we'll let them try it.
+            drive_size = SETTINGS['DRIVESIZE_DEFAULT']
+    elif drive_size and not ram_size:
+        try:
+            ram_size = list(SETTINGS['SIZES'].keys())[list(SETTINGS['SIZES'].values()).index(drive_size)]
+        except ValueError: # Doesn't match, but we'll let them try it.
+            ram_size = SETTINGS['RAMSIZE_DEFAULT']
+    elif not ram_size and not drive_size:
+        ram_size = SETTINGS['RAMSIZE_DEFAULT']
+        drive_size = SETTINGS['DRIVESIZE_DEFAULT']
+    # else both exist, just try using them
+
+    set_env_var('ramsize', ram_size)
+    set_env_var('drivesize', drive_size)
+
+    ## ram_size
+    if ram_size not in iter(SETTINGS['SIZES']):
+        msg = ('RAM Size "%s" is not in the RAM sizes list.\n'
+               'Did you have a typo? We\'ll try anyway.\n'
+               'Here is as list of avalible RAM sizes:\n\n'
+               % ram_size)
+        for supported_ram_size in iter(SETTINGS['SIZES']):
+            msg = msg + '%s\n' % supported_ram_size
+        utils.warn(msg)
+
+    ## drive_size
+    if drive_size not in iter(SETTINGS['SIZES'].values()):
+        msg = ('DRIVE Size "%s" is not in the DRIVE sizes list.\n'
+               'Did you have a typo? We\'ll try anyway.\n'
+               'Here is as list of avalible DRIVE sizes:\n\n'
+               % drive_size)
+        for supported_drive_size in iter(SETTINGS['SIZES'].values()):
+            msg = msg + '%s\n' % supported_drive_size
+        utils.warn(msg)
+
+    ## Provider specific handling.
+    ## Must come after all else, because logic may be done on env vars set above.
+    if provider == 'digitalocean':
+        providers.digitalocean()
+    elif provider == 'docker':
+        providers.docker()
+    elif provider == 'ec2':
+        providers.ec2()
 
     _invoke_vagrant('up')
 
@@ -382,13 +455,13 @@ def vagrant_general_command(cmd):
 
 ## Unused defs
 def setup_lastpass():
-    dir_create(os.path.join(get_user_home(), '/.tmp-common'))
-    open(os.path.join(get_user_home(), '/.tmp-common/install-lastpass-log'),'w')
-    dir_create(os.path.join(get_user_home(), '/.tmp-common'))
-    with open(os.path.join(get_user_home(), '/.tmp-common/install-lastpass.sh'), 'w') as file_obj:
+    utils.dir_create(os.path.join(utils.get_user_home(), '/.tmp-common'))
+    open(os.path.join(utils.get_user_home(), '/.tmp-common/install-lastpass-log'),'w')
+    utils.dir_create(os.path.join(utils.get_user_home(), '/.tmp-common'))
+    with open(os.path.join(utils.get_user_home(), '/.tmp-common/install-lastpass.sh'), 'w') as file_obj:
         file_obj.write(install_lastpass)
     # Not used, and won't work as is because we're now enforcing use of vagrant in private function.
-    _invoke_vagrant(os.path.join('cd ', get_user_home(), '/.tmp-common; bash install-lastpass.sh'), ' install-lastpass-log')
+    _invoke_vagrant(os.path.join('cd ', utils.get_user_home(), '/.tmp-common; bash install-lastpass.sh'), ' install-lastpass-log')
 
 
 class Run_app():

@@ -1,22 +1,19 @@
 {
-    "PLUGINS": 
-      {
-      "Linux":
-        [
-          "vagrant-aws",
-          "vagrant-digitalocean",
-          "vagrant-lxc",
-          "vagrant-triggers",
-          "vagrant-scp"
+    "PLUGINS": {
+        "Linux": [
+            "vagrant-aws",
+            "vagrant-digitalocean",
+            "vagrant-lxc",
+            "vagrant-triggers",
+            "vagrant-scp"
         ],
-      "Darwin":
-        [
-          "vagrant-aws",
-          "vagrant-digitalocean",
-          "vagrant-triggers",
-          "vagrant-scp"
+        "Darwin": [
+            "vagrant-aws",
+            "vagrant-digitalocean",
+            "vagrant-triggers",
+            "vagrant-scp"
         ]
-      },
+    },
     "PROJECT_NAME": "rambo",
     "PROVIDERS": [
         "digitalocean",
@@ -26,11 +23,33 @@
         "virtualbox"
     ],
     "PROVIDERS_DEFAULT": "virtualbox",
-    "GUEST_OSES": [
-        "debian-8",
-        "ubuntu-1404",
-        "ubuntu-1604",
-        "centos-7"
-    ],
-    "GUEST_OSES_DEFAULT": "ubuntu-1604"
+    "GUEST_OSES": {
+        "debian-8": {
+            "do": "debian-8-x64",
+            "ec2": "ami-a5d621e1"
+        },
+        "centos-7": {
+            "do": "centos-7-x64",
+            "ec2": "ami-65e0e305"
+        },
+        "ubuntu-1404": {
+            "do": "ubuntu-14-04-x64",
+            "ec2": "ami-48030c28"
+        },
+        "ubuntu-1604": {
+            "do": "ubuntu-16-04-x64",
+            "docker": "ubuntu/xenial64",
+            "ec2": "ami-07585467"
+        }
+    },
+    "GUEST_OSES_DEFAULT": "ubuntu-1604",
+    "SIZES": {
+        "512": "20",
+        "1024": "30",
+        "2048": "40",
+        "4096": "60",
+        "8192": "80"
+    },
+    "RAMSIZE_DEFAULT": "1024",
+    "DRIVESIZE_DEFAULT": "30"
 }
