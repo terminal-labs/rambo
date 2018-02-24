@@ -49,21 +49,8 @@ class ConfigFileProcessor(ConfigFileReader):
     config_section_schemas = config_section_primary_schemas
 
 
-### BASE COMMAND LIST
-cmd = ''
-commands_handled_by_click = [
-    'destory_cmd',
-    'export_cmd',
-    'ssh_cmd',
-    'up_cmd',
-]
-if len(sys.argv) > 1:
-    cmd = (sys.argv[1])
-    if cmd in commands_handled_by_click:
-        cmd = ''
-
-# Only used for the base command and not any subcommands
-BASECMD_CONTEXT_SETTINGS = {
+# Only used for the `vagrant` subcommand
+HANDLE_EXTRA_ARGS = {
     'ignore_unknown_options': True,
     'allow_extra_args': True,
 }
@@ -77,7 +64,7 @@ CONTEXT_SETTINGS = {
 
 
 ### Main command / CLI entry point
-@click.group(context_settings=dict(CONTEXT_SETTINGS, **BASECMD_CONTEXT_SETTINGS))
+@click.group(context_settings=CONTEXT_SETTINGS)
 @click.option('--vagrant-cwd', default=None, type=click.Path(),
               help='Path entry point to the Vagrantfile. Defaults to '
               'the Vagrantfile provided by %s in the installed path.'
@@ -105,18 +92,6 @@ def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
 
     app.write_to_log('\nNEW CMD')
     app.write_to_log(' '.join(sys.argv))
-
-
-### Catch-all for everything that doesn't hit a subcommand
-@cli.command(name=cmd, context_settings=dict(CONTEXT_SETTINGS, **BASECMD_CONTEXT_SETTINGS))
-def gen():
-    # TODO: figure out better warning system
-    click.echo("Warning -- you entered a command %s does not understand. "
-               "Passing raw commands to Vagrant backend" % PROJECT_NAME.capitalize())
-    click.echo('You ran "%s"' % ' '.join(sys.argv))
-    sys.argv.pop(0) # Remove Rambo path from full command
-    click.echo('Vagrant backend says:')
-    app.vagrant_general_command(' '.join(sys.argv))
 
 
 ### Subcommands
@@ -206,5 +181,13 @@ def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type):
               % PROJECT_NAME)
 
     app.up(ctx, provider, guest_os, ram_size, drive_size, machine_type)
+
+@cli.command('vagrant', context_settings=dict(CONTEXT_SETTINGS, **HANDLE_EXTRA_ARGS))
+@click.pass_context
+def vagrant_cmd(ctx):
+    '''Run a vagrant command through rambo.
+    '''
+    app.vagrant_general_command(' '.join(ctx.args))
+
 
 main = cli
