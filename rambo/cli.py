@@ -161,7 +161,7 @@ def install_plugins(force, plugins):
         plugins = ('all',)
     app.install_plugins(force, plugins)
 
-        
+
 @cli.command('ssh', short_help="Connect with `vagrant ssh`")
 @click.pass_context
 def ssh_cmd(ctx):
@@ -187,9 +187,10 @@ def up_cmd(ctx, provider, guest_os):
     Precedence is CLI > Config > Env Var > defaults.
     '''
     if not os.path.isfile('%s.conf' % PROJECT_NAME):
-        abort("Config file %s.conf must be present in working directory.\n"
-              "You can create one with `%s setup config`." %
-              (PROJECT_NAME, PROJECT_NAME))
+        abort('Config file %s.conf must be present in working directory.\n'
+              'A config file is automatically created when you run \n'
+              'createproject. You can also make a config file manually.'
+              % PROJECT_NAME)
 
     app.up(ctx, provider, guest_os)
 
