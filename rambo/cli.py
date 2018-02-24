@@ -34,6 +34,7 @@ class ConfigSectionSchema(object):
         guest_os      = Param(type=str)
         ram_size      = Param(type=int)
         drive_size    = Param(type=int)
+        machine_type  = Param(type=str)
 
 
 class ConfigFileProcessor(ConfigFileReader):
