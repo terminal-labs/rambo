@@ -325,12 +325,13 @@ def install_plugins(force=None, plugins=('all',)):
                           'to install anyway?' % plugin, abort=True)
             _invoke_vagrant('plugin install %s' % plugin)
 
-def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def ssh(ctx=None, command=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Connect to an running VM / container over ssh.
     All str args can also be set as an environment variable; arg takes precedence.
 
     Agrs:
         ctx (object): Click Context object.
+        command (str): Pass-through command to run with `vagrant ssh --command`.
         vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
@@ -339,7 +340,13 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    os.system('vagrant ssh')
+    ## Add pass-through 'command' option.
+    cmd = 'vagrant ssh'
+    if command:
+        cmd = ' '.join([cmd, '--command', command])
+
+    # do not use _invoke_vagrant, that will give a persistent ssh session regardless.
+    os.system(cmd)
 
 def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
        machine_type=None, provision=None, destroy_on_error=None,
