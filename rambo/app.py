@@ -465,12 +465,11 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
 
     ## Add straight pass-through flags. Keep test for True/False explicit as only those values should work
     cmd = 'up'
-    # `vagrant up` provisioning flag
     if provision is True:
         cmd = ' '.join([cmd, '--provision'])
     elif provision is False:
         cmd = ' '.join([cmd, '--no-provision'])
-    # `vagrant up` destroy-on-error flag
+
     if destroy_on_error is True:
         cmd = ' '.join([cmd, '--destroy-on-error'])
     elif destroy_on_error is False:
