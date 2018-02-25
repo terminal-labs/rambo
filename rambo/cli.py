@@ -30,11 +30,13 @@ class ConfigSectionSchema(object):
     @matches_section('up')
     class Up(SectionSchema):
         '''Corresponds to the `up` command group.'''
-        provider      = Param(type=str)
-        guest_os      = Param(type=str)
-        ram_size      = Param(type=int)
-        drive_size    = Param(type=int)
-        machine_type  = Param(type=str)
+        provider           = Param(type=str)
+        guest_os           = Param(type=str)
+        ram_size           = Param(type=int)
+        drive_size         = Param(type=int)
+        machine_type       = Param(type=str)
+        provision          = Param(type=bool)
+        destroy_on_error   = Param(type=bool)
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -50,7 +52,7 @@ class ConfigFileProcessor(ConfigFileReader):
 
 
 # Only used for the `vagrant` subcommand
-HANDLE_EXTRA_ARGS = {
+VAGRANT_CMD_CONTEXT_SETTINGS = {
     'ignore_unknown_options': True,
     'allow_extra_args': True,
 }
@@ -167,8 +169,11 @@ def ssh_cmd(ctx):
 @click.option('-m', '--machine-type', type=str,
               help='Machine type for cloud providers.\n'
               'E.g. m5.medium for ec2, or s-8vcpu-32gb for digitalocean.\n')
+@click.option('--provision/--no-provision', default=None)
+@click.option('--destroy-on-error/--no-destroy-on-error', default=None)
 @click.pass_context
-def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type):
+def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
+           provision, destroy_on_error):
     '''Start a VM / container with `vagrant up`.
     Params can be passed as usual with
     click (CLI or env var) and also with an INI config file.
@@ -180,9 +185,10 @@ def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type):
               'createproject. You can also make a config file manually.'
               % PROJECT_NAME)
 
-    app.up(ctx, provider, guest_os, ram_size, drive_size, machine_type)
+    app.up(ctx, provider, guest_os, ram_size, drive_size, machine_type,
+           provision, destroy_on_error)
 
-@cli.command('vagrant', context_settings=dict(CONTEXT_SETTINGS, **HANDLE_EXTRA_ARGS))
+@cli.command('vagrant', context_settings=VAGRANT_CMD_CONTEXT_SETTINGS)
 @click.pass_context
 def vagrant_cmd(ctx):
     '''Run a vagrant command through rambo.

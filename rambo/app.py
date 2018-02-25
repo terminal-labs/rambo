@@ -342,7 +342,8 @@ def ssh(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     os.system('vagrant ssh')
 
 def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
-       machine_type=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+       machine_type=None, provision=None, destroy_on_error=None,
+       vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -353,6 +354,8 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         ram_size (int): RAM in MB to use.
         drive_size (int): Drive size in GB to use.
         machine_type (str): Machine type to use for cloud providers.
+        provision (bool): vagrant provisioning flag.
+        destroy_on_error (bool): vagrant destroy-on-error flag.
         vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
@@ -442,6 +445,7 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
             utils.abort(msg)
         set_env_var('machinetype', machine_type)
 
+
     ## Provider specific handling.
     ## Must come after all else, because logic may be done on env vars set above.
     if provider == 'digitalocean':
@@ -451,7 +455,22 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
     elif provider == 'ec2':
         providers.ec2()
 
-    _invoke_vagrant('up')
+
+    ## Add straight pass-through flags. Keep test for True/False explicit as only those values should work
+    cmd = 'up'
+    # `vagrant up` provisioning flag
+    if provision is True:
+        cmd = ' '.join([cmd, '--provision'])
+    elif provision is False:
+        cmd = ' '.join([cmd, '--no-provision'])
+    # `vagrant up` destroy-on-error flag
+    if destroy_on_error is True:
+        cmd = ' '.join([cmd, '--destroy-on-error'])
+    elif destroy_on_error is False:
+        cmd = ' '.join([cmd, '--no-destroy-on-error'])
+
+
+    _invoke_vagrant(cmd)
 
 def vagrant_general_command(cmd):
     '''Invoke vagrant with custom command.
