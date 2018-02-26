@@ -27,6 +27,7 @@ Vagrant.configure("2") do |config|
     apt-get update
     apt-get install -y docker-ce
     usermod -a -G docker ubuntu
+    usermod -a -G docker vagrant
     ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill
   EOS
 
