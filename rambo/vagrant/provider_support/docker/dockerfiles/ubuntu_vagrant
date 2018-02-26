@@ -1,4 +1,4 @@
-FROM nishidayuya/docker-vagrant-debian
+FROM nishidayuya/docker-vagrant-ubuntu:xenial
 RUN apt-get update
 RUN apt-get -y upgrade
 RUN apt-get -y install ca-certificates
