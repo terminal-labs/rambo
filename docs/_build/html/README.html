@@ -1,0 +1,221 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>README &#8212; Rambo 0.3.2.dev documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="readme">
+<span id="readme"></span><h1>README<a class="headerlink" href="#readme" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://gitter.im/terminal-labs/rambo?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img alt="Join the chat at https://gitter.im/terminal-labs/rambo" src="https://badges.gitter.im/terminal-labs/rambo.svg" /></a></p>
+<div class="section" id="installation">
+<span id="installation"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>To get up and running fast, see: <a class="reference external" href="https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md">INSTALL.md</a></p>
+</div>
+<div class="section" id="what-is-this-repository-for">
+<span id="what-is-this-repository-for"></span><h2>What Is This Repository For?<a class="headerlink" href="#what-is-this-repository-for" title="Permalink to this headline">¶</a></h2>
+<p>This project is for provisioning and configuration of virtual machines (and containers) in a simple, predictable, and highly reproducible way. Just run one command and your VM is up, code is deployed, and your app is running, on any supported platform.</p>
+<p>At this time this repo allows you to create a Linux VM on multiple providers (AWS EC2, DigitalOcean, VirtualBox, LXC). Several more Operating Systems are available on select providers. The base machine configuration is a Ubuntu 16.04 64bit OS with 1024MB RAM, and 30GB drive.</p>
+<p>One of the goals of this project is be able to run a simple command and have a new VM be created on your provider of choice. Once the VM is initialized SaltStack is used to deploy code to and provision your machine. The SaltStack machine configuration code (states) will run the same regardless of which provider is actually running the machine.</p>
+<p>Another goal of this repo is to have the spawned VMs be maximally similar across providers. Usually, your application will not need to change at all and will simply run on all providers.</p>
+<p>This project uses Vagrant and Vagrant plugins for some of the heavy lifting, and many core Vagrant functions still work here on all providers, such as <code class="docutils literal notranslate"><span class="pre">up</span></code>, <code class="docutils literal notranslate"><span class="pre">ssh</span></code>, <code class="docutils literal notranslate"><span class="pre">destroy</span></code>, and <code class="docutils literal notranslate"><span class="pre">rsync</span></code>. Any command that Rambo doesn’t use is simply passed to Vagrant.</p>
+<p>By default Rambo offers a basic provisioning, but you can customize this. See <a class="reference external" href="#advanced-usage"><strong>Advanced Usage</strong></a> for that.</p>
+</div>
+<div class="section" id="basic-usage">
+<span id="basic-usage"></span><h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>Rambo needs to be installed first. It is a Python package, and can be installed in an Conda or Virtualenv environment with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">rambo-vagrant</span></code>, or the development version (this repo) can be installed with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span> <span class="pre">--process-dependency-links</span></code>. Some providers will need a more configuration for things like key managment (see: <a class="reference external" href="https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md">INSTALL.md</a>). Once installed, you can run one of these commands to get your VM:</p>
+<p>for VirtualBox run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rambo up
+$ rambo ssh
+</pre></div>
+</div>
+<p>for AWS EC2 run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rambo up -p ec2
+$ rambo ssh
+</pre></div>
+</div>
+<p>for DigitalOcean run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rambo up -p digitalocean
+$ rambo ssh
+</pre></div>
+</div>
+<p>for Docker run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rambo up -p docker
+$ rambo ssh
+</pre></div>
+</div>
+<p>for LXC run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rambo up -p lxc
+$ rambo ssh
+</pre></div>
+</div>
+<p>Note on host platform support: LXC is only supported on Ubuntu 16. The other providers also work on Mac and should work on any Unix-like system. No testing has been done on Windows.</p>
+</div>
+<div class="section" id="advanced-usage">
+<span id="advanced-usage"></span><h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="custom-provisioning">
+<span id="custom-provisioning"></span><h3>Custom Provisioning<a class="headerlink" href="#custom-provisioning" title="Permalink to this headline">¶</a></h3>
+<p>Rambo provides a basic default provisioning with Vagrant and SaltStack. To build out what you need for your project you will need your own customized provisioning. You can do this provisioning with any tool you like through Vagrant, such as with shell scripts, SaltStack, or any other provisioning tool.</p>
+<p>All Rambo code that is used to provision the VM is kept where Rambo is installed. This directory is copied into the VM at an early stage in the spawn process so that it can be invoked to provision the VM.</p>
+<p>Rambo has a few Salt States available that are commented out that you can ‘turn on’ and use. You will need to uncomment any states you want in the <code class="docutils literal notranslate"><span class="pre">salt_resources/states/top.sls</span></code> file. Then you will need to uncomment and supply your relevant data in the <code class="docutils literal notranslate"><span class="pre">salt_resources/grains/grains</span></code> file. Of course you can add your own as well.</p>
+<p>You can add your custom Salt States right into the Salt code and they should be automatically picked up and used. If you want to add provisioning with any other tool, you will need to modify the Vagrantfiles found in <code class="docutils literal notranslate"><span class="pre">vagrant_resources/vagrantfiles/</span></code> to add that provisioning.</p>
+</div>
+<div class="section" id="cli-and-python-api">
+<span id="cli-and-python-api"></span><h3>CLI and Python API<a class="headerlink" href="#cli-and-python-api" title="Permalink to this headline">¶</a></h3>
+<p><strong>Both the CLI and Python API are young and subject to breaking changes without notice.</strong></p>
+<p>Rambo has a CLI and Python API that are compatible. In other words, what you can do in the CLI, you can do in the Python API. To accomplish this the CLI is largely dependant on the Python API. You can access the Python API by importing the various functions in app.py, such as with <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">rambo.app</span> <span class="pre">import</span> <span class="pre">vagrant_up</span></code></p>
+<p>Through the Python API you can call <code class="docutils literal notranslate"><span class="pre">vagrant_up</span></code> and <code class="docutils literal notranslate"><span class="pre">vagrant_destroy</span></code> to create and destroy VMs. <code class="docutils literal notranslate"><span class="pre">vagrant_ssh</span></code> is also available and presents an interactive shell to the VM, as if you ran <code class="docutils literal notranslate"><span class="pre">rambo</span> <span class="pre">ssh</span></code> with the CLI.</p>
+<p>CLI options are available to be set as either functions in app.py, or as parameters to those functions, depending on whether the CLI option was on <code class="docutils literal notranslate"><span class="pre">rambo</span></code> command itself or a subcommand (e.g. <code class="docutils literal notranslate"><span class="pre">up</span></code>). For instance, the following are equivalent:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rambo --vagrant-cwd /path up -p virtualbox
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rambo.app</span> <span class="k">import</span> <span class="n">set_vagrant_vars</span><span class="p">,</span> <span class="n">vagrant_up</span>
+<span class="n">set_vagrant_vars</span><span class="p">(</span><span class="n">vagrant</span><span class="o">-</span><span class="n">cwd</span><span class="p">,</span><span class="s2">&quot;/path&quot;</span><span class="p">)</span>
+<span class="n">vagrant_up</span><span class="p">(</span><span class="n">provider</span><span class="o">=</span><span class="s2">&quot;virtualbox&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Currently, all of the CLI options can also be set as environment variables. Environment variables are respected by both the CLI and Python API, but are overridden when set with a CLI option / Python API param.</p>
+</div>
+<div class="section" id="environment-variables">
+<span id="environment-variables"></span><h3>Environment Variables<a class="headerlink" href="#environment-variables" title="Permalink to this headline">¶</a></h3>
+<p>The following environment variables are used by Rambo, and can be set manually before using Rambo to change its behavior:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">VAGRANT_DOTFILE_PATH</span></code> - <a class="reference external" href="https://www.vagrantup.com/docs/other/environmental-variables.html#vagrant_dotfile_path">This is used by Vagrant directly</a>, and is able to be set via the CLI / API.</li>
+<li><code class="docutils literal notranslate"><span class="pre">VAGRANT_CWD</span></code> - <a class="reference external" href="https://www.vagrantup.com/docs/other/environmental-variables.html#vagrant_cwd">This is used by Vagrant directly</a>, and is able to be set via the CLI / API.</li>
+<li><code class="docutils literal notranslate"><span class="pre">RAMBO_ENV</span></code> - This is the location of the project environment Rambo’s code lives in. It is generated internally and not able to be set with the CLI / API.</li>
+<li><code class="docutils literal notranslate"><span class="pre">RAMBO_TMPDIR_PATH</span></code> - This is the location of Rambo’s metadata folder specific to each VM. It is automatically placed in the CWD when the CLI / API is used.</li>
+<li><code class="docutils literal notranslate"><span class="pre">RAMBO_PROVIDER</span></code> - This is the provider that is being used. It is able to be set via the CLI / API.</li>
+</ul>
+</div>
+<div class="section" id="ssh-alias-key-sharing-and-emacs">
+<span id="ssh-alias-key-sharing-and-emacs"></span><h3>SSH Alias: Key Sharing and Emacs<a class="headerlink" href="#ssh-alias-key-sharing-and-emacs" title="Permalink to this headline">¶</a></h3>
+<p><strong>The following is deprecated with Rambo’s new CLI / API</strong></p>
+<p>Rambo defaults to using a priveleged user (e.g. <code class="docutils literal notranslate"><span class="pre">vagrant</span></code>, <code class="docutils literal notranslate"><span class="pre">root</span></code>) to provision the machine when it’s spawned, but also to create a non-priveleged or deescalated user. This user is for development and for specific production server tasks that do not require root priviliges. Rambo defaults to only sharing keys with the rooted user, so you may need to share your keys deliberately with the deescalated user if you’re working there manually (such as during development.) Assuming Rambo is configuring a deescalated user called <code class="docutils literal notranslate"><span class="pre">webserver</span></code>, here’s how.</p>
+<p>After logging in with <code class="docutils literal notranslate"><span class="pre">rambo</span> <span class="pre">ssh</span></code>,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd /home/webserver
+sudo setfacl -m webserver:x $(dirname &quot;$SSH_AUTH_SOCK&quot;)
+sudo setfacl -m webserver:rwx &quot;$SSH_AUTH_SOCK&quot;
+sudo su webserver
+</pre></div>
+</div>
+<p>Alternatively, you may want to make this into a handy alias to ssh into the virtual machine.
+Using the above commands instead is tedious, and will have to be repeated every time you want to ssh in and use this deescalated user.
+Using an alias is much more convenient.</p>
+<p>Emacs users will like to add a last line for <code class="docutils literal notranslate"><span class="pre">script</span> <span class="pre">/dev/null</span></code> to allow emacsclient to work correctly as the development user.
+<strong><code class="docutils literal notranslate"><span class="pre">script</span> <span class="pre">/dev/null</span></code> is unsafe and should not be used in production.</strong></p>
+<p>To create this alias, append this to your .bashrc file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alias</span> <span class="n">vssh</span><span class="o">=</span><span class="s2">&quot;vagrant ssh -- -t &#39;cd /home/webserver;</span><span class="se">\</span>
+<span class="s2">    sudo setfacl -m webserver:x \$(dirname </span><span class="se">\&quot;</span><span class="s2">\$SSH_AUTH_SOCK</span><span class="se">\&quot;</span><span class="s2">);</span><span class="se">\</span>
+<span class="s2">    sudo setfacl -m webserver:rwx </span><span class="se">\&quot;</span><span class="s2">\$SSH_AUTH_SOCK</span><span class="se">\&quot;</span><span class="s2">;</span><span class="se">\</span>
+<span class="s2">    sudo su webserver&#39;</span><span class="se">\</span>
+<span class="s2">    -c &#39;script /dev/null&#39;&quot;</span>
+</pre></div>
+</div>
+<p>Just swap out <code class="docutils literal notranslate"><span class="pre">webserver</span></code> for another user if you changed this user name in your Rambo configuration.</p>
+</div>
+</div>
+<div class="section" id="contributing">
+<span id="contributing"></span><h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
+<p>We heartily welcome any contirubtions to this project, whether in the form of commenting on or posting an issue, or development. If you would like to submit a pull request, you might first want to look at our development guidlines for this project in <a class="reference external" href="https://github.com/terminal-labs/rambo/blob/master/RULES.md">RULES.md</a></p>
+</div>
+<div class="section" id="special-thanks">
+<span id="special-thanks"></span><h2>Special Thanks<a class="headerlink" href="#special-thanks" title="Permalink to this headline">¶</a></h2>
+<p>Thanks go out to the Vagrant community and HashiCorp. Vagrant is a great tool it has helped us a lot over the years.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">README</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#what-is-this-repository-for">What Is This Repository For?</a></li>
+<li><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li><a class="reference internal" href="#advanced-usage">Advanced Usage</a><ul>
+<li><a class="reference internal" href="#custom-provisioning">Custom Provisioning</a></li>
+<li><a class="reference internal" href="#cli-and-python-api">CLI and Python API</a></li>
+<li><a class="reference internal" href="#environment-variables">Environment Variables</a></li>
+<li><a class="reference internal" href="#ssh-alias-key-sharing-and-emacs">SSH Alias: Key Sharing and Emacs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contributing">Contributing</a></li>
+<li><a class="reference internal" href="#special-thanks">Special Thanks</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/README.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Michael Verhulst, Joseph Nix, Christopher Smith.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/README.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
