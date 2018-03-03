@@ -2,24 +2,22 @@
 
 [![Join the chat at https://gitter.im/terminal-labs/rambo](https://badges.gitter.im/terminal-labs/rambo.svg)](https://gitter.im/terminal-labs/rambo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-## Installation
-To get up and running fast, see: [INSTALL.md](https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md)
+## Quickstart
+To get up and running fast, see: [quickstart.md](docs/quickstart.md)
 
 ## What Is This Repository For?
-This project is for provisioning and configuration of virtual machines (and containers) in a simple, predictable, and highly reproducible way. Just run one command and your VM is up, code is deployed, and your app is running, on any supported platform.
+This project is for provisioning and configuring virtual machines (and containers) in a simple, predictable, and highly reproducible way. Just run one command and your VM is up, code is deployed, and your app is running, on any supported platform.
 
-At this time this repo allows you to create a Linux VM on multiple providers (AWS EC2, DigitalOcean, VirtualBox, LXC). Several more Operating Systems are available on select providers. The base machine configuration is a Ubuntu 16.04 64bit OS with 1024MB RAM, and 30GB drive.
+At this time this repo allows you to create a Linux VM on multiple providers (AWS EC2, DigitalOcean, VirtualBox, LXC). Several Operating Systems are available on select providers. The base machine configuration is a Ubuntu 16.04 64bit OS with 1024MB RAM, and 30GB drive.
 
-One of the goals of this project is be able to run a simple command and have a new VM be created on your provider of choice. Once the VM is initialized SaltStack is used to deploy code to and provision your machine. The SaltStack machine configuration code (states) will run the same regardless of which provider is actually running the machine.
+One of the goals of this project is be able to run a simple command and have a new VM be created on your provider of choice. Once the VM is initialized SaltStack is used to deploy code to and provision your machine. The SaltStack machine configuration code (states) will run the same regardless of which provider is actually running the machine. You can easily cycle your VMs by destroying and rebuilding them.
 
 Another goal of this repo is to have the spawned VMs be maximally similar across providers. Usually, your application will not need to change at all and will simply run on all providers.
 
-This project uses Vagrant and Vagrant plugins for some of the heavy lifting, and many core Vagrant functions still work here on all providers, such as `up`, `ssh`, `destroy`, and `rsync`. Any command that Rambo doesn't use is simply passed to Vagrant.
-
-By default Rambo offers a basic provisioning, but you can customize this. See [**Advanced Usage**](#advanced-usage) for that.
+By default Rambo offers a basic VM configuration with SaltStack, but you can customize this. See [**Advanced Usage**](#advanced-usage) for that.
 
 ## Basic Usage
-Rambo needs to be installed first. It is a Python package, and can be installed in an Conda or Virtualenv environment with `pip install rambo-vagrant`, or the development version (this repo) can be installed with `pip install -e . --process-dependency-links`. Some providers will need a more configuration for things like key managment (see: [INSTALL.md](https://github.com/terminal-labs/rambo/blob/master/docs/INSTALL.md)). Once installed, you can run one of these commands to get your VM:
+Once [installed](docs/quickstart.md#installation), you can run one of these commands to get your VM:
 
 for VirtualBox run
 ```
@@ -50,8 +48,6 @@ for LXC run
 $ rambo up -p lxc
 $ rambo ssh
 ```
-
-Note on host platform support: LXC is only supported on Ubuntu 16. The other providers also work on Mac and should work on any Unix-like system. No testing has been done on Windows.
 
 ## Advanced Usage
 

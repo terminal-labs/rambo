@@ -1,8 +1,8 @@
 # Docker Provider:
 
-**NOTE: This will only work on Ubuntu 16.04 or newer**
+At this time Docker is supported by using an intermediate host. The intermediate host is created with VirtualBox, and is the same OS as is used for the Docker container inside it. Setting both of those OSes to be the same avoids certain complexities and potential problems that would otherwise present.
 
-Assuming that you installed the dependencies and that you are running Ubuntu16.04+ as your host you should be able to run
+Basic usage of Docker:
 
 ```
 rambo up -p docker
