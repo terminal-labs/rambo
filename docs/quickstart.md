@@ -9,7 +9,7 @@ For running VMs locally in VirtualBox (default), we suggest a minimum of:
 
 For running containers locally (e.g. LXC) or spawning cloud based VMs (e.g. AWS EC2) you can get away with comparatively slow computer and you don't need VT-x, you don't even need VirtualBox. In fact, these providers can be managed from just a [Raspberry Pi](https://www.raspberrypi.org/).
 
-## Supported Host OS:
+## Supported Host Operating Systems:
 
 - [Ubuntu 16.04 or newer](https://www.ubuntu.com/download/desktop)
 
@@ -41,6 +41,8 @@ Now that Rambo is installed, you must initialize a project. This will create a d
 rambo createproject yourprojectname
 cd yourprojectname
 ```
+
+In this project directory Rambo gave you a few things to help you get started, a `rambo.conf`, `auth` dir, and `saltstack` dir. These are basic configs to start you out. You don't need to modify them for basic use.
 
 ## Providers
 
