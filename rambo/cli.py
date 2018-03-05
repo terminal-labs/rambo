@@ -139,12 +139,12 @@ def install_plugins(force, plugins):
     app.install_plugins(force, plugins)
 
 
-@cli.command('ssh', short_help="Connect with `vagrant ssh`.")
+@cli.command('ssh', short_help="Connect with ssh.")
 @click.option('-c', '--command', type=str,
               help='Execute an SSH command directly')
 @click.pass_context
 def ssh_cmd(ctx, command):
-    '''Connect to an running VM / container over ssh with `vagrant ssh`.
+    '''Connect to an running VM / container over ssh.
     '''
     app.ssh(ctx, command)
 
@@ -180,7 +180,7 @@ def ssh_cmd(ctx, command):
 @click.pass_context
 def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
            provision, destroy_on_error):
-    '''Create or start a VM / container with `vagrant up`.
+    '''Create or start a VM / container.
     Params can be passed as usual with
     click (CLI or env var) and also with an INI config file.
     Precedence is CLI > Config > Env Var > defaults.
