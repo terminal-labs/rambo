@@ -1,7 +1,5 @@
 # CLI
 
-**Caution: The CLI is young and subject to breaking changes without notice.**
-
 Rambo's CLI is the expected normal way people interact with Rambo. At it's core, Rambo is an interface to Vagrant. Rambo duplicates several commands from Vagrant, that are either commonly used, or Rambo needs to do some preemptive work for before passing the reigns to Vagrant. For most other Vagrant commands, you can call Vagrant through Rambo. Many commands have various options that have defaults that are used when the option is not specified, e.g. `rambo up` defaults using VirtualBox as the `provider`.
 
 This is a short list of Rambo's commands, followed by a more detailed explanation of each:
