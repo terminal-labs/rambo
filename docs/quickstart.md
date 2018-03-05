@@ -19,6 +19,8 @@ We expect it's likely you can get Rambo to work on any Unix-like system, but you
 
 ## Installation:
 
+1. Install / Use Python 3.2+ and pip (for example with a Virtual Environment).
+
 1. Download and install [VirtualBox](https://www.virtualbox.org/) 5.1 or newer.
 
 1. Download and install [Vagrant](http://www.vagrantup.com/).

@@ -14,3 +14,5 @@ After that, starting an LXC container with basic usage is:
 rambo up -p lxc
 rambo ssh
 ```
+
+**Note:** At this time using LXC as a provider will require root priveleges / sudo.
