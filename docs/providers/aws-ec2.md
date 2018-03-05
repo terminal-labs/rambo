@@ -7,25 +7,26 @@ This repo will create real resources on AWS so you need to provide AWS with vali
 
 ## Create SSH Keys
 
-Next you need to create a ssh key pair for AWS.
+Next you need to create a SSH key pair for AWS.
 
 Run:
 ```
 mkdir -p auth/keys
 cd auth/keys
 ssh-keygen -t rsa -N '' -f "aws.pem"
-xclip -sel clip < aws.pem.pub
 ```
 
 *If you want multiple users or computers to access the same AWS profile or team, you must have unique key names. For example, you will need to change the base name of your `.pem` and `.pem.pub` files to something else like `aws-myname`.
 
-**Create a new key and name the key the same as the base name of your ssh key. If AWS's key name and the one one your host don't match, you won't communicate to your VM.**
+**Create a new key and name the key the same as the base name of your SSH key. If AWS's key name and the one one your host don't match, you won't communicate to your VM.**
 
 Now go to AWS's "EC2 Dashboard", on the left hand side go to "Key Pairs" and click the "Import Key Pair" button.
 
-Here are instructions on how to setup ssh keys with aws:
+Here are instructions on how to setup SSH keys with aws:
 
 http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
+
+You will need to copy the contents of `aws.pem.pub`.
 
 **NOTE: You need the aws.pem file and the aws.pem.pub file. The aws.pem file needs permissions set to 600 and The aws.pem.pub file needs permissions set to 644**
 
