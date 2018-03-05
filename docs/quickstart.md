@@ -26,7 +26,7 @@ We expect it's likely you can get Rambo to work on any Unix-like system, but you
 1. Install Rambo with pip,
 
     - [latest release](https://github.com/terminal-labs/rambo/releases) with pypi: `pip install rambo-vagrant`, or
-    - from source: `pip install -e . --process-dependency-links`
+    - [from source](https://github.com/terminal-labs/rambo): `pip install -e . --process-dependency-links`
 
 1. Install plugins with `rambo install-plugins`
 
@@ -35,7 +35,7 @@ Note: Vagrant and VirtualBox update frequently, and sometimes with breaking chan
 
 ## Create Project
 
-Now that Rambo is installed, you must initialize a project. This will create a directory that will be tied to your VM. Outside of this directory, Rambo won't be able to find the VM to control it. This also means that if you want to create or control multiple VMs with Rambo, you can, by simply creating more projects and running Rambo commands from inside them. Create and go to your project:
+Now that Rambo is installed, you must initialize a project. This will create a directory that will be tied to your VM. Outside of this directory, Rambo won't be able to find the VM to control it. This also means that if you want to create or control multiple VMs with Rambo, you can, by simply creating more projects and running Rambo commands from the directories where they reside. Create and go to your project:
 
 ```
 rambo createproject yourprojectname

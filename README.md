@@ -49,6 +49,19 @@ $ rambo up -p lxc
 $ rambo ssh
 ```
 
+## More Docs
+
+- [Quickstart](docs/quickstart.md)
+- [CLI](docs/cli.md)
+- [Customizing](docs/customizing.md)
+- [API](docs/api.md)
+- Provider Specific
+  - [AWS EC2](docs/providers/aws-ec2.md)
+  - [DigitalOcean](docs/providers/digitalocean.md)
+  - [Docker](docs/providers/docker.md)
+  - [LXC](docs/providers/lxc.md)
+  - [VirtualBox](docs/quickstart.md#default-provider---virtualbox)
+
 ## Contributing
 We heartily welcome any contirubtions to this project, whether in the form of commenting on or posting an issue, or development. If you would like to submit a pull request, you might first want to look at our development guidlines for this project in [RULES.md](https://github.com/terminal-labs/rambo/blob/master/RULES.md).
 
