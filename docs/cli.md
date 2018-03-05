@@ -48,9 +48,7 @@ Accepts any args and forwards them to Vagrant directly, allowing you to run any 
 
 ## rambo.conf
 
-The `rambo.conf` file is required at the top level in your project directory. It is an INI config file that can specify options on various commands. Options passed to the CLI will take precedence over options set via this config file. If you're repeating the same CLI options, setting those options in this config might make your life a little easier. Further, if you intend on tracking your Rambo project in version control, it can be very handy to set some options in this config that match the purpose of your project.
-
-Options on the base `rambo` command and the subcommand `up` can be set in `rambo.conf`. The INI section refers to the command used in the CLI, and the keys/values within that section refers to the options being set on that command. For example, a useful `rambo.conf` could look like this:
+The `rambo.conf` file is used to add options to various Rambo commands without having to pass them to the CLI. This is encouraged and has a few benefits. See the following quick example:
 
 ```ini
 [up]
@@ -58,13 +56,13 @@ provider = digitalocean
 guest_os = centos-7
 ```
 
-which is equivalent to:
+is equivalent to:
 
 ```bash
-rambo up -p digitalocean -o centos-7
+rambo up --provider digitalocean --guest-os centos-7
 ```
 
-Setting the config file to this allows you to type simply `rambo up` to run `up` with the `provider` and `guest-os` options set. Note that dashes in CLI options need to be underscores in the config file. If these options are set, to switch providers, but keep the same guest-os, you would only need to set the provider option in the CLI. For example, `rambo up -p ec2` would set the provider to be `ec2`, taking precedence over the `digitalocean` set in the config, but still use the guest-os `centos-7` set in the config.
+For a more detailed description, see the separate [rambo.conf docs](conf.md).
 
 ## Environment Variables
 
