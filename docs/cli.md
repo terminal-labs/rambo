@@ -9,7 +9,9 @@ This is a short list of Rambo's commands, followed by a more detailed explanatio
 - [`createproject`](#createproject): Create a Rambo project dir with basic setup.
 - [`destroy`](#destroy): Destroy a VM / container and all its metadata. Default leaves logs.
 - [`export-vagrant-conf`](#export-vagrant-conf): Get Vagrant configuration.
+- [`halt`](#halt): Halt VM.
 - [`install-plugins`](#install-plugins): Install Vagrant plugins.
+- [`scp`](#scp): Transfer Files with scp.
 - [`ssh`](#ssh): Connect with `vagrant ssh`
 - [`up`](#up): Start a VM / container with `vagrant up`.
 - [`vagrant`](#vagrant): Run a Vagrant command through Rambo.
@@ -18,7 +20,7 @@ This is a short list of Rambo's commands, followed by a more detailed explanatio
 
 Create project takes an arguement for the name to give to the project it creates. It will create a directory in the CWD for this project. Upon creation, this project directory will contain a `rambo.conf` file, an `auth` directory, and a `saltstack` directory.
 
-- `rambo.conf` is the config file that is required to be present in your project to run `rambo up`, and is described [later in this document](#ramboconf).
+- `rambo.conf` is the config file that is required to be present in your project to run `rambo up`, and is described [later in conf.md](conf.md).
 - `auth` contains some sample scripts that will aid in setting up keys / tokens for the cloud providers. It is not required. How to use that is described in the cloud provider specific documentation.
 - `saltstack` is a basic set of SaltStack configuration code that Rambo offers. [It can be modified for custom configuration.](customizing.md)
 
@@ -30,9 +32,13 @@ Destroy a VM / container. This will tell vagrant to forcibly destroy a VM, and t
 
 Places the default `Vagrantfile` and its resources (`vagrant` dir, `settings.json`) in the CWD for [customizing](customizing.md).
 
+### `halt`
+
+Tells Vagrant to 'halt' the VM. Useful to free the Host's resources without destroying the VM.
+
 ### `install-plugins`
 
-Installs plugins used by Rambo. Default behavior is to detect the host platform and install all its relevant plugins. This can also be used to install any specified plugins.
+ Install passed args as Vagrant plugins. `all` or no args installs all default Vagrant plugins from host platform specific list.
 
 ### `ssh`
 
@@ -40,7 +46,7 @@ Connect to the VM / container over SSH. With `-c` / `--command`, will executed a
 
 ### `up`
 
-Start a VM or container. Will create one and begin provisioning it if it did not already exist. Accepts specific flags to pass through to `vagrant up`. Accepts many options to set aspects of your VM.
+Start a VM or container. Will create one and begin provisioning it if it did not already exist. Accepts many options to set aspects of your VM. Precedence is CLI > Config > Env Var > defaults.
 
 ### `vagrant`
 

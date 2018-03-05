@@ -64,6 +64,7 @@ def _invoke_vagrant(cmd=None):
     '''
     masters, slaves = zip(pty.openpty(), pty.openpty())
     cmd = ' '.join(['vagrant', cmd]).split()
+    print('cmd = ', cmd)
     with Popen(cmd, stdin=slaves[0], stdout=slaves[0], stderr=slaves[1]) as p:
         for fd in slaves:
             os.close(fd) # no input
