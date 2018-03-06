@@ -105,7 +105,7 @@ def createproject_cmd(project_name):
     app.createproject(project_name)
 
 
-@cli.command('destroy')
+@cli.command('destroy', short_help='Destroy VM and metadata.')
 @click.pass_context
 def destroy_cmd(ctx):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
@@ -124,12 +124,13 @@ def export_vagrant_conf(output_path, force):
     app.export('vagrant', output_path, force)
 
 
-@cli.command('install-plugins', context_settings=CONTEXT_SETTINGS)
+@cli.command('install-plugins', context_settings=CONTEXT_SETTINGS,
+             short_help='Install Vagrant plugins')
 @click.option('-f', '--force', is_flag=True,
               help='Install plugins without confirmation.')
 @click.argument('plugins', nargs=-1, type=str)
 def install_plugins(force, plugins):
-    '''Install passed args as vagrant plugins. `all` or no args installs
+    '''Install passed args as Vagrant plugins. `all` or no args installs
     all default vagrant plugins.
     '''
     # If auth and plugins are both not specified, run both.
@@ -138,17 +139,18 @@ def install_plugins(force, plugins):
     app.install_plugins(force, plugins)
 
 
-@cli.command('ssh', short_help="Connect with `vagrant ssh`")
+@cli.command('ssh', short_help="Connect with ssh.")
 @click.option('-c', '--command', type=str,
               help='Execute an SSH command directly')
 @click.pass_context
 def ssh_cmd(ctx, command):
-    '''Connect to an running VM / container over ssh with `vagrant ssh`.
+    '''Connect to an running VM / container over ssh.
     '''
     app.ssh(ctx, command)
 
 
-@cli.command('up', context_settings=CONTEXT_SETTINGS)
+@cli.command('up', context_settings=CONTEXT_SETTINGS,
+             short_help='Create or start VM.')
 @click.option('-p', '--provider', type=str,
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default %s.'
@@ -178,7 +180,7 @@ def ssh_cmd(ctx, command):
 @click.pass_context
 def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
            provision, destroy_on_error):
-    '''Start a VM / container with `vagrant up`.
+    '''Create or start a VM / container.
     Params can be passed as usual with
     click (CLI or env var) and also with an INI config file.
     Precedence is CLI > Config > Env Var > defaults.
