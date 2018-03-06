@@ -16,7 +16,7 @@ rambo up --provider digitalocean --guest-os centos-7
 
 The `rambo.conf` file is required at the top level in your project directory. It is an INI config file that can specify options. Options passed to the CLI will take precedence over options set via this config file. If you're repeating the same CLI options, setting those options in this config might make your life a little easier. Further, if you intend on tracking your Rambo project in version control, it can be very handy to set some options in this config that match the purpose of your project.
 
-Options on the base `rambo` and the command `up` can be set in `rambo.conf`. For example, a useful `rambo.conf` could look like this:
+Options can be set in `rambo.conf`. For example, a useful `rambo.conf` could look like this:
 
 ```ini
 [up]
