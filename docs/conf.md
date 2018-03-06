@@ -32,10 +32,6 @@ rambo up --provider digitalocean --guest-os centos-7
 
 Setting the config file to this allows you to type simply `rambo up` to run `up` with the `provider` and `guest-os` options set in the rambo.conf, and not specified in the CLI.
 
-## Sections
-
-There are only two sections for the conf file that Rambo uses: `[base]` and `[up]`. These correspond to options on rambo, and on the `up` command. We expect that you will most often only need to set options in the `[up]` section for the `up` command like `drive-size`, and only rarely need to set options in the `[base]` section for options like `vagrant-dotfile-path`.
-
 ## Option names
 
 The options in the conf file are the same as the full option names in the CLI, with preceeding dashes removed and other dashes replaced with underscores. As examples:
