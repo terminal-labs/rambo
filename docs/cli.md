@@ -12,7 +12,7 @@ This is a short list of Rambo's commands, followed by a more detailed explanatio
 - [`install-plugins`](#install-plugins): Install Vagrant plugins.
 - [`ssh`](#ssh): Connect with `vagrant ssh`
 - [`up`](#up): Start a VM / container with `vagrant up`.
-- [`vagrant`](#vagrant): Run a vagrant command through rambo.
+- [`vagrant`](#vagrant): Run a Vagrant command through Rambo.
 
 ### `createproject`
 
@@ -44,7 +44,7 @@ Start a VM or container. Will create one and begin provisioning it if it did not
 
 ### `vagrant`
 
-Accepts any args and forwards them to Vagrant directly, allowing you to run any vagrant command. Rambo has first-class duplicates or wrappers for the most common Vagrant commands, but for less common commands or commands that are not customized, they don't need to be duplicated, so we call them directly.
+Accepts any args and forwards them to Vagrant directly, allowing you to run any Vagrant command. Rambo has first-class duplicates or wrappers for the most common Vagrant commands, but for less common commands or commands that are not customized, they don't need to be duplicated, so we call them directly.
 
 ## rambo.conf
 
