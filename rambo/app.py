@@ -64,7 +64,7 @@ def _invoke_vagrant(cmd=None):
     '''
     masters, slaves = zip(pty.openpty(), pty.openpty())
     cmd = ' '.join(['vagrant', cmd]).split()
-    print('cmd = ', cmd)
+
     with Popen(cmd, stdin=slaves[0], stdout=slaves[0], stderr=slaves[1]) as p:
         for fd in slaves:
             os.close(fd) # no input
@@ -193,7 +193,7 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    _invoke_vagrant('destroy --force')
+    vagrant_general_command('destroy --force')
     utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/provider'))
     utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/random_tag'))
     utils.dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
@@ -324,7 +324,18 @@ def install_plugins(force=None, plugins=('all',)):
             if not force:
                 click.confirm('The plugin "%s" is not in our list of plugins. Attempt '
                           'to install anyway?' % plugin, abort=True)
-            _invoke_vagrant('plugin install %s' % plugin)
+            vagrant_general_command('plugin install %s' % plugin)
+
+def scp(ctx=None, locations=None):
+    assert(len(locations)==2)
+
+
+    if ':' in locations[0]: # [0] is remote, fix [1] which is local
+        locations[1] = os.path.abspath(locations[1])
+    else: # if no : in first location, second location must be remote, fix [0] which is local
+        locations[0] = os.path.abspath(locations[0])
+
+    vagrant_general_command('{} {}'.format('scp', ' '.join(locations)))
 
 def ssh(ctx=None, command=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Connect to an running VM / container over ssh.
@@ -476,7 +487,7 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
     elif destroy_on_error is False:
         cmd = '{} {}'.format(cmd, '--no-destroy-on-error')
 
-    _invoke_vagrant(cmd)
+    vagrant_general_command(cmd)
 
 def vagrant_general_command(cmd):
     '''Invoke vagrant with custom command.
@@ -495,7 +506,7 @@ def setup_lastpass():
     with open(os.path.join(utils.get_user_home(), '/.tmp-common/install-lastpass.sh'), 'w') as file_obj:
         file_obj.write(install_lastpass)
     # Not used, and won't work as is because we're now enforcing use of vagrant in private function.
-    _invoke_vagrant(os.path.join('cd ', utils.get_user_home(), '/.tmp-common; bash install-lastpass.sh'), ' install-lastpass-log')
+    vagrant_general_command(os.path.join('cd ', utils.get_user_home(), '/.tmp-common; bash install-lastpass.sh'), ' install-lastpass-log')
 
 
 class Run_app():

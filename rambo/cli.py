@@ -168,7 +168,7 @@ def install_plugins(force, plugins):
 def scp_cmd(ctx):
     '''Transfer Files with scp. Accepts the sa
     '''
-    app.vagrant_general_command('{} {}'.format('scp', ' '.join(ctx.args)))
+    app.scp(ctx, ctx.args)
 
 
 @cli.command('ssh', short_help="Connect with ssh.")
