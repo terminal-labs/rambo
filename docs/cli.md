@@ -47,9 +47,15 @@ following forms:
 
     <local_path> <remote_path>
 
+    <local_path> :<remote_path>
+
+    :<remote_path> <local_path>
+
     <local_path> [vm_name]:<remote_path>
 
     [vm_name]:<remote_path> <local_path>
+
+For example: `rambo scp localfile.txt remotefile.txt`
 
 ### `ssh`
 
