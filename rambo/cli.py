@@ -163,17 +163,25 @@ def install_plugins(force, plugins):
     app.install_plugins(force, plugins)
 
 
-@cli.command('scp', context_settings=VAGRANT_CMD_CONTEXT_SETTINGS)
+@cli.command('scp', context_settings=VAGRANT_CMD_CONTEXT_SETTINGS,
+             short_help='Transfer files with scp.')
 @click.pass_context
 def scp_cmd(ctx):
-    '''Transfer Files with scp. Accepts the sa
+    '''Transfer files or directories with scp. Accepts two args in one of the
+    following forms:
+
+    <local_path> <remote_path>
+
+    <local_path> [vm_name]:<remote_path>
+
+    [vm_name]:<remote_path> <local_path>
     '''
     app.scp(ctx, ctx.args)
 
 
 @cli.command('ssh', short_help="Connect with ssh.")
 @click.option('-c', '--command', type=str,
-              help='Execute an SSH command directly')
+              help='Execute an SSH command directly.')
 @click.pass_context
 def ssh_cmd(ctx, command):
     '''Connect to an running VM / container over ssh. With `-c` / `--command`,

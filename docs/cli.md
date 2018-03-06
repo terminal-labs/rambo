@@ -11,7 +11,7 @@ This is a short list of Rambo's commands, followed by a more detailed explanatio
 - [`export-vagrant-conf`](#export-vagrant-conf): Get Vagrant configuration.
 - [`halt`](#halt): Halt VM.
 - [`install-plugins`](#install-plugins): Install Vagrant plugins.
-- [`scp`](#scp): Transfer Files with scp.
+- [`scp`](#scp): Transfer files with scp.
 - [`ssh`](#ssh): Connect with `vagrant ssh`
 - [`up`](#up): Start a VM / container with `vagrant up`.
 - [`vagrant`](#vagrant): Run a Vagrant command through Rambo.
@@ -39,6 +39,17 @@ Tells Vagrant to 'halt' the VM. Useful to free the Host's resources without dest
 ### `install-plugins`
 
  Install passed args as Vagrant plugins. `all` or no args installs all default Vagrant plugins from host platform specific list.
+
+### `scp`
+
+Transfer files or directories with scp. Accepts two args in one of the
+following forms:
+
+    <local_path> <remote_path>
+
+    <local_path> [vm_name]:<remote_path>
+
+    [vm_name]:<remote_path> <local_path>
 
 ### `ssh`
 
