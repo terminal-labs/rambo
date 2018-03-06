@@ -327,13 +327,22 @@ def install_plugins(force=None, plugins=('all',)):
             vagrant_general_command('plugin install %s' % plugin)
 
 def scp(ctx=None, locations=None):
-    assert(len(locations)==2)
+    '''Transfer file or dir with scp. This makes use of the vagrant-scp plugin,
+    which allows for simplified args.
+    '''
+    if len(locations)!=2:
+        utils.abort("There needs to be exactly two arguments for scp, a 'from' location "
+                    "and a 'to' location.\nYou gave: %s." % ' '.join(locations))
 
+    copy_from = locations[0]
+    copy_to = locations[1]
 
-    if ':' in locations[0]: # [0] is remote, fix [1] which is local
-        locations[1] = os.path.abspath(locations[1])
-    else: # if no : in first location, second location must be remote, fix [0] which is local
-        locations[0] = os.path.abspath(locations[0])
+    if ':' in copy_from: # copy_from is remote, fix copy_to which is local
+        copy_to = os.path.abspath(copy_to)
+    else: # if no ':' in copy_from, copy_to must be remote, fix copy_from which is local
+        copy_from = os.path.abspath(copy_from)
+
+    locations = [copy_from, copy_to]
 
     vagrant_general_command('{} {}'.format('scp', ' '.join(locations)))
 
