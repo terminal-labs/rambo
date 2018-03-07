@@ -6,6 +6,8 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/stable/config
 
+from rambo import __version__
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -20,13 +22,13 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Rambo'
-copyright = '2018, Michael Verhulst, Joseph Nix, Christopher Smith'
-author = 'Michael Verhulst, Joseph Nix, Christopher Smith'
+copyright = '2018, Terminal Labs'
+author = 'Terminal Labs'
 
 # The short X.Y version
-version = ''
+version = __version__
 # The full version, including alpha/beta/rc tags
-release = '0.3.2.dev'
+release = version
 
 
 # -- General configuration ---------------------------------------------------
