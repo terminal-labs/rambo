@@ -8,6 +8,7 @@ import os
 import re
 import shutil
 import urllib.request
+from codecs import open
 from setuptools import setup, find_packages
 from setuptools.command.sdist import sdist
 from setuptools.command.egg_info import egg_info
