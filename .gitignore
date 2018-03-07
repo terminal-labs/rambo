@@ -22,6 +22,7 @@ dist
 env.sh
 digitalocean.env.sh
 aws.env.sh
+docs/_build
 srv/salt/ssh_keys
 rambo/saltstack
 .tmp
