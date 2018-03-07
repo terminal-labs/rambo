@@ -5,6 +5,7 @@ if sys.version_info.major < 3:
 
 import json
 import os
+import re
 import shutil
 import urllib.request
 from setuptools import setup, find_packages
@@ -13,6 +14,8 @@ from setuptools.command.egg_info import egg_info
 from setuptools.command.develop import develop
 from setuptools.command.install import install
 from zipfile import ZipFile
+
+from rambo import __version__
 
 def download_sample_states(command_subclass):
     """Customized setuptools command to download saltstack sample states
@@ -77,9 +80,18 @@ class CustomDevelopCommand(develop):
 class CustomInstallCommand(install):
     pass
 
+VERSIONFILE='rambo/_version.py'
+verstrline = open(VERSIONFILE, "rt").read()
+VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+mo = re.search(VSRE, verstrline, re.M)
+if mo:
+    verstr = mo.group(1)
+else:
+    raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
+
 setup(
     name='Rambo-vagrant',
-    version='0.3.4.dev',
+    version=verstr,
     description='Virtual Machines on Any Provider',
     url='https://github.com/terminal-labs/rambo',
     author='Terminal Labs',

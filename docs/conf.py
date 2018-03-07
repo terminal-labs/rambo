@@ -6,7 +6,7 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/stable/config
 
-from rambo import __version__
+from rambo._version import __version__
 
 # -- Path setup --------------------------------------------------------------
 
