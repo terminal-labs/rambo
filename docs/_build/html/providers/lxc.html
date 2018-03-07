@@ -4,7 +4,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>LXC Provider: &#8212; Rambo 0.3.2.dev documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -31,12 +31,17 @@
             
   <div class="section" id="lxc-provider">
 <span id="lxc-provider"></span><h1>LXC Provider:<a class="headerlink" href="#lxc-provider" title="Permalink to this headline">¶</a></h1>
-<p><strong>NOTE: This will only work on Ubuntu 16.04+</strong></p>
-<p>Assuming that you installed the dependencies and that you are running Ubuntu 16.04+ as your host you should be able to run</p>
+<p><strong>NOTE: At this time, this will only work on Ubuntu 16.04+ host OS</strong></p>
+<p>At this time LXC is supported natively on Ubuntu 16.04. For this native support, you need a few additional dependencies. They can all be installed with this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>sudo apt install -y build-essential linux-headers-$(uname -r) lxc lxc-templates cgroup-lite redir
+</pre></div>
+</div>
+<p>After that, starting an LXC container with basic usage is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rambo</span> <span class="n">up</span> <span class="o">-</span><span class="n">p</span> <span class="n">lxc</span>
 <span class="n">rambo</span> <span class="n">ssh</span>
 </pre></div>
 </div>
+<p><strong>Note:</strong> At this time using LXC as a provider will require root priveleges / sudo.</p>
 </div>
 
 
@@ -78,7 +83,7 @@
       &copy;2018, Michael Verhulst, Joseph Nix, Christopher Smith.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

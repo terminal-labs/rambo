@@ -1,6 +1,6 @@
 Welcome to Rambo's documentation!
 =================================
 
-   * [INSTALL](INSTALL.html)
+   * [QUICKSTART](quickstart.html)
    * [README](README.html)
    * [CHANGELOG](CHANGELOG.html)

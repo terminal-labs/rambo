@@ -4,7 +4,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Docker Provider: &#8212; Rambo 0.3.2.dev documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
@@ -31,8 +31,8 @@
             
   <div class="section" id="docker-provider">
 <span id="docker-provider"></span><h1>Docker Provider:<a class="headerlink" href="#docker-provider" title="Permalink to this headline">¶</a></h1>
-<p><strong>NOTE: This will only work on Ubuntu 16.04 or newer</strong></p>
-<p>Assuming that you installed the dependencies and that you are running Ubuntu16.04+ as your host you should be able to run</p>
+<p>At this time Docker is supported by using an intermediate host. The intermediate host is created with VirtualBox, and is the same OS as is used for the Docker container inside it. Setting both of those OSes to be the same avoids certain complexities and potential problems that would otherwise present.</p>
+<p>Basic usage of Docker:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rambo</span> <span class="n">up</span> <span class="o">-</span><span class="n">p</span> <span class="n">docker</span>
 <span class="n">rambo</span> <span class="n">ssh</span>
 </pre></div>
@@ -78,7 +78,7 @@
       &copy;2018, Michael Verhulst, Joseph Nix, Christopher Smith.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
