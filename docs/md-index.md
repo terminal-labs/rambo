@@ -1,6 +1,0 @@
-Welcome to Rambo's documentation!
-=================================
-
-   * [QUICKSTART](quickstart.html)
-   * [README](README.html)
-   * [CHANGELOG](CHANGELOG.html)
