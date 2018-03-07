@@ -5,5 +5,4 @@ Welcome to Rambo's documentation!
    :maxdepth: 2
    :glob:
 
-   providers/*
-   *
+   **
