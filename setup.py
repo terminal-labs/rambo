@@ -17,6 +17,8 @@ from zipfile import ZipFile
 
 from rambo import __version__
 
+here = os.path.abspath(os.path.dirname(__file__))
+
 def download_sample_states(command_subclass):
     """Customized setuptools command to download saltstack sample states
     dependencies from https://github.com/terminal-labs/sample-states
@@ -80,19 +82,14 @@ class CustomDevelopCommand(develop):
 class CustomInstallCommand(install):
     pass
 
-VERSIONFILE='rambo/_version.py'
-verstrline = open(VERSIONFILE, "rt").read()
-VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-mo = re.search(VSRE, verstrline, re.M)
-if mo:
-    verstr = mo.group(1)
-else:
-    raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
+about = {}
+with open(os.path.join(here, 'rambo', '__version__.py'), 'r', 'utf-8') as f:
+    exec(f.read(), about)
 
 setup(
     name='Rambo-vagrant',
-    version=verstr,
-    description='Virtual Machines on Any Provider',
+    version=about['__version__'],
+    description=about['__description__'],
     url='https://github.com/terminal-labs/rambo',
     author='Terminal Labs',
     author_email='solutions@terminallabs.com',

@@ -6,7 +6,7 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/stable/config
 
-from rambo._version import __version__
+from rambo.__version__ import __version__
 
 # -- Path setup --------------------------------------------------------------
 
@@ -28,7 +28,7 @@ author = 'Terminal Labs'
 # The short X.Y version
 version = __version__
 # The full version, including alpha/beta/rc tags
-release = version
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
