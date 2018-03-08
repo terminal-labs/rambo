@@ -50,7 +50,7 @@ $ rambo ssh
 ```
 
 ## Contributing
-We heartily welcome any contirubtions to this project, whether in the form of commenting on or posting an issue, or development. If you would like to submit a pull request, you might first want to look at our development [guidlines](https://github.com/terminal-labs/rambo/blob/master/RULES.md) for this project.
+We heartily welcome any contirubtions to this project, whether in the form of commenting on or posting an issue, or development. If you would like to submit a pull request, you might first want to look at our development [guidelines](https://github.com/terminal-labs/rambo/blob/master/RULES.md) for this project.
 
 ## Special Thanks
 Thanks go out to the Vagrant community and HashiCorp. Vagrant is a great tool it has helped us a lot over the years.

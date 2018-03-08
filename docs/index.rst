@@ -109,7 +109,7 @@ Contributing
 We heartily welcome any contirubtions to this project, whether in the
 form of commenting on or posting an issue, or development. If you would
 like to submit a pull request, you might first want to look at our
-development `guidlines <https://github.com/terminal-labs/rambo/blob/master/RULES.md>`__ for this project.
+development `guidelines <https://github.com/terminal-labs/rambo/blob/master/RULES.md>`__ for this project.
 
 Special Thanks
 --------------
