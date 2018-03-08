@@ -5,7 +5,7 @@
 ## Quickstart
 To get started fast, see: [Quickstart](http://terminallabs-rambo.readthedocs.io/en/latest/core/quickstart/), or go to our [docs homepage](http://terminallabs-rambo.readthedocs.io/en/latest/)
 
-## What Is This Repository For?
+## What's Rambo For?
 This project is for provisioning and configuring virtual machines (and containers) in a simple, predictable, and highly reproducible way. Just run one command and your VM is up, code is deployed, and your app is running, on any supported platform.
 
 At this time this repo allows you to create a Linux VM on multiple providers (AWS EC2, DigitalOcean, VirtualBox, LXC). Several Operating Systems are available on select providers. The base machine configuration is a Ubuntu 16.04 64bit OS with 1024MB RAM, and 30GB drive.

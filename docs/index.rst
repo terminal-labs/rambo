@@ -3,43 +3,37 @@ Welcome to Rambo's documentation!
 
 |Join the chat at https://gitter.im/terminal-labs/rambo|
 
-Release v\ |version|.
+Latest: v\ |version|
 
 Quickstart
 ----------
 
 To get started fast, see `Quickstart <docs/Quickstart>`__.
 
-The User Guide
---------------
-
-This is a quickstart.
-
 .. toctree::
+   :caption: Usage Documentation
    :maxdepth: 2
    :glob:
 
    core/quickstart
    core/*
 
-This is provider specific documentation.
-
 .. toctree::
+   :caption: Provider Specific Documentation
    :maxdepth: 2
    :glob:
 
    providers/*
 
-Here is Rambo's Changelog:
-
 .. toctree::
+   :caption: Changelog:
    :maxdepth: 1
    :glob:
 
    CHANGELOG
 
-What Is This Repository For?
-----------------------------
+What's Rambo For?
+-----------------
 
 This project is for provisioning and configuring virtual machines (and
 containers) in a simple, predictable, and highly reproducible way. Just
