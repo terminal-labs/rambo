@@ -13,7 +13,7 @@ For running containers locally (e.g. LXC) or spawning cloud based VMs (e.g. AWS 
 
 - [Ubuntu 16.04 or newer](https://www.ubuntu.com/download/desktop)
 
-- [OSX](http://www.apple.com/mac-mini/)
+- [OSX](https://www.apple.com/mac-mini/)
 
 We expect it's likely you can get Rambo to work on any Unix-like system, but your milleage may vary. So far we have made no effort to get this working with Windows. Contributions are very welcome.
 
@@ -23,7 +23,7 @@ We expect it's likely you can get Rambo to work on any Unix-like system, but you
 
 1. Download and install [VirtualBox](https://www.virtualbox.org/) 5.1 or newer.
 
-1. Download and install [Vagrant](http://www.vagrantup.com/).
+1. Download and install [Vagrant](https://www.vagrantup.com/).
 
 1. Install Rambo with pip,
 

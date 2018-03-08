@@ -1,6 +1,8 @@
 Welcome to Rambo's documentation!
 =================================
 
+Release v\ |version|
+
 The User Guide
 --------------
 
