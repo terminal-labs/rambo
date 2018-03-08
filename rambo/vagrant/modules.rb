@@ -6,7 +6,9 @@ def random_tag
   if File.file?(random_tag_path)
     tag = File.read(random_tag_path)
   else
-    tag = host + '-' + File.basename(File.dirname(tmp_dir)) + '-' + SecureRandom.hex(6)
+    working_dir_name = File.basename(File.dirname(tmp_dir))
+    working_dir_name = working_dir_name.gsub! '_', '-'
+    tag = host + '-' + working_dir_name + '-' + SecureRandom.hex(6)
     File.write(random_tag_path, tag)
   end
   return tag
