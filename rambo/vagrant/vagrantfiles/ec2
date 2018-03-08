@@ -31,7 +31,7 @@ Vagrant.configure('2') do |config|
       provider.instance_type = 't2.large'
     end
 
-    if get_env_var_rb('guest_os') != 'debian-8'
+    if (get_env_var_rb('guest_os') != 'debian-9') && (get_env_var_rb('guest_os') != 'debian-8')
       provider.block_device_mapping = [{
         'DeviceName' => '/dev/sda1',
         'Ebs.VolumeSize' => get_env_var_rb('drivesize'),
