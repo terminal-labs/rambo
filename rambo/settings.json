@@ -28,6 +28,10 @@
             "do": "debian-8-x64",
             "ec2": "ami-a5d621e1"
         },
+        "debian-9": {
+            "do": "debian-9-x64",
+            "ec2": "ami-8c828aec"
+        },
         "centos-7": {
             "do": "centos-7-x64",
             "ec2": "ami-65e0e305"
