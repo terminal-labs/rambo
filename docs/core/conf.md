@@ -32,7 +32,7 @@ rambo up --provider digitalocean --guest-os centos-7
 
 Setting the config file to this allows you to type simply `rambo up` to run `up` with the `provider` and `guest-os` options set in the rambo.conf, and not specified in the CLI.
 
-## Option names
+## Option Names
 
 The options in the conf file are the same as the full option names in the CLI, with preceeding dashes removed and other dashes replaced with underscores. As examples:
 

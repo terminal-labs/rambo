@@ -1,4 +1,4 @@
-# AWS EC2 Provider:
+# AWS EC2:
 
 ## Create Account
 

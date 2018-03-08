@@ -50,10 +50,10 @@ In this project directory Rambo gave you a few things to help you get started, a
 
 Rambo supports various providers, and aims to let you switch between them as easily as possible. Nevertheless, some providers do have particular considerations, such as setting up keys and payment for cloud services, or specific dependencies for the host OS. This is a list of Rambo's supported providers, with links to specific documentation pages for each.
 
-- [AWS EC2](providers/aws-ec2.md)
-- [DigitalOcean](providers/digitalocean.md)
-- [Docker](providers/docker.md)
-- [LXC](providers/lxc.md)
+- [AWS EC2](../../providers/aws-ec2)
+- [DigitalOcean](../../providers/digitalocean)
+- [Docker](../../providers/docker)
+- [LXC](../../providers/lxc)
 - VirtualBox (see below)
 
 ### Default Provider - VirtualBox:

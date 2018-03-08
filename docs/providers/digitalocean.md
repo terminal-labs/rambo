@@ -1,4 +1,4 @@
-# DigitalOcean Provider:
+# DigitalOcean:
 
 ## Create Account
 
