@@ -3,11 +3,9 @@
   background: #2F9A41;
 }
 /* links */
-.section{
-  a {
+.section a {
     color: #2F9A41;
-  }
-  a:visited {
+}
+.section a:visited {
     color: #2980B9;
-  }
 }
