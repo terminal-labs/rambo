@@ -3,7 +3,7 @@
 [![Join the chat at https://gitter.im/terminal-labs/rambo](https://badges.gitter.im/terminal-labs/rambo.svg)](https://gitter.im/terminal-labs/rambo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Quickstart
-To get up and running fast, see: [quickstart.md](docs/quickstart.md)
+To get started fast, see: [Quickstart](http://terminallabs-rambo.readthedocs.io/en/latest/core/quickstart/), or go to our [docs homepage](http://terminallabs-rambo.readthedocs.io/en/latest/)
 
 ## What Is This Repository For?
 This project is for provisioning and configuring virtual machines (and containers) in a simple, predictable, and highly reproducible way. Just run one command and your VM is up, code is deployed, and your app is running, on any supported platform.
@@ -14,10 +14,10 @@ One of the goals of this project is be able to run a simple command and have a n
 
 Another goal of this repo is to have the spawned VMs be maximally similar across providers. Usually, your configuration will not need to change at all and will simply run on all providers.
 
-By default Rambo offers a basic VM configuration with SaltStack, but you can customize this. See [**Customizing Rambo**](docs/customizing.md) for that.
+By default Rambo offers a basic VM configuration with SaltStack, but you can customize this. See [Customizing Rambo](http://terminallabs-rambo.readthedocs.io/en/latest/core/customizing/) for that.
 
 ## Basic Usage
-Once [installed](docs/quickstart.md#installation), you can run one of these commands to get your VM:
+Once [installed](http://terminallabs-rambo.readthedocs.io/en/latest/core/quickstart/#installation), you can run one of these commands to get your VM:
 
 for [VirtualBox](https://www.virtualbox.org/) run
 ```
@@ -49,21 +49,10 @@ $ rambo up -p lxc
 $ rambo ssh
 ```
 
-## More Docs
-
-- [Quickstart](docs/quickstart.md)
-- [CLI](docs/cli.md)
-- [Customizing](docs/customizing.md)
-- [API](docs/api.md)
-- Provider Specific
-  - [AWS EC2](docs/providers/aws-ec2.md)
-  - [DigitalOcean](docs/providers/digitalocean.md)
-  - [Docker](docs/providers/docker.md)
-  - [LXC](docs/providers/lxc.md)
-  - [VirtualBox](docs/quickstart.md#default-provider---virtualbox)
-
 ## Contributing
-We heartily welcome any contirubtions to this project, whether in the form of commenting on or posting an issue, or development. If you would like to submit a pull request, you might first want to look at our development guidlines for this project in [RULES.md](https://github.com/terminal-labs/rambo/blob/master/RULES.md).
+We heartily welcome any contirubtions to this project, whether in the form of commenting on or posting an issue, or development. If you would like to submit a pull request, you might first want to look at our development [guidlines](https://github.com/terminal-labs/rambo/blob/master/RULES.md) for this project.
 
 ## Special Thanks
 Thanks go out to the Vagrant community and HashiCorp. Vagrant is a great tool it has helped us a lot over the years.
+
+Rambo is supported by [Terminal Labs](https://terminallabs.com/).
