@@ -8,7 +8,6 @@ import os
 import re
 import shutil
 import urllib.request
-from codecs import open
 from setuptools import setup, find_packages
 from setuptools.command.sdist import sdist
 from setuptools.command.egg_info import egg_info
@@ -16,7 +15,6 @@ from setuptools.command.develop import develop
 from setuptools.command.install import install
 from zipfile import ZipFile
 
-#from rambo import __version__
 import rambo
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -83,10 +81,6 @@ class CustomDevelopCommand(develop):
 @download_sample_states
 class CustomInstallCommand(install):
     pass
-
-about = {}
-with open(os.path.join(here, 'rambo', '__version__.py'), 'r', 'utf-8') as f:
-    exec(f.read(), about)
 
 setup(
     name='Rambo-vagrant',
