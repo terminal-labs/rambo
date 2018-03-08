@@ -21,6 +21,7 @@ FEATURES:
 
 IMPROVEMENTS:
 
+- Rounded out OS whitelist: Debian 8/9, CentOS 7, Ubuntu 14.04/16.04
 - Fix Docker bugs
 - Added readthedocs.
 - Defining a project by the existence of a conf file.
