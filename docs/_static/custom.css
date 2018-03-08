@@ -1,0 +1,13 @@
+/* Sidebar header (and topbar for mobile) */
+.wy-side-nav-search, .wy-nav-top {
+  background: #2F9A41;
+}
+/* links */
+.section{
+  a {
+    color: #2F9A41;
+  }
+  a:visited {
+    color: #2980B9;
+  }
+}
