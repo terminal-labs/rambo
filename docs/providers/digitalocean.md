@@ -1,4 +1,4 @@
-# DigitalOcean:
+# DigitalOcean
 
 ## Create Account
 

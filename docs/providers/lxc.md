@@ -1,4 +1,4 @@
-# LXC:
+# LXC
 
 **NOTE: At this time, this will only work on Ubuntu 16.04+ host OS**
 

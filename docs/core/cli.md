@@ -6,17 +6,17 @@ This is a short list of Rambo's commands, followed by a more detailed explanatio
 
 ## Commands
 
-- [`createproject`](#createproject): Create a Rambo project dir with basic setup.
-- [`destroy`](#destroy): Destroy a VM / container and all its metadata. Default leaves logs.
-- [`export-vagrant-conf`](#export-vagrant-conf): Get Vagrant configuration.
-- [`halt`](#halt): Halt VM.
-- [`install-plugins`](#install-plugins): Install Vagrant plugins.
-- [`scp`](#scp): Transfer files with scp.
-- [`ssh`](#ssh): Connect with `vagrant ssh`
-- [`up`](#up): Start a VM / container with `vagrant up`.
-- [`vagrant`](#vagrant): Run a Vagrant command through Rambo.
+- [createproject](#createproject): Create a Rambo project dir with basic setup.
+- [destroy](#destroy): Destroy a VM / container and all its metadata. Default leaves logs.
+- [export-vagrant-conf](#export-vagrant-conf): Get Vagrant configuration.
+- [halt](#halt): Halt VM.
+- [install-plugins](#install-plugins): Install Vagrant plugins.
+- [scp](#scp): Transfer files with scp.
+- [ssh](#ssh): Connect with `vagrant ssh`
+- [up](#up): Start a VM / container with `vagrant up`.
+- [vagrant](#vagrant): Run a Vagrant command through Rambo.
 
-### `createproject`
+### createproject
 
 Create project takes an arguement for the name to give to the project it creates. It will create a directory in the CWD for this project. Upon creation, this project directory will contain a `rambo.conf` file, an `auth` directory, and a `saltstack` directory.
 
@@ -24,23 +24,23 @@ Create project takes an arguement for the name to give to the project it creates
 - `auth` contains some sample scripts that will aid in setting up keys / tokens for the cloud providers. It is not required. How to use that is described in the cloud provider specific documentation.
 - `saltstack` is a basic set of SaltStack configuration code that Rambo offers. [It can be modified for custom configuration.](../customizing)
 
-### `destroy`
+### destroy
 
 Destroy a VM / container. This will tell vagrant to forcibly destroy a VM, and to also destroy its Rambo metadata (provider and random_tag), and Vagrant metadata (`.vagrant` dir).
 
-### `export-vagrant-conf`
+### export-vagrant-conf
 
 Places the default `Vagrantfile` and its resources (`vagrant` dir, `settings.json`) in the CWD for [customizing](../customizing).
 
-### `halt`
+### halt
 
 Tells Vagrant to 'halt' the VM. Useful to free the Host's resources without destroying the VM.
 
-### `install-plugins`
+### install-plugins
 
  Install passed args as Vagrant plugins. `all` or no args installs all default Vagrant plugins from host platform specific list.
 
-### `scp`
+### scp
 
 Transfer files or directories with scp. Accepts two args in one of the
 following forms:
@@ -57,15 +57,15 @@ following forms:
 
 For example: `rambo scp localfile.txt remotefile.txt`
 
-### `ssh`
+### ssh
 
 Connect to the VM / container over SSH. With `-c` / `--command`, will executed an SSH command directly.
 
-### `up`
+### up
 
 Start a VM or container. Will create one and begin provisioning it if it did not already exist. Accepts many options to set aspects of your VM. Precedence is CLI > Config > Env Var > defaults.
 
-### `vagrant`
+### vagrant
 
 Accepts any args and forwards them to Vagrant directly, allowing you to run any Vagrant command. Rambo has first-class duplicates or wrappers for the most common Vagrant commands, but for less common commands or commands that are not customized, they don't need to be duplicated, so we call them directly.
 

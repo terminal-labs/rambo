@@ -1,3 +1,5 @@
+# Changelog
+
 ## 0.4.dev (TBD)
 
 FEATURES:

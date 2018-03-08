@@ -9,7 +9,7 @@ The User Guide
 This is a quickstart.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :glob:
 
 
@@ -20,7 +20,7 @@ This is a quickstart.
 This is provider specific documentation.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :glob:
 
    providers/*
@@ -32,4 +32,4 @@ Here is Rambo's Changelog:
    :maxdepth: 1
    :glob:
 
-   CHANGELOG.md
+   CHANGELOG

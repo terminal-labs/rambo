@@ -6,7 +6,7 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/stable/config
 
-from rambo.__version__ import __version__
+from rambo import __version__
 
 # -- Path setup --------------------------------------------------------------
 
@@ -69,21 +69,26 @@ language = None
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**flymd*']
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'default'
 
 
 # -- Options for HTML output -------------------------------------------------
 
+gettext_compact = False
+
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'analytics_id': 'UA-36783686-3',
+    'collapse_navigation': False,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -98,14 +103,21 @@ html_theme = 'alabaster'
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {}
+html_sidebars = {}
 
+# If true, links to the reST sources are added to the pages.
+html_show_sourcelink = False
+
+# If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
+html_show_sphinx = False
+
+# If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
+html_show_copyright = True
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Rambodoc'
-
 
 # -- Options for LaTeX output ------------------------------------------------
 
@@ -132,7 +144,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Rambo.tex', 'Rambo Documentation',
-     'Michael Verhulst, Joseph Nix, Christopher Smith', 'manual'),
+     'Terminal Labs', 'manual'),
 ]
 
 

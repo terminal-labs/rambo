@@ -16,7 +16,8 @@ from setuptools.command.develop import develop
 from setuptools.command.install import install
 from zipfile import ZipFile
 
-from rambo import __version__
+#from rambo import __version__
+import rambo
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -89,8 +90,8 @@ with open(os.path.join(here, 'rambo', '__version__.py'), 'r', 'utf-8') as f:
 
 setup(
     name='Rambo-vagrant',
-    version=about['__version__'],
-    description=about['__description__'],
+    version=rambo.__version__,
+    description=rambo.__description__,
     url='https://github.com/terminal-labs/rambo',
     author='Terminal Labs',
     author_email='solutions@terminallabs.com',
@@ -101,6 +102,7 @@ setup(
     install_requires=[
         'click',
         'click-configfile<=1',
+        'sphinx_rtd_theme',
     ],
     dependency_links=[
         'https://github.com/terminal-labs/click-configfile/archive/merge-with-primary-schema.zip#egg=click-configfile-1',
