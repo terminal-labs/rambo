@@ -3,9 +3,9 @@
   background: #2F9A41;
 }
 /* links */
-.section a {
+.wy-nav-content a {
     color: #2F9A41;
 }
-.section a:visited {
+.wy-nav-content a:visited {
     color: #2980B9;
 }
