@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.dev (TBD)
+## 0.4.0 (March 9, 2018)
 
 FEATURES:
 
