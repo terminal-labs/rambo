@@ -82,6 +82,14 @@ class CustomDevelopCommand(develop):
 class CustomInstallCommand(install):
     pass
 
+# Remove this section when we stop using our submoduled fork
+# of click_configfile
+install_requires = ["click >= 6.6", "six >= 1.10"]
+before_py35_extra = []
+if sys.version < "3.5":
+    install_requires.append("configparser >= 3.5.0")
+    before_py35_extra.append("configparser >= 3.5.0")
+
 setup(
     name='Rambo-vagrant',
     version=rambo.__version__,
@@ -93,13 +101,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=[
+    install_requires=install_requires + [
         'click',
-        'click-configfile<=1',
         'sphinx_rtd_theme',
-    ],
-    dependency_links=[
-        'https://github.com/terminal-labs/click-configfile/archive/merge-with-primary-schema.zip#egg=click-configfile-1',
     ],
     cmdclass={
         'install': CustomInstallCommand,

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 (March 9, 2018)
+
+BUGFIX:
+
+- Now custom fork of click_configfile is added as a submodule so it's always present.
+
 ## 0.4.0 (March 9, 2018)
 
 FEATURES:
