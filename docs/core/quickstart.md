@@ -28,7 +28,7 @@ We expect it's likely you can get Rambo to work on any Unix-like system, but you
 1. Install Rambo with pip,
 
     - [latest release](https://github.com/terminal-labs/rambo/releases) with pypi: `pip install rambo-vagrant`, or
-    - [from source](https://github.com/terminal-labs/rambo): `pip install -e . --process-dependency-links`
+    - [from source](https://github.com/terminal-labs/rambo): `git clone git@github.com:terminal-labs/rambo.git --recursive; cd rambo; pip install -e .`
 
 1. Install plugins with `rambo install-plugins`
 
