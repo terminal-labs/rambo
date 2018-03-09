@@ -3,9 +3,10 @@ import sys
 import json
 import pkg_resources
 
-from click_configfile import ConfigFileReader, Param, SectionSchema
-from click_configfile import matches_section
 import click
+
+from rambo.click_configfile import ConfigFileReader, Param, SectionSchema
+from rambo.click_configfile import matches_section
 
 import rambo.app as app
 from rambo.settings import SETTINGS, PROJECT_NAME

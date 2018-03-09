@@ -1,4 +1,4 @@
 [submodule "click-configfile"]
-	path = click-configfile
+	path = rambo/click-configfile
 	url = git@github.com:terminal-labs/click-configfile.git
 	branch = merge-with-primary-schema

@@ -1,12 +1,11 @@
 recursive-include rambo/auth/env_scripts *
 recursive-include rambo/saltstack *
 recursive-include rambo/vagrant *
+recursive-include rambo/click-configfile *
 recursive-include docs *
-recursive-include click-configfile *
 include rambo/Vagrantfile
 include rambo/settings.json
 include LICENSE
 include README.md
 include CHANGELOG.md
-include click_configfile.py
 global-exclude *.py[cdo] __pycache__ *.so *.pyd .DS_Store

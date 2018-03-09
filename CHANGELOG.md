@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.2 (March 9, 2018)
+## 0.4.4 (March 9, 2018)
 
 BUGFIX:
 
