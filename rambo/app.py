@@ -369,7 +369,7 @@ def ssh(ctx=None, command=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     # do not use _invoke_vagrant, that will give a persistent ssh session regardless.
     os.system(cmd)
 
-def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
+def up(ctx=None, provider=None, guest_os=None, ram_size=None, drive_size=None,
        machine_type=None, provision=None, destroy_on_error=None,
        vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Start a VM / container with `vagrant up`.
@@ -482,7 +482,9 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
         providers.docker()
     elif provider == 'ec2':
         providers.ec2()
-
+    elif provider == 'gce':
+        providers.gce(guest_os, ram_size, drive_size, machine_type,
+                      provision, destroy_on_error)
 
     ## Add straight pass-through flags. Keep test for True/False explicit as only those values should work
     cmd = 'up'
