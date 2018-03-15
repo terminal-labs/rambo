@@ -392,6 +392,9 @@ def up(ctx=None, **params):
         vagrant_providers.docker()
     elif params['provider'] == 'ec2':
         vagrant_providers.ec2()
+    elif params['provider'] == 'gce':
+        providers.gce(guest_os, ram_size, drive_size, machine_type,
+                      provision, destroy_on_error)
 
     ## Add straight pass-through flags. Keep test for True/False explicit as only those values should work
     cmd = 'up'

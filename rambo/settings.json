@@ -19,6 +19,7 @@
         "digitalocean",
         "docker",
         "ec2",
+        "gce",
         "lxc",
         "virtualbox"
     ],
