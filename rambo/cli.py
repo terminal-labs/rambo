@@ -9,8 +9,8 @@ from rambo.click_configfile import ConfigFileReader, Param, SectionSchema
 from rambo.click_configfile import matches_section
 
 import rambo.app as app
+import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_NAME
-from rambo.utils import abort
 
 
 version = pkg_resources.get_distribution('rambo-vagrant').version
@@ -93,8 +93,11 @@ def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
     app.set_init_vars(cwd, tmpdir_path)
     app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    app.write_to_log('\nNEW CMD')
-    app.write_to_log(' '.join(sys.argv))
+    utils.write_to_log('\nNEW CMD')
+    utils.write_to_log(' '.join(sys.argv))
+
+    utils.write_to_log('\nNEW CMD', 'stderr')
+    utils.write_to_log(' '.join(sys.argv), 'stderr')
 
 
 ### Subcommands
@@ -146,7 +149,7 @@ def halt_cmd(ctx):
     '''Tells Vagrant to 'halt' the VM. Useful to free the Host's
     resources without destroying the VM.
     '''
-    app.vagrant_general_command('{} {}'.format('halt', ' '.join(ctx.args)))
+    app.halt(ctx)
 
 
 @cli.command('install-plugins', context_settings=CONTEXT_SETTINGS,
@@ -233,13 +236,12 @@ def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
     Precedence is CLI > Config > Env Var > defaults.
     '''
     if not os.path.isfile('%s.conf' % PROJECT_NAME):
-        abort('Config file %s.conf must be present in working directory.\n'
+        utils.abort('Config file %s.conf must be present in working directory.\n'
               'A config file is automatically created when you run \n'
               'createproject. You can also make a config file manually.'
               % PROJECT_NAME)
 
-    app.up(ctx, provider, guest_os, ram_size, drive_size, machine_type,
-           provision, destroy_on_error)
+    app.up(ctx, **ctx.params)
 
 @cli.command('vagrant', context_settings=VAGRANT_CMD_CONTEXT_SETTINGS,
              short_help='Run a vagrant command through rambo.')

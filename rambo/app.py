@@ -1,55 +1,26 @@
-import click
 import distutils
 import errno
 import json
 import os
+import platform
 import pty
 import shutil
 import subprocess
 import sys
 import time
-import platform
 from distutils.dir_util import copy_tree
 from distutils.errors import DistutilsFileError
 from select import select
 from subprocess import Popen
 from threading import Thread
 
-import rambo.providers as providers
+import rambo.options as options
+import rambo.providers.gce as gce
 import rambo.utils as utils
+import rambo.vagrant_providers as vagrant_providers
 from rambo.scripts import install_lastpass
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
-
-
-def write_to_log(data=None, file_name=None):
-    '''Write data to log files. Will append data to a single combined log.
-    Additionally write data to a log with a custom name (such as stderr)
-    for any custom logs.
-
-    Args:
-        data (str or bytes): Data to write to log file.
-        file_name (str): Used to create (or append to) an additional
-                         log file with a custom name. Custom name always gets
-                         `.log` added to the end.
-    '''
-    try:
-        data = data.decode('utf-8')
-    except AttributeError:
-        pass # already a string
-
-    data = ''.join([data.rstrip(), '\n']) # strip possible eol chars and add back exactly one
-
-    utils.dir_create(get_env_var('LOG_PATH'))
-    fd_path = os.path.join(get_env_var('LOG_PATH'), 'history.log')
-    fd = open(fd_path, 'a+')
-    fd.write(data)
-    fd.close()
-    if file_name:
-        fd_custom_path = os.path.join(get_env_var('LOG_PATH'), ''.join([file_name, '.log']))
-        fd_custom = open(fd_custom_path, 'a+')
-        fd_custom.write(data)
-        fd_custom.close()
 
 def _invoke_vagrant(cmd=None):
     '''Pass a command to vagrant. This outputs in near real-time,
@@ -85,11 +56,11 @@ def _invoke_vagrant(cmd=None):
                         del readable[fd]
                     else:
                         if fd == masters[0]: # We caught stdout
-                            click.echo(data.rstrip())
-                            write_to_log(data)
+                            utils.echo(data.rstrip())
+                            utils.write_to_log(data)
                         else: # We caught stderr
-                            click.echo(data.rstrip(), err=True)
-                            write_to_log(data, 'stderr')
+                            utils.echo(data.rstrip(), err=True)
+                            utils.write_to_log(data, 'stderr')
                         readable[fd].flush()
     for fd in masters:
         os.close(fd)
@@ -168,7 +139,7 @@ def createproject(project_name, config_only=None):
         os.makedirs(path) # Make parent dirs if needed.
     except FileExistsError:
         utils.abort('Directory already exists.')
-    click.echo('Created %s project "%s" in %s.'
+    utils.echo('Created %s project "%s" in %s.'
                % (PROJECT_NAME.capitalize(), project_name, path))
     ## Fill project dir with basic configs.
     install_config(output_path=path)
@@ -193,12 +164,19 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
+    try:
+        if utils.read_specs()['provider'] == 'gce':
+            gce.destroy()
+    except TypeError:
+        pass
+
     vagrant_general_command('destroy --force')
-    utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/provider'))
-    utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), '/random_tag'))
+    utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json'))
+    utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'provider'))
+    utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'random_tag'))
     utils.dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
-    click.echo('Temporary files removed')
-    click.echo('Destroy complete.')
+    utils.echo('Temporary files removed')
+    utils.echo('Destroy complete.')
 
 def export(resource=None, export_path=None, force=None):
     '''Drop default code in the CWD / user defined space. Operate on saltstack
@@ -245,7 +223,19 @@ def export(resource=None, export_path=None, force=None):
                 os.makedirs(os.path.dirname(dst), exist_ok=True) # Make parent dirs if needed. # Py 3.2+
                 shutil.copy(src, dst) # Copy file with overwrites.
 
-    click.echo('Done exporting %s code.' % resource)
+    utils.echo('Done exporting %s code.' % resource)
+
+def halt(ctx=None, *args):
+    if not ctx: # Using API. Else handled by cli.
+        set_init_vars()
+        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+    else:
+        args = ctx.args + list(args)
+
+    if utils.read_specs()['provider'] == 'gce':
+        gce.halt()
+
+    vagrant_general_command('{} {}'.format('halt', ' '.join(args)))
 
 def install_auth(ctx=None, output_path=None):
     '''Install auth directory.
@@ -264,7 +254,7 @@ def install_auth(ctx=None, output_path=None):
         os.makedirs(license_dir)
     except FileExistsError:
         pass # Dir already created. Moving on.
-    click.echo('Any (license) files you put in %s will be synced into your VM.'
+    utils.echo('Any (license) files you put in %s will be synced into your VM.'
                % license_dir)
 
     for filename in os.listdir(os.path.join(get_env_var('env'), 'auth/env_scripts')):
@@ -273,9 +263,9 @@ def install_auth(ctx=None, output_path=None):
         if not os.path.isfile(dst):
             os.makedirs(dst_dir, exist_ok=True) # Make parent dirs if needed. # Py 3.2+
             shutil.copy(os.path.join(get_env_var('env'), 'auth/env_scripts', filename), dst)
-            click.echo('Added template key loading scripts %s to auth/keys.' % filename)
+            utils.echo('Added template key loading scripts %s to auth/keys.' % filename)
         else:
-            click.echo('File %s exists. Leaving it.' % dst)
+            utils.echo('File %s exists. Leaving it.' % dst)
 
     # TODO: Have Rambo optionally store the same keys that may be in auth/keys in metadata,
     # added from the cli/api. Automatically check if keys in metatdata and not keys
@@ -303,7 +293,7 @@ def install_config(ctx=None, output_path=None):
         with open(path, 'w') as f:
             f.write('[up]\nprovider = %s\nguest_os = %s\n'
                     % (SETTINGS['PROVIDERS_DEFAULT'], SETTINGS['GUEST_OSES_DEFAULT']))
-        click.echo('Created config at %s' % path)
+        utils.echo('Created config at %s' % path)
 
 def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins
@@ -315,7 +305,7 @@ def install_plugins(force=None, plugins=('all',)):
     host_system = platform.system()
     for plugin in plugins:
         if plugin == 'all':
-            click.echo('Installing all default plugins.')
+            utils.echo('Installing all default plugins.')
             for plugin in SETTINGS['PLUGINS'][host_system]:
                 _invoke_vagrant('plugin install %s' % plugin)
         elif plugin in SETTINGS['PLUGINS'][host_system]:
@@ -344,6 +334,9 @@ def scp(ctx=None, locations=None):
 
     locations = [copy_from, copy_to]
 
+    if utils.read_specs()['provider'] == 'gce':
+        gce.scp(locations)
+
     vagrant_general_command('{} {}'.format('scp', ' '.join(locations)))
 
 def ssh(ctx=None, command=None, vagrant_cwd=None, vagrant_dotfile_path=None):
@@ -356,10 +349,12 @@ def ssh(ctx=None, command=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
-    # TODO: Better logs.
     if not ctx: # Using API. Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+
+    if utils.read_specs()['provider'] == 'gce':
+        gce.ssh()
 
     ## Add pass-through 'command' option.
     cmd = 'vagrant ssh'
@@ -369,14 +364,15 @@ def ssh(ctx=None, command=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     # do not use _invoke_vagrant, that will give a persistent ssh session regardless.
     os.system(cmd)
 
-def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
-       machine_type=None, provision=None, destroy_on_error=None,
-       vagrant_cwd=None, vagrant_dotfile_path=None):
+def up(ctx=None, **params):
     '''Start a VM / container with `vagrant up`.
     All str args can also be set as an environment variable; arg takes precedence.
 
     Agrs:
         ctx (object): Click Context object. Used to detect if CLI is used.
+        params (dict): Dict of all args passed to `up`.
+
+    In params, this takes:
         provider (str): Provider to use.
         guest_os (str): Guest OS to use.
         ram_size (int): RAM in MB to use.
@@ -391,109 +387,46 @@ def up(ctx=None, provider=None,  guest_os=None, ram_size=None, drive_size=None,
 
     if not ctx: # Using API. Else handled by cli.
         set_init_vars()
-        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+        set_vagrant_vars(params.get(vagrant_cwd), params.get(vagrant_dotfile_path))
 
-    ## provider. Make this be last.
-    if not provider:
-        provider = SETTINGS['PROVIDERS_DEFAULT']
-    set_env_var('provider', provider)
+    ## Save Initial command list
+    with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json'), 'w') as fp:
+        json.dump({'params': params}, fp, indent=4, sort_keys=True)
 
-    if provider not in SETTINGS['PROVIDERS']:
-        msg = ('Provider "%s" is not in the provider list.\n'
-               'Did you have a typo? Here is as list of avalible providers:\n\n'
-               % provider)
-        for supported_provider in SETTINGS['PROVIDERS']:
-            msg = msg + '%s\n' % supported_provider
-        utils.abort(msg)
+    ## Option Handling - These might modify the params dict or set env vars.
+    params = options.provider_option(params)
+    params = options.guest_os_option(params)
+    params = options.size_option(params) # both ram and drive size
+    params = options.machine_type_option(params)
 
-    ## guest_os
-    if not guest_os:
-        guest_os = SETTINGS['GUEST_OSES_DEFAULT']
-    set_env_var('guest_os', str(guest_os))
-
-    if guest_os not in SETTINGS['GUEST_OSES']:
-        msg = ('Guest OS "%s" is not in the guest OSes whitelist.\n'
-               'Did you have a typo? We\'ll try anyway.\n'
-               'Here is as list of avalible guest OSes:\n\n'
-               % guest_os)
-        for supported_os in SETTINGS['GUEST_OSES']:
-            msg = msg + '%s\n' % supported_os
-        utils.warn(msg)
-
-    ## ram_size and drive_size (coupled)
-    # Cast to strings if they exist so they can stored as env vars.
-    if ram_size:
-        ram_size = str(ram_size)
-    if drive_size:
-        drive_size = str(drive_size)
-
-    if ram_size and not drive_size:
-        try:
-            drive_size = SETTINGS['SIZES'][ram_size]
-        except KeyError: # Doesn't match, but we'll let them try it.
-            drive_size = SETTINGS['DRIVESIZE_DEFAULT']
-    elif drive_size and not ram_size:
-        try:
-            ram_size = list(SETTINGS['SIZES'].keys())[list(SETTINGS['SIZES'].values()).index(drive_size)]
-        except ValueError: # Doesn't match, but we'll let them try it.
-            ram_size = SETTINGS['RAMSIZE_DEFAULT']
-    elif not ram_size and not drive_size:
-        ram_size = SETTINGS['RAMSIZE_DEFAULT']
-        drive_size = SETTINGS['DRIVESIZE_DEFAULT']
-    # else both exist, just try using them
-
-    set_env_var('ramsize', ram_size)
-    set_env_var('drivesize', drive_size)
-
-    ## ram_size
-    if ram_size not in iter(SETTINGS['SIZES']):
-        msg = ('RAM Size "%s" is not in the RAM sizes list.\n'
-               'Did you have a typo? We\'ll try anyway.\n'
-               'Here is as list of avalible RAM sizes:\n\n'
-               % ram_size)
-        for supported_ram_size in iter(SETTINGS['SIZES']):
-            msg = msg + '%s\n' % supported_ram_size
-        utils.warn(msg)
-
-    ## drive_size
-    if drive_size not in iter(SETTINGS['SIZES'].values()):
-        msg = ('DRIVE Size "%s" is not in the DRIVE sizes list.\n'
-               'Did you have a typo? We\'ll try anyway.\n'
-               'Here is as list of avalible DRIVE sizes:\n\n'
-               % drive_size)
-        for supported_drive_size in iter(SETTINGS['SIZES'].values()):
-            msg = msg + '%s\n' % supported_drive_size
-        utils.warn(msg)
-
-    if machine_type:
-        if provider in ('docker', 'lxc', 'virtualbox'):
-            msg = ('You have selected a machine-type, but are not using\n'
-                   'a cloud provider. You selected %s with %s.\n'
-                   % (machine_type, provider))
-            utils.abort(msg)
-        set_env_var('machinetype', machine_type)
-
+    ## Save Specs (same `params` now modified)
+    with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json')) as fp:
+        data = json.load(fp)
+    data.update({'specs': params})
+    with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json'), 'w') as fp:
+        json.dump(data, fp, indent=4, sort_keys=True)
 
     ## Provider specific handling.
-    ## Must come after all else, because logic may be done on env vars set above.
-    if provider == 'digitalocean':
-        providers.digitalocean()
-    elif provider == 'docker':
-        providers.docker()
-    elif provider == 'ec2':
-        providers.ec2()
-
+    ## Must come after all else, because logic may be done on params above.
+    if params['provider'] == 'digitalocean':
+        vagrant_providers.digitalocean()
+    elif params['provider'] == 'docker':
+        vagrant_providers.docker()
+    elif params['provider'] == 'ec2':
+        vagrant_providers.ec2()
+    elif params['provider'] == 'gce':
+        gce.up(**params)
 
     ## Add straight pass-through flags. Keep test for True/False explicit as only those values should work
     cmd = 'up'
-    if provision is True:
+    if params['provision'] is True:
         cmd = '{} {}'.format(cmd, '--provision')
-    elif provision is False:
+    elif params['provision'] is False:
         cmd = '{} {}'.format(cmd, '--no-provision')
 
-    if destroy_on_error is True:
+    if params['destroy_on_error'] is True:
         cmd = '{} {}'.format(cmd, '--destroy-on-error')
-    elif destroy_on_error is False:
+    elif params['destroy_on_error'] is False:
         cmd = '{} {}'.format(cmd, '--no-destroy-on-error')
 
     vagrant_general_command(cmd)
@@ -506,16 +439,6 @@ def vagrant_general_command(cmd):
     '''
     # Modify cmd in private function to keep enforcement of being a vagrant cmd there.
     _invoke_vagrant(cmd)
-
-## Unused defs
-def setup_lastpass():
-    utils.dir_create(os.path.join(utils.get_user_home(), '/.tmp-common'))
-    open(os.path.join(utils.get_user_home(), '/.tmp-common/install-lastpass-log'),'w')
-    utils.dir_create(os.path.join(utils.get_user_home(), '/.tmp-common'))
-    with open(os.path.join(utils.get_user_home(), '/.tmp-common/install-lastpass.sh'), 'w') as file_obj:
-        file_obj.write(install_lastpass)
-    # Not used, and won't work as is because we're now enforcing use of vagrant in private function.
-    vagrant_general_command(os.path.join('cd ', utils.get_user_home(), '/.tmp-common; bash install-lastpass.sh'), ' install-lastpass-log')
 
 
 class Run_app():
