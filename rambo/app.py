@@ -1,4 +1,3 @@
-import click
 import distutils
 import errno
 import json
@@ -57,10 +56,10 @@ def _invoke_vagrant(cmd=None):
                         del readable[fd]
                     else:
                         if fd == masters[0]: # We caught stdout
-                            click.echo(data.rstrip())
+                            utils.echo(data.rstrip())
                             utils.write_to_log(data)
                         else: # We caught stderr
-                            click.echo(data.rstrip(), err=True)
+                            utils.echo(data.rstrip(), err=True)
                             utils.write_to_log(data, 'stderr')
                         readable[fd].flush()
     for fd in masters:
@@ -140,7 +139,7 @@ def createproject(project_name, config_only=None):
         os.makedirs(path) # Make parent dirs if needed.
     except FileExistsError:
         utils.abort('Directory already exists.')
-    click.echo('Created %s project "%s" in %s.'
+    utils.echo('Created %s project "%s" in %s.'
                % (PROJECT_NAME.capitalize(), project_name, path))
     ## Fill project dir with basic configs.
     install_config(output_path=path)
@@ -176,8 +175,8 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'provider'))
     utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'random_tag'))
     utils.dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
-    click.echo('Temporary files removed')
-    click.echo('Destroy complete.')
+    utils.echo('Temporary files removed')
+    utils.echo('Destroy complete.')
 
 def export(resource=None, export_path=None, force=None):
     '''Drop default code in the CWD / user defined space. Operate on saltstack
@@ -224,7 +223,7 @@ def export(resource=None, export_path=None, force=None):
                 os.makedirs(os.path.dirname(dst), exist_ok=True) # Make parent dirs if needed. # Py 3.2+
                 shutil.copy(src, dst) # Copy file with overwrites.
 
-    click.echo('Done exporting %s code.' % resource)
+    utils.echo('Done exporting %s code.' % resource)
 
 def halt(ctx=None, *args):
     if not ctx: # Using API. Else handled by cli.
@@ -255,7 +254,7 @@ def install_auth(ctx=None, output_path=None):
         os.makedirs(license_dir)
     except FileExistsError:
         pass # Dir already created. Moving on.
-    click.echo('Any (license) files you put in %s will be synced into your VM.'
+    utils.echo('Any (license) files you put in %s will be synced into your VM.'
                % license_dir)
 
     for filename in os.listdir(os.path.join(get_env_var('env'), 'auth/env_scripts')):
@@ -264,9 +263,9 @@ def install_auth(ctx=None, output_path=None):
         if not os.path.isfile(dst):
             os.makedirs(dst_dir, exist_ok=True) # Make parent dirs if needed. # Py 3.2+
             shutil.copy(os.path.join(get_env_var('env'), 'auth/env_scripts', filename), dst)
-            click.echo('Added template key loading scripts %s to auth/keys.' % filename)
+            utils.echo('Added template key loading scripts %s to auth/keys.' % filename)
         else:
-            click.echo('File %s exists. Leaving it.' % dst)
+            utils.echo('File %s exists. Leaving it.' % dst)
 
     # TODO: Have Rambo optionally store the same keys that may be in auth/keys in metadata,
     # added from the cli/api. Automatically check if keys in metatdata and not keys
@@ -294,7 +293,7 @@ def install_config(ctx=None, output_path=None):
         with open(path, 'w') as f:
             f.write('[up]\nprovider = %s\nguest_os = %s\n'
                     % (SETTINGS['PROVIDERS_DEFAULT'], SETTINGS['GUEST_OSES_DEFAULT']))
-        click.echo('Created config at %s' % path)
+        utils.echo('Created config at %s' % path)
 
 def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins
@@ -306,7 +305,7 @@ def install_plugins(force=None, plugins=('all',)):
     host_system = platform.system()
     for plugin in plugins:
         if plugin == 'all':
-            click.echo('Installing all default plugins.')
+            utils.echo('Installing all default plugins.')
             for plugin in SETTINGS['PLUGINS'][host_system]:
                 _invoke_vagrant('plugin install %s' % plugin)
         elif plugin in SETTINGS['PLUGINS'][host_system]:

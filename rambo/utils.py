@@ -27,15 +27,18 @@ def read_specs():
         return None
     return data['specs']
 
-def abort(message):
-    msg = click.style(''.join(['ABORTED - ', message]), fg='red', bold=True)
+def abort(msg):
+    msg = click.style(''.join(['ABORTED - ', msg]), fg='red', bold=True)
     write_to_log(msg, 'stderr')
     sys.exit(msg)
 
-def warn(message):
-    msg = click.style(''.join(['WARNING - ', message]), fg='yellow')
+def echo(msg):
     write_to_log(msg)
     click.echo(msg)
+
+def warn(msg):
+    msg = click.style(''.join(['WARNING - ', msg]), fg='yellow')
+    echo(msg)
 
 def write_to_log(data=None, file_name=None):
     '''Write data to log files. Will append data to a single combined log.
