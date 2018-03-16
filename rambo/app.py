@@ -381,7 +381,6 @@ def ssh(ctx=None, command=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
-    # TODO: Better logs.
     if not ctx: # Using API. Else handled by cli.
         set_init_vars()
         set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
@@ -403,6 +402,9 @@ def up(ctx=None, **params):
 
     Agrs:
         ctx (object): Click Context object. Used to detect if CLI is used.
+        params (dict): Dict of all args passed to `up`.
+
+    In params, this takes:
         provider (str): Provider to use.
         guest_os (str): Guest OS to use.
         ram_size (int): RAM in MB to use.
@@ -423,7 +425,7 @@ def up(ctx=None, **params):
     with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json'), 'w') as fp:
         json.dump({'params': params}, fp, indent=4, sort_keys=True)
 
-    ## Option Handling - These might modify the params list or set env vars.
+    ## Option Handling - These might modify the params dict or set env vars.
     params = options.provider_option(params)
     params = options.guest_os_option(params)
     params = options.size_option(params) # both ram and drive size
