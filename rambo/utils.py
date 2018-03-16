@@ -19,6 +19,7 @@ def get_env_var(name):
     '''
     return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
 
+
 def abort(msg):
     msg = click.style(''.join(['ABORTED - ', msg]), fg='red', bold=True)
     write_to_log(msg, 'stderr')
@@ -31,6 +32,14 @@ def echo(msg, err=None):
     else:
         write_to_log(msg)
         click.echo(msg)
+
+def read_specs():
+    try:
+        with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json')) as fp:
+            data = json.load(fp)
+    except FileNotFoundError:
+        return None
+    return data['specs']
 
 def warn(msg):
     msg = click.style(''.join(['WARNING - ', msg]), fg='yellow')

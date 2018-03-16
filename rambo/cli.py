@@ -100,6 +100,9 @@ def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
     utils.write_to_log('\nNEW CMD', 'stderr')
     utils.write_to_log(' '.join(sys.argv), 'stderr')
 
+    app.write_to_log('\nNEW CMD', 'stderr')
+    app.write_to_log(' '.join(sys.argv), 'stderr')
+
 
 ### Subcommands
 @cli.command('createproject')
@@ -243,7 +246,6 @@ def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
               'A config file is automatically created when you run \n'
               'createproject. You can also make a config file manually.'
               % PROJECT_NAME)
-
     app.up(ctx, **ctx.params)
 
 @cli.command('vagrant', context_settings=VAGRANT_CMD_CONTEXT_SETTINGS,

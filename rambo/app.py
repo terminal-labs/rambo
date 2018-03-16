@@ -14,8 +14,10 @@ from subprocess import Popen
 from threading import Thread
 
 import rambo.options as options
+import rambo.providers.gce as gce
 import rambo.utils as utils
 import rambo.vagrant_providers as vagrant_providers
+from rambo.scripts import install_lastpass
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
 
@@ -162,7 +164,14 @@ def destroy(ctx=None, **params):
         set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
         set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
+    try:
+        if utils.read_specs()['provider'] == 'gce':
+            gce.destroy()
+    except TypeError:
+        pass
+
     vagrant_general_command('destroy --force')
+    utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json'))
     utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'provider'))
     utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'random_tag'))
     utils.dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
@@ -216,16 +225,19 @@ def export(resource=None, export_path=None, force=None):
 
     utils.echo('Done exporting %s code.' % resource)
 
-def halt(ctx=None, *args, **params):
+def halt(ctx=None, *args):
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
-        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
+        set_init_vars()
+        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
     else:
         args = ctx.args + list(args)
 
+    if utils.read_specs()['provider'] == 'gce':
+        gce.halt()
+
     vagrant_general_command('{} {}'.format('halt', ' '.join(args)))
 
-def install_auth(ctx=None, output_path=None, **params):
+def install_auth(ctx=None, output_path=None):
     '''Install auth directory.
 
     Agrs:
@@ -326,6 +338,9 @@ def scp(ctx=None, locations=None, **params):
 
     locations = [copy_from, copy_to]
 
+    if utils.read_specs()['provider'] == 'gce':
+        gce.scp(locations)
+
     vagrant_general_command('{} {}'.format('scp', ' '.join(locations)))
 
 def ssh(ctx=None, command=None, **params):
@@ -341,6 +356,9 @@ def ssh(ctx=None, command=None, **params):
     if not ctx: # Using API. Else handled by cli.
         set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
         set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
+
+    if utils.read_specs()['provider'] == 'gce':
+        gce.ssh()
 
     ## Add pass-through 'command' option.
     cmd = 'vagrant ssh'
@@ -376,6 +394,10 @@ def up(ctx=None, **params):
         set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
         set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
+    ## Save Initial command list
+    with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json'), 'w') as fp:
+        json.dump({'params': params}, fp, indent=4, sort_keys=True)
+
     ## Option Handling - These might modify the params dict or set env vars.
     params['guest_os'] = options.guest_os_option(params.get('guest_os'))
     params['machine_type'] = options.machine_type_option(params.get('machine_type'), params.get('provider'))
@@ -384,8 +406,15 @@ def up(ctx=None, **params):
         params.get('ram_size'), params.get('drive_size')) # both ram and drive size
     params['sync_dir'] = options.sync_dir_option(params.get('sync_dir'))
 
+    ## Save Specs
+    with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json')) as fp:
+        data = json.load(fp)
+    data.update({'specs': params})
+    with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json'), 'w') as fp:
+        json.dump(data, fp, indent=4, sort_keys=True)
+
     ## Provider specific handling.
-    ## Must come after all else, because logic may be done on params above.
+    ## Must come after all else, because logic may be done on env vars set above.
     if params['provider'] == 'digitalocean':
         vagrant_providers.digitalocean()
     elif params['provider'] == 'docker':
@@ -393,8 +422,7 @@ def up(ctx=None, **params):
     elif params['provider'] == 'ec2':
         vagrant_providers.ec2()
     elif params['provider'] == 'gce':
-        providers.gce(guest_os, ram_size, drive_size, machine_type,
-                      provision, destroy_on_error)
+        gce.up(**params)
 
     ## Add straight pass-through flags. Keep test for True/False explicit as only those values should work
     cmd = 'up'
