@@ -15,6 +15,7 @@ from select import select
 from subprocess import Popen
 from threading import Thread
 
+import rambo.options as options
 import rambo.providers.gce as gce
 import rambo.utils as utils
 import rambo.vagrant_providers as vagrant_providers
@@ -422,89 +423,13 @@ def up(ctx=None, **params):
     with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json'), 'w') as fp:
         json.dump({'params': params}, fp, indent=4, sort_keys=True)
 
-    ## provider.
-    if not params['provider']:
-        params['provider'] = SETTINGS['PROVIDERS_DEFAULT']
-    set_env_var('provider', params['provider'])
+    ## Option Handling - These might modify the params list or set env vars.
+    params = options.provider_option(params)
+    params = options.guest_os_option(params)
+    params = options.size_option(params) # both ram and drive size
+    params = options.machine_type_option(params)
 
-    if params['provider'] not in SETTINGS['PROVIDERS']:
-        msg = ('Provider "%s" is not in the provider list.\n'
-               'Did you have a typo? Here is as list of avalible providers:\n\n'
-               % params['provider'])
-        for supported_provider in SETTINGS['PROVIDERS']:
-            msg = msg + '%s\n' % supported_provider
-        utils.abort(msg)
-
-    ## guest_os
-    if not params['guest_os']:
-        params['guest_os'] = SETTINGS['GUEST_OSES_DEFAULT']
-    set_env_var('guest_os', params['guest_os'])
-
-    if params['guest_os'] not in SETTINGS['GUEST_OSES']:
-        msg = ('Guest OS "%s" is not in the guest OSes whitelist.\n'
-               'Did you have a typo? We\'ll try anyway.\n'
-               'Here is as list of avalible guest OSes:\n\n'
-               % params['guest_os'])
-        for supported_os in SETTINGS['GUEST_OSES']:
-            msg = msg + '%s\n' % supported_os
-        utils.warn(msg)
-
-    ## ram_size and drive_size (coupled)
-    # Cast to strings if they exist so they can stored as env vars.
-    if params['ram_size']:
-        params['ram_size'] = str(params['ram_size'])
-    if params['drive_size']:
-        params['drive_size'] = str(params['drive_size'])
-
-    if params['ram_size'] and not params['drive_size']:
-        try:
-            params['drive_size'] = SETTINGS['SIZES'][params['ram_size']]
-        except KeyError: # Doesn't match, but we'll let them try it.
-            params['drive_size'] = SETTINGS['DRIVESIZE_DEFAULT']
-    elif params['drive_size'] and not params['ram_size']:
-        try:
-            params['ram_size'] = list(SETTINGS['SIZES'].keys())[
-                list(SETTINGS['SIZES'].values()).index(params['drive_size'])]
-        except ValueError: # Doesn't match, but we'll let them try it.
-            params['ram_size'] = SETTINGS['RAMSIZE_DEFAULT']
-    elif not params['ram_size'] and not params['drive_size']:
-        params['ram_size'] = SETTINGS['RAMSIZE_DEFAULT']
-        params['drive_size'] = SETTINGS['DRIVESIZE_DEFAULT']
-    # else both exist, just try using them
-
-    set_env_var('ramsize', params['ram_size'])
-    set_env_var('drivesize', params['drive_size'])
-
-    ## ram_size
-    if params['ram_size'] not in iter(SETTINGS['SIZES']):
-        msg = ('RAM Size "%s" is not in the RAM sizes list.\n'
-               'Did you have a typo? We\'ll try anyway.\n'
-               'Here is as list of avalible RAM sizes:\n\n'
-               % params['ram_size'])
-        for supported_ram_size in iter(SETTINGS['SIZES']):
-            msg = msg + '%s\n' % supported_ram_size
-        utils.warn(msg)
-
-    ## drive_size
-    if params['drive_size'] not in iter(SETTINGS['SIZES'].values()):
-        msg = ('DRIVE Size "%s" is not in the DRIVE sizes list.\n'
-               'Did you have a typo? We\'ll try anyway.\n'
-               'Here is as list of avalible DRIVE sizes:\n\n'
-               % params['drive_size'])
-        for supported_drive_size in iter(SETTINGS['SIZES'].values()):
-            msg = msg + '%s\n' % supported_drive_size
-        utils.warn(msg)
-
-    ## Cloud-specific machine_type
-    if params['machine_type']:
-        if params['provider'] in ('docker', 'lxc', 'virtualbox'):
-            msg = ('You have selected a machine-type, but are not using\n'
-                   'a cloud provider. You selected %s with %s.\n'
-                   % (params['machine_type'], params['provider']))
-            utils.abort(msg)
-        set_env_var('machinetype', params['machine_type'])
-
-    ## Save Specs
+    ## Save Specs (same `params` now modified)
     with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json')) as fp:
         data = json.load(fp)
     data.update({'specs': params})
@@ -512,7 +437,7 @@ def up(ctx=None, **params):
         json.dump(data, fp, indent=4, sort_keys=True)
 
     ## Provider specific handling.
-    ## Must come after all else, because logic may be done on env vars set above.
+    ## Must come after all else, because logic may be done on params above.
     if params['provider'] == 'digitalocean':
         vagrant_providers.digitalocean()
     elif params['provider'] == 'docker':

@@ -240,8 +240,7 @@ def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
               'A config file is automatically created when you run \n'
               'createproject. You can also make a config file manually.'
               % PROJECT_NAME)
-    # import ipdb
-    # ipdb.set_trace()
+
     app.up(ctx, **ctx.params)
 
 @cli.command('vagrant', context_settings=VAGRANT_CMD_CONTEXT_SETTINGS,
