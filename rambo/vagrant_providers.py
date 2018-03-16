@@ -42,8 +42,3 @@ def ec2():
         abort('Sorry, we really need a RAM size from our whitelist for '
               'digitalocean. \nThe only way around that is if you specify '
               'a machine-type like m3.medium.')
-
-def gce(guest_os=None, ram_size=None, drive_size=None, machine_type=None,
-        provision=None, destroy_on_error=None):
-    print(guest_os, ram_size, drive_size, machine_type, provision, destroy_on_error)
-    abort('got google?')

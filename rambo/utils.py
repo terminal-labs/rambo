@@ -19,6 +19,14 @@ def get_env_var(name):
     '''
     return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
 
+def read_specs():
+    try:
+        with open(os.path.join(get_env_var('TMPDIR_PATH'), 'instance.json')) as fp:
+            data = json.load(fp)
+    except FileNotFoundError:
+        return None
+    return data['specs']
+
 def abort(message):
     sys.exit(click.style(''.join(['ABORTED - ', message]), fg='red', bold=True))
 

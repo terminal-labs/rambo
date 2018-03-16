@@ -96,6 +96,9 @@ def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
     app.write_to_log('\nNEW CMD')
     app.write_to_log(' '.join(sys.argv))
 
+    app.write_to_log('\nNEW CMD', 'stderr')
+    app.write_to_log(' '.join(sys.argv), 'stderr')
+
 
 ### Subcommands
 @cli.command('createproject')
@@ -146,7 +149,7 @@ def halt_cmd(ctx):
     '''Tells Vagrant to 'halt' the VM. Useful to free the Host's
     resources without destroying the VM.
     '''
-    app.vagrant_general_command('{} {}'.format('halt', ' '.join(ctx.args)))
+    app.halt(ctx)
 
 
 @cli.command('install-plugins', context_settings=CONTEXT_SETTINGS,
@@ -237,9 +240,9 @@ def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
               'A config file is automatically created when you run \n'
               'createproject. You can also make a config file manually.'
               % PROJECT_NAME)
-
-    app.up(ctx, provider, guest_os, ram_size, drive_size, machine_type,
-           provision, destroy_on_error)
+    # import ipdb
+    # ipdb.set_trace()
+    app.up(ctx, **ctx.params)
 
 @cli.command('vagrant', context_settings=VAGRANT_CMD_CONTEXT_SETTINGS,
              short_help='Run a vagrant command through rambo.')
