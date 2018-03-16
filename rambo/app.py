@@ -23,37 +23,6 @@ from rambo.scripts import install_lastpass
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
 
-
-def write_to_log(data=None, file_name=None):
-    '''Write data to log files. Will append data to a single combined log.
-    Additionally write data to a log with a custom name (such as stderr)
-    for any custom logs.
-
-    Args:
-        data (str or bytes): Data to write to log file.
-        file_name (str): Used to create (or append to) an additional
-                         log file with a custom name. Custom name always gets
-                         `.log` added to the end.
-    '''
-    try:
-        data = data.decode('utf-8')
-    except AttributeError:
-        pass # already a string
-
-    # strip possible eol chars and add back exactly one
-    data = ''.join([data.rstrip(), '\n'])
-
-    utils.dir_create(get_env_var('LOG_PATH'))
-    fd_path = os.path.join(get_env_var('LOG_PATH'), 'history.log')
-    fd = open(fd_path, 'a+')
-    fd.write(data)
-    fd.close()
-    if file_name:
-        fd_custom_path = os.path.join(get_env_var('LOG_PATH'), ''.join([file_name, '.log']))
-        fd_custom = open(fd_custom_path, 'a+')
-        fd_custom.write(data)
-        fd_custom.close()
-
 def _invoke_vagrant(cmd=None):
     '''Pass a command to vagrant. This outputs in near real-time,
     logs both stderr and stdout in a combined file, and detects stderr for
@@ -89,10 +58,10 @@ def _invoke_vagrant(cmd=None):
                     else:
                         if fd == masters[0]: # We caught stdout
                             click.echo(data.rstrip())
-                            write_to_log(data)
+                            utils.write_to_log(data)
                         else: # We caught stderr
                             click.echo(data.rstrip(), err=True)
-                            write_to_log(data, 'stderr')
+                            utils.write_to_log(data, 'stderr')
                         readable[fd].flush()
     for fd in masters:
         os.close(fd)

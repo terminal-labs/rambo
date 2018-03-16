@@ -33,6 +33,36 @@ def abort(message):
 def warn(message):
     click.secho(''.join(['WARNING - ', message]), fg='yellow')
 
+def write_to_log(data=None, file_name=None):
+    '''Write data to log files. Will append data to a single combined log.
+    Additionally write data to a log with a custom name (such as stderr)
+    for any custom logs.
+
+    Args:
+        data (str or bytes): Data to write to log file.
+        file_name (str): Used to create (or append to) an additional
+                         log file with a custom name. Custom name always gets
+                         `.log` added to the end.
+    '''
+    try:
+        data = data.decode('utf-8')
+    except AttributeError:
+        pass # already a string
+
+    # strip possible eol chars and add back exactly one
+    data = ''.join([data.rstrip(), '\n'])
+
+    dir_create(get_env_var('LOG_PATH'))
+    fd_path = os.path.join(get_env_var('LOG_PATH'), 'history.log')
+    fd = open(fd_path, 'a+')
+    fd.write(data)
+    fd.close()
+    if file_name:
+        fd_custom_path = os.path.join(get_env_var('LOG_PATH'), ''.join([file_name, '.log']))
+        fd_custom = open(fd_custom_path, 'a+')
+        fd_custom.write(data)
+        fd_custom.close()
+
 def dir_exists(path):
     return os.path.isdir(path)
 
