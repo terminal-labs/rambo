@@ -371,11 +371,11 @@ def up(ctx=None, **params):
         set_vagrant_vars(params.get(vagrant_cwd), params.get(vagrant_dotfile_path))
 
     ## Option Handling - These might modify the params dict or set env vars.
-    params['provider'] = options.provider_option(params['provider'])
     params['guest_os'] = options.guest_os_option(params['guest_os'])
+    params['machine_type'] = options.machine_type_option(params['machine_type'])
+    params['provider'] = options.provider_option(params['provider'])
     params['ram_size'], params['drive_size'] = options.size_option(
         params['ram_size'], params['drive_size']) # both ram and drive size
-    params['machine_type'] = options.machine_type_option(params['machine_type'])
 
     ## Provider specific handling.
     ## Must come after all else, because logic may be done on params above.

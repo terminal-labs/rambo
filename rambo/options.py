@@ -2,27 +2,6 @@ import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
 
-def provider_option(provider=None):
-    '''Validate provider. If not supplied, set to default. Set as env var.
-
-    Args:
-        provider (str): Provider to use.
-
-    Return provider (str)
-    '''
-    if not provider:
-        provider = SETTINGS['PROVIDERS_DEFAULT']
-    set_env_var('provider', provider)
-
-    if provider not in SETTINGS['PROVIDERS']:
-        msg = ('Provider "%s" is not in the provider list.\n'
-           'Did you have a typo? Here is as list of avalible providers:\n\n'
-           % provider)
-        for supported_provider in SETTINGS['PROVIDERS']:
-            msg = msg + '%s\n' % supported_provider
-        utils.abort(msg)
-    return provider
-
 def guest_os_option(guest_os=None):
     '''Validate guest_os. If not supplied, set to default. Set as env var.
 
@@ -44,6 +23,44 @@ def guest_os_option(guest_os=None):
             msg = msg + '%s\n' % supported_os
         utils.warn(msg)
     return guest_os
+
+def machine_type_option(machine_type=None):
+    '''Validate machine_type. If not supplied, set to default. Set as env var.
+
+    Args:
+        machine_type (str): Machine type to use for cloud providers.
+
+    Return machine_type (str)
+    '''
+    if machine_type:
+        if params['provider'] in ('docker', 'lxc', 'virtualbox'):
+            msg = ('You have selected a machine-type, but are not using\n'
+                   'a cloud provider. You selected %s with %s.\n'
+                   % (machine_type, params['provider']))
+            utils.abort(msg)
+        set_env_var('machinetype', machine_type)
+    return machine_type
+
+def provider_option(provider=None):
+    '''Validate provider. If not supplied, set to default. Set as env var.
+
+    Args:
+        provider (str): Provider to use.
+
+    Return provider (str)
+    '''
+    if not provider:
+        provider = SETTINGS['PROVIDERS_DEFAULT']
+    set_env_var('provider', provider)
+
+    if provider not in SETTINGS['PROVIDERS']:
+        msg = ('Provider "%s" is not in the provider list.\n'
+           'Did you have a typo? Here is as list of avalible providers:\n\n'
+           % provider)
+        for supported_provider in SETTINGS['PROVIDERS']:
+            msg = msg + '%s\n' % supported_provider
+        utils.abort(msg)
+    return provider
 
 def size_option(ram_size=None, drive_size=None):
     '''Validate ram and drive sizes. Pair them if possible. If not
@@ -100,20 +117,3 @@ def size_option(ram_size=None, drive_size=None):
             msg = msg + '%s\n' % supported_drive_size
         utils.warn(msg)
     return (ram_size, drive_size)
-
-def machine_type_option(machine_type=None):
-    '''Validate machine_type. If not supplied, set to default. Set as env var.
-
-    Args:
-        machine_type (str): Machine type to use for cloud providers.
-
-    Return machine_type (str)
-    '''
-    if machine_type:
-        if params['provider'] in ('docker', 'lxc', 'virtualbox'):
-            msg = ('You have selected a machine-type, but are not using\n'
-                   'a cloud provider. You selected %s with %s.\n'
-                   % (machine_type, params['provider']))
-            utils.abort(msg)
-        set_env_var('machinetype', machine_type)
-    return machine_type
