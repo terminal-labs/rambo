@@ -414,7 +414,7 @@ def up(ctx=None, **params):
         json.dump(data, fp, indent=4, sort_keys=True)
 
     ## Provider specific handling.
-    ## Must come after all else, because logic may be done on params set above.
+    ## Must come after all else, because above logic may have modified params.
     if params['provider'] == 'digitalocean':
         vagrant_providers.digitalocean()
     elif params['provider'] == 'docker':
