@@ -18,7 +18,6 @@ import rambo.options as options
 import rambo.providers.gce as gce
 import rambo.utils as utils
 import rambo.vagrant_providers as vagrant_providers
-from rambo.scripts import install_lastpass
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
 
@@ -415,7 +414,7 @@ def up(ctx=None, **params):
         json.dump(data, fp, indent=4, sort_keys=True)
 
     ## Provider specific handling.
-    ## Must come after all else, because logic may be done on env vars set above.
+    ## Must come after all else, because logic may be done on params set above.
     if params['provider'] == 'digitalocean':
         vagrant_providers.digitalocean()
     elif params['provider'] == 'docker':
