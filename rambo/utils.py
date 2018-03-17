@@ -24,9 +24,13 @@ def abort(msg):
     write_to_log(msg, 'stderr')
     sys.exit(msg)
 
-def echo(msg):
-    write_to_log(msg)
-    click.echo(msg)
+def echo(msg, err=None):
+    if err:
+        write_to_log(msg, 'stderr')
+        click.echo(msg, err=err)
+    else:
+        write_to_log(msg)
+        click.echo(msg)
 
 def warn(msg):
     msg = click.style(''.join(['WARNING - ', msg]), fg='yellow')
