@@ -19,11 +19,52 @@ def get_env_var(name):
     '''
     return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
 
-def abort(message):
-    sys.exit(click.style(''.join(['ABORTED - ', message]), fg='red', bold=True))
+def abort(msg):
+    msg = click.style(''.join(['ABORTED - ', msg]), fg='red', bold=True)
+    write_to_log(msg, 'stderr')
+    sys.exit(msg)
 
-def warn(message):
-    click.secho(''.join(['WARNING - ', message]), fg='yellow')
+def echo(msg, err=None):
+    if err:
+        write_to_log(msg, 'stderr')
+        click.echo(msg, err=err)
+    else:
+        write_to_log(msg)
+        click.echo(msg)
+
+def warn(msg):
+    msg = click.style(''.join(['WARNING - ', msg]), fg='yellow')
+    echo(msg)
+
+def write_to_log(data=None, file_name=None):
+    '''Write data to log files. Will append data to a single combined log.
+    Additionally write data to a log with a custom name (such as stderr)
+    for any custom logs.
+
+    Args:
+        data (str or bytes): Data to write to log file.
+        file_name (str): Used to create (or append to) an additional
+                         log file with a custom name. Custom name always gets
+                         `.log` added to the end.
+    '''
+    try:
+        data = data.decode('utf-8')
+    except AttributeError:
+        pass # already a string
+
+    # strip possible eol chars and add back exactly one
+    data = ''.join([data.rstrip(), '\n'])
+
+    dir_create(get_env_var('LOG_PATH'))
+    fd_path = os.path.join(get_env_var('LOG_PATH'), 'history.log')
+    fd = open(fd_path, 'a+')
+    fd.write(data)
+    fd.close()
+    if file_name:
+        fd_custom_path = os.path.join(get_env_var('LOG_PATH'), ''.join([file_name, '.log']))
+        fd_custom = open(fd_custom_path, 'a+')
+        fd_custom.write(data)
+        fd_custom.close()
 
 def dir_exists(path):
     return os.path.isdir(path)
