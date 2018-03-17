@@ -353,7 +353,7 @@ def up(ctx=None, **params):
         ctx (object): Click Context object. Used to detect if CLI is used.
         params (dict): Dict of all args passed to `up`.
 
-    In params, this takes:
+    In params, this looks for:
         provider (str): Provider to use.
         guest_os (str): Guest OS to use.
         ram_size (int): RAM in MB to use.
