@@ -24,19 +24,20 @@ def guest_os_option(guest_os=None):
         utils.warn(msg)
     return guest_os
 
-def machine_type_option(machine_type=None):
+def machine_type_option(machine_type=None, provider=None):
     '''Validate machine_type. If not supplied, set to default. Set as env var.
 
     Args:
         machine_type (str): Machine type to use for cloud providers.
+        provider (str): Provider to use.
 
     Return machine_type (str)
     '''
     if machine_type:
-        if params['provider'] in ('docker', 'lxc', 'virtualbox'):
+        if provider in ('docker', 'lxc', 'virtualbox'):
             msg = ('You have selected a machine-type, but are not using\n'
                    'a cloud provider. You selected %s with %s.\n'
-                   % (machine_type, params['provider']))
+                   % (machine_type, provider))
             utils.abort(msg)
         set_env_var('machinetype', machine_type)
     return machine_type

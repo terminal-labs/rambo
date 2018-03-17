@@ -372,7 +372,7 @@ def up(ctx=None, **params):
 
     ## Option Handling - These might modify the params dict or set env vars.
     params['guest_os'] = options.guest_os_option(params['guest_os'])
-    params['machine_type'] = options.machine_type_option(params['machine_type'])
+    params['machine_type'] = options.machine_type_option(params['machine_type'], params['provider'])
     params['provider'] = options.provider_option(params['provider'])
     params['ram_size'], params['drive_size'] = options.size_option(
         params['ram_size'], params['drive_size']) # both ram and drive size
