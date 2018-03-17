@@ -100,9 +100,6 @@ def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
     utils.write_to_log('\nNEW CMD', 'stderr')
     utils.write_to_log(' '.join(sys.argv), 'stderr')
 
-    app.write_to_log('\nNEW CMD', 'stderr')
-    app.write_to_log(' '.join(sys.argv), 'stderr')
-
 
 ### Subcommands
 @cli.command('createproject')

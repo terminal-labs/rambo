@@ -1,5 +1,6 @@
 import distutils
 import errno
+import json
 import os
 import platform
 import pty
