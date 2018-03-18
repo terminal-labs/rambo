@@ -144,7 +144,7 @@ def createproject(project_name, config_only=None):
         export('saltstack', path)
         install_auth(output_path=path)
 
-def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def destroy(ctx=None, **params):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -158,8 +158,8 @@ def destroy(ctx=None, vagrant_cwd=None, vagrant_dotfile_path=None):
     # TODO add an --all flag to delete the whole .rambo-tmp dir. Default leaves logs.
 
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars()
-        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+        set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
+        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
     vagrant_general_command('destroy --force')
     utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'provider'))
@@ -215,16 +215,16 @@ def export(resource=None, export_path=None, force=None):
 
     utils.echo('Done exporting %s code.' % resource)
 
-def halt(ctx=None, *args):
+def halt(ctx=None, *args, **params):
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars()
-        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+        set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
+        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
     else:
         args = ctx.args + list(args)
 
     vagrant_general_command('{} {}'.format('halt', ' '.join(args)))
 
-def install_auth(ctx=None, output_path=None):
+def install_auth(ctx=None, output_path=None, **params):
     '''Install auth directory.
 
     Agrs:
@@ -232,7 +232,7 @@ def install_auth(ctx=None, output_path=None):
         output_path (path): Path to place auth dir.
     '''
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars()
+        set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
 
     if not output_path:
         output_path = get_env_var('cwd')
@@ -260,7 +260,7 @@ def install_auth(ctx=None, output_path=None):
     # and not needing the auth key scripts.
     # load_provider_keys()
 
-def install_config(ctx=None, output_path=None):
+def install_config(ctx=None, output_path=None, **params):
     '''Install config file.
 
     Agrs:
@@ -268,7 +268,7 @@ def install_config(ctx=None, output_path=None):
         output_path (path): Path to place conf file.
     '''
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars()
+        set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
 
     if not output_path:
         output_path = get_env_var('cwd')
@@ -303,10 +303,14 @@ def install_plugins(force=None, plugins=('all',)):
                           'to install anyway?' % plugin, abort=True)
             vagrant_general_command('plugin install %s' % plugin)
 
-def scp(ctx=None, locations=None):
+def scp(ctx=None, locations=None, **params):
     '''Transfer file or dir with scp. This makes use of the vagrant-scp plugin,
     which allows for simplified args.
     '''
+    if not ctx: # Using API. Else handled by cli.
+        set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
+        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
+
     if len(locations)!=2:
         utils.abort("There needs to be exactly two arguments for scp, a 'from' location "
                     "and a 'to' location.\nYou gave: %s." % ' '.join(locations))
@@ -323,7 +327,7 @@ def scp(ctx=None, locations=None):
 
     vagrant_general_command('{} {}'.format('scp', ' '.join(locations)))
 
-def ssh(ctx=None, command=None, vagrant_cwd=None, vagrant_dotfile_path=None):
+def ssh(ctx=None, command=None, **params):
     '''Connect to an running VM / container over ssh.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -334,8 +338,8 @@ def ssh(ctx=None, command=None, vagrant_cwd=None, vagrant_dotfile_path=None):
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars()
-        set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+        set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
+        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
     ## Add pass-through 'command' option.
     cmd = 'vagrant ssh'
@@ -367,15 +371,15 @@ def up(ctx=None, **params):
     # TODO: Add registering of VM for all of this installation to see
 
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars()
-        set_vagrant_vars(params.get(vagrant_cwd), params.get(vagrant_dotfile_path))
+        set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
+        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
     ## Option Handling - These might modify the params dict or set env vars.
-    params['guest_os'] = options.guest_os_option(params['guest_os'])
-    params['machine_type'] = options.machine_type_option(params['machine_type'], params['provider'])
-    params['provider'] = options.provider_option(params['provider'])
+    params['guest_os'] = options.guest_os_option(params.get('guest_os'))
+    params['machine_type'] = options.machine_type_option(params.get('machine_type'), params.get('provider'))
+    params['provider'] = options.provider_option(params.get('provider'))
     params['ram_size'], params['drive_size'] = options.size_option(
-        params['ram_size'], params['drive_size']) # both ram and drive size
+        params.get('ram_size'), params.get('drive_size')) # both ram and drive size
 
     ## Provider specific handling.
     ## Must come after all else, because logic may be done on params above.
@@ -388,14 +392,14 @@ def up(ctx=None, **params):
 
     ## Add straight pass-through flags. Keep test for True/False explicit as only those values should work
     cmd = 'up'
-    if params['provision'] is True:
+    if params.get('provision') is True:
         cmd = '{} {}'.format(cmd, '--provision')
-    elif params['provision'] is False:
+    elif params.get('provision') is False:
         cmd = '{} {}'.format(cmd, '--no-provision')
 
-    if params['destroy_on_error'] is True:
+    if params.get('destroy_on_error') is True:
         cmd = '{} {}'.format(cmd, '--destroy-on-error')
-    elif params['destroy_on_error'] is False:
+    elif params.get('destroy_on_error') is False:
         cmd = '{} {}'.format(cmd, '--no-destroy-on-error')
 
     vagrant_general_command(cmd)
