@@ -5,8 +5,8 @@ import pkg_resources
 
 import click
 
-from rambo.click_configfile import ConfigFileReader, Param, SectionSchema
-from rambo.click_configfile import matches_section
+from click_configfile import ConfigFileReader, Param, SectionSchema
+from click_configfile import matches_section
 
 import rambo.app as app
 import rambo.utils as utils
