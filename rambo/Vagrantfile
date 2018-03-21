@@ -82,7 +82,12 @@ custom_code_dirs = [
 # Provisioning
 Vagrant.configure("2") do |config|
   if get_env_var_rb('SYNC') != 'disabled'
-    config.vm.synced_folder '.', "/vagrant",
+    if get_env_var_rb('syncdir')
+      sync_dir = get_env_var_rb('syncdir')
+    else
+      sync_dir = '.'
+    end
+    config.vm.synced_folder sync_dir, "/vagrant",
       type: get_env_var_rb('SYNC'),
       rsync__exclude: ['saltstack/'] # only provisioning code in project dir
     for custom_code_dir in custom_code_dirs
