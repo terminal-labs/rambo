@@ -129,7 +129,6 @@ def sync_dir_option(sync_dir=None):
 
     Return sync_dir (path)
     '''
-
     if not sync_dir:
         sync_dir = os.getcwd()
 
