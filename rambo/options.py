@@ -1,3 +1,5 @@
+import os
+
 import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
@@ -129,7 +131,7 @@ def sync_dir_option(sync_dir=None):
     '''
 
     if not sync_dir:
-        sync_dir = '.'
+        sync_dir = os.getcwd()
 
     set_env_var('sync_dir', sync_dir)
 
