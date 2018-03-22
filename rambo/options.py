@@ -10,10 +10,13 @@ def guest_sync_dir(sync_dir=None):
 
     Return sync_dir (str)
     '''
-    if sync_dir:
-        return sync_dir
-    else:
-        return '.'
+
+    if not sync_dir:
+        sync_dir = '.'
+
+    set_env_var('syncdir', sync_dir)
+
+    return sync_dir
 
 def guest_os_option(guest_os=None):
     '''Validate guest_os. If not supplied, set to default. Set as env var.

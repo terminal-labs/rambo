@@ -404,8 +404,6 @@ def up(ctx=None, **params):
     elif params.get('destroy_on_error') is False:
         cmd = '{} {}'.format(cmd, '--no-destroy-on-error')
 
-    set_env_var('syncdir', params.get('sync_dir'))
-
     vagrant_general_command(cmd)
 
 def vagrant_general_command(cmd):
