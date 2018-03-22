@@ -13,7 +13,7 @@ def random_tag
 end
 
 def read_provider_file
-  tmp_dir = get_env_var_rb('TMPDIR_PATH')
+  tmp_dir = get_env_var_rb('TMPDIR_PATH') || File.join(Dir.pwd, '.' + PROJECT_NAME + '-tmp')
   provider_path = File.join(tmp_dir, 'provider')
   if File.file?(provider_path)
     provider=''
