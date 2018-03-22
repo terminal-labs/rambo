@@ -2,22 +2,6 @@ import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
 
-def sync_dir_option(sync_dir=None):
-    '''Validate sync_dir. If not supplied, set to default. Set as env var.
-
-    Args:
-        sync_dir: Path to sync into VM.
-
-    Return sync_dir (str)
-    '''
-
-    if not sync_dir:
-        sync_dir = '.'
-
-    set_env_var('sync_dir', sync_dir)
-
-    return sync_dir
-
 def guest_os_option(guest_os=None):
     '''Validate guest_os. If not supplied, set to default. Set as env var.
 
@@ -134,3 +118,19 @@ def size_option(ram_size=None, drive_size=None):
             msg = msg + '%s\n' % supported_drive_size
         utils.warn(msg)
     return (ram_size, drive_size)
+
+def sync_dir_option(sync_dir=None):
+    '''Validate sync_dir. If not supplied, set to default. Set as env var.
+
+    Args:
+        sync_dir: Path to sync into VM.
+
+    Return sync_dir (path)
+    '''
+
+    if not sync_dir:
+        sync_dir = '.'
+
+    set_env_var('sync_dir', sync_dir)
+
+    return sync_dir
