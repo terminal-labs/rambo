@@ -38,7 +38,7 @@ class ConfigSectionSchema(object):
         machine_type       = Param(type=str)
         provision          = Param(type=bool)
         destroy_on_error   = Param(type=bool)
-        sync_dir           = Param(type=str)
+        sync_dir           = Param(type=click.Path())
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -229,8 +229,8 @@ def ssh_cmd(ctx, command):
               help='Enable or disable provisioning')
 @click.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
-@click.option('--sync-dir', default=None,
-              help='Path os dir to rsync into rambo instance')
+@click.option('--sync-dir', type=click.Path(),
+              help='Path to sync into VM')
 @click.pass_context
 def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
            provision, destroy_on_error, sync_dir):
