@@ -69,6 +69,9 @@ end
 unless get_env_var_rb('DRIVESIZE')
   set_env_var_rb('DRIVESIZE', SETTINGS['DRIVESIZE_DEFAULT'])
 end
+unless get_env_var_rb('sync_dir')
+  set_env_var_rb('sync_dir', '.')
+end
 
 custom_code_dirs = [
   'ansible',
@@ -82,7 +85,7 @@ custom_code_dirs = [
 # Provisioning
 Vagrant.configure("2") do |config|
   if get_env_var_rb('SYNC') != 'disabled'
-    config.vm.synced_folder '.', "/vagrant",
+    config.vm.synced_folder get_env_var_rb('sync_dir'), "/vagrant",
       type: get_env_var_rb('SYNC'),
       rsync__exclude: ['saltstack/'] # only provisioning code in project dir
     for custom_code_dir in custom_code_dirs

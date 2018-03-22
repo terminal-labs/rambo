@@ -36,6 +36,7 @@ class ConfigSectionSchema(object):
         ram_size           = Param(type=int)
         drive_size         = Param(type=int)
         machine_type       = Param(type=str)
+        sync_dir           = Param(type=click.Path())
         provision          = Param(type=bool)
         destroy_on_error   = Param(type=bool)
 
@@ -224,13 +225,15 @@ def ssh_cmd(ctx, command):
 @click.option('-m', '--machine-type', type=str,
               help='Machine type for cloud providers.\n'
               'E.g. m5.medium for ec2, or s-8vcpu-32gb for digitalocean.\n')
+@click.option('--sync-dir', type=click.Path(),
+              help='Path to sync into VM')
 @click.option('--provision/--no-provision', default=None,
               help='Enable or disable provisioning')
 @click.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
 @click.pass_context
 def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
-           provision, destroy_on_error):
+           sync_dir, provision, destroy_on_error):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.

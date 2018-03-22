@@ -364,6 +364,7 @@ def up(ctx=None, **params):
         ram_size (int): RAM in MB to use.
         drive_size (int): Drive size in GB to use.
         machine_type (str): Machine type to use for cloud providers.
+        sync_dir (path): Path to sync into VM.
         provision (bool): vagrant provisioning flag.
         destroy_on_error (bool): vagrant destroy-on-error flag.
         vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
@@ -381,6 +382,7 @@ def up(ctx=None, **params):
     params['provider'] = options.provider_option(params.get('provider'))
     params['ram_size'], params['drive_size'] = options.size_option(
         params.get('ram_size'), params.get('drive_size')) # both ram and drive size
+    params['sync_dir'] = options.sync_dir_option(params.get('sync_dir'))
 
     ## Provider specific handling.
     ## Must come after all else, because logic may be done on params above.
