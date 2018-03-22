@@ -84,6 +84,7 @@ def set_init_vars(cwd=None, tmpdir_path=None):
         except FileNotFoundError:
             utils.abort('Your current working directory no longer exists. '
                   'Did you delete it? Check for it with `ls ..`')
+    os.chdir(get_env_var('cwd'))
 
     # loc of tmpdir_path
     if tmpdir_path: # cli / api
