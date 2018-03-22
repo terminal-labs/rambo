@@ -13,7 +13,7 @@ def random_tag
 end
 
 def read_provider_file
-  tmp_dir = get_env_var_rb('TMPDIR_PATH') || File.join(Dir.pwd, '.' + PROJECT_NAME + '-tmp')
+  tmp_dir = get_env_var_rb('TMPDIR_PATH')
   provider_path = File.join(tmp_dir, 'provider')
   if File.file?(provider_path)
     provider=''
@@ -29,6 +29,10 @@ end
 def write_provider_file(provider)
   tmp_dir = get_env_var_rb('TMPDIR_PATH') || File.join(Dir.pwd,  '.' + PROJECT_NAME + '-tmp')
   provider_path = File.join(tmp_dir, 'provider')
+  dirname = File.dirname(provider_path)
+  unless File.directory?(dirname)
+    FileUtils.mkdir_p(dirname)
+  end
   File.write(provider_path, provider)
 end
 

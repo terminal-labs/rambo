@@ -2,6 +2,19 @@ import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
 
+def guest_name_option(guest_name=None):
+    '''Validate guest_name. If not supplied, set to default. Set as env var.
+
+    Args:
+        guest_name (str): Guest name to use.
+
+    Return guest_name (str)
+    '''
+    if guest_name:
+        return guest_name
+    else:
+        return "DEFAULT"
+
 def guest_os_option(guest_os=None):
     '''Validate guest_os. If not supplied, set to default. Set as env var.
 

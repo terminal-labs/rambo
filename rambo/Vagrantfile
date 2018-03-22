@@ -16,7 +16,11 @@ require_relative "vagrant/modules.rb" # for random_tag
 ## Default Settings
 SETTINGS = JSON.parse(File.read('settings.json'))
 PROJECT_NAME = SETTINGS["PROJECT_NAME"]
-VM_NAME = PROJECT_NAME + "-" + random_tag()
+if get_env_var_rb("GUESTNAME") != "DEFAULT"
+  VM_NAME = get_env_var_rb("GUESTNAME")
+else
+  VM_NAME = PROJECT_NAME + "-" + random_tag()
+end
 FORWARD_SSH = true
 CUSTOM_PKG_SRC = true
 PROVISION_WITH_SALT = true

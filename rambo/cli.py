@@ -38,6 +38,7 @@ class ConfigSectionSchema(object):
         machine_type       = Param(type=str)
         provision          = Param(type=bool)
         destroy_on_error   = Param(type=bool)
+        guest_name         = Param(type=str)
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -228,9 +229,11 @@ def ssh_cmd(ctx, command):
               help='Enable or disable provisioning')
 @click.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
+@click.option('--guest-name', default=None,
+              help='Set guest name')
 @click.pass_context
 def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
-           provision, destroy_on_error):
+           provision, destroy_on_error, guest_name):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.
