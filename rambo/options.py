@@ -2,7 +2,7 @@ import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
 
-def guest_sync_dir(sync_dir=None):
+def sync_dir_option(sync_dir=None):
     '''Validate sync_dir. If not supplied, set to default. Set as env var.
 
     Args:
@@ -14,7 +14,7 @@ def guest_sync_dir(sync_dir=None):
     if not sync_dir:
         sync_dir = '.'
 
-    set_env_var('syncdir', sync_dir)
+    set_env_var('sync_dir', sync_dir)
 
     return sync_dir
 

@@ -82,8 +82,8 @@ custom_code_dirs = [
 # Provisioning
 Vagrant.configure("2") do |config|
   if get_env_var_rb('SYNC') != 'disabled'
-    if get_env_var_rb('syncdir')
-      sync_dir = get_env_var_rb('syncdir')
+    if get_env_var_rb('sync_dir')
+      sync_dir = get_env_var_rb('sync_dir')
     else
       sync_dir = '.'
     end
