@@ -1,5 +1,20 @@
 # Changelog
 
+## TBD
+
+FEATURES:
+
+- Add option to set path to sync into VM.
+
+IMPROVEMENTS:
+
+- More comprehensive logging.
+
+BUGFIX:
+
+- Fix bug when setting machine-type.
+- Fix ability to set cwd.
+
 ## 0.4.4 (March 9, 2018)
 
 BUGFIX:
