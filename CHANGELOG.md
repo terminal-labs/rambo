@@ -8,6 +8,7 @@ FEATURES:
 
 IMPROVEMENTS:
 
+- Now you can pass fancy pathing like `..` and symlinks to the CLI.
 - More comprehensive logging.
 
 BUGFIX:
