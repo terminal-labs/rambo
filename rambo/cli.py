@@ -69,18 +69,18 @@ CONTEXT_SETTINGS = {
 
 ### Main command / CLI entry point
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.option('--vagrant-cwd', default=None, type=click.Path(resolve_path=True),
+@click.option('--vagrant-cwd', type=click.Path(resolve_path=True),
               help='Path entry point to the Vagrantfile. Defaults to '
               'the Vagrantfile provided by %s in the installed path.'
               % PROJECT_NAME.capitalize())
-@click.option('--vagrant-dotfile-path', default=None, type=click.Path(resolve_path=True),
+@click.option('--vagrant-dotfile-path', type=click.Path(resolve_path=True),
               help='Path location of the .vagrant directory for the '
               'virtual machine. Defaults to the current working directory.')
-@click.option('--cwd', default=None, type=click.Path(resolve_path=True),
+@click.option('--cwd', type=click.Path(resolve_path=True),
               help='The CWD of for this command. Defaults to '
               'actual CWD, but may be set for customization. Used to look '
               'for optional resources such as custom SaltStack code.')
-@click.option('--tmpdir-path', default=None, type=click.Path(resolve_path=True),
+@click.option('--tmpdir-path', type=click.Path(resolve_path=True),
               help='Path location of the .rambo-tmp directory for the virtual '
               'machine. Defaults to the current working directory')
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
