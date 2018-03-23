@@ -69,18 +69,18 @@ CONTEXT_SETTINGS = {
 
 ### Main command / CLI entry point
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.option('--vagrant-cwd', default=None, type=click.Path(),
+@click.option('--vagrant-cwd', default=None, type=click.Path(resolve_path=True),
               help='Path entry point to the Vagrantfile. Defaults to '
               'the Vagrantfile provided by %s in the installed path.'
               % PROJECT_NAME.capitalize())
-@click.option('--vagrant-dotfile-path', default=None, type=click.Path(),
+@click.option('--vagrant-dotfile-path', default=None, type=click.Path(resolve_path=True),
               help='Path location of the .vagrant directory for the '
               'virtual machine. Defaults to the current working directory.')
-@click.option('--cwd', default=None, type=click.Path(),
+@click.option('--cwd', default=None, type=click.Path(resolve_path=True),
               help='The CWD of for this command. Defaults to '
               'actual CWD, but may be set for customization. Used to look '
               'for optional resources such as custom SaltStack code.')
-@click.option('--tmpdir-path', default=None, type=click.Path(),
+@click.option('--tmpdir-path', default=None, type=click.Path(resolve_path=True),
               help='Path location of the .rambo-tmp directory for the virtual '
               'machine. Defaults to the current working directory')
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
@@ -134,7 +134,7 @@ def destroy_cmd(ctx):
 @cli.command('export-vagrant-conf', short_help="Get Vagrant configuration")
 @click.option('-f', '--force', is_flag=True,
               help='Accept attempts to overwrite and merge.')
-@click.option('-O', '--output-path', type=click.Path(), default=None,
+@click.option('-O', '--output-path', type=click.Path(resolve_path=True),
               help='The optional output path.')
 def export_vagrant_conf(output_path, force):
     '''Places the default Vagrantfile and its resources (vagrant dir,
@@ -225,7 +225,7 @@ def ssh_cmd(ctx, command):
 @click.option('-m', '--machine-type', type=str,
               help='Machine type for cloud providers.\n'
               'E.g. m5.medium for ec2, or s-8vcpu-32gb for digitalocean.\n')
-@click.option('--sync-dir', type=click.Path(),
+@click.option('--sync-dir', type=click.Path(resolve_path=True),
               help='Path to sync into VM')
 @click.option('--provision/--no-provision', default=None,
               help='Enable or disable provisioning')
