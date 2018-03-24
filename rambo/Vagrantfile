@@ -112,6 +112,10 @@ Vagrant.configure("2") do |config|
       mv /etc/salt/minion{,-dist}
       cp /vagrant/saltstack/minions/minion.#{provider}  /etc/salt/minion
       cp /vagrant/saltstack/grains/grains /etc/salt/grains
+      if [ -d "/vagrant/secrets/" ]; then
+          echo -e "\n" >> /etc/salt/grains
+          cat /vagrant/secrets/grains/grains >> /etc/salt/grains
+      fi
       mkdir -p /vagrant/saltstack/states/files/licenses
       if [ -d "/vagrant/auth/licenses/" ]; then
           cp -a /vagrant/auth/licenses/. /vagrant/saltstack/states/files/licenses/
