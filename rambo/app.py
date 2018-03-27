@@ -383,6 +383,7 @@ def up(ctx=None, **params):
     params['ram_size'], params['drive_size'] = options.size_option(
         params.get('ram_size'), params.get('drive_size')) # both ram and drive size
     params['sync_dir'] = options.sync_dir_option(params.get('sync_dir'))
+    params['address'] = options.address_option(params.get('address'))
 
     ## Provider specific handling.
     ## Must come after all else, because logic may be done on params above.
