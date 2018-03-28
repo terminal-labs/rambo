@@ -90,10 +90,6 @@ def set_init_vars(cwd=None, tmpdir_path=None):
     if tmpdir_path: # cli / api
         set_env_var('TMPDIR_PATH',
                     os.path.join(tmpdir_path, '.%s-tmp' % PROJECT_NAME))
-    elif get_env_var('TMPDIR_PATH'): # Previously set env var
-        set_env_var('TMPDIR_PATH',
-                    os.path.join(get_env_var('TMPDIR_PATH'),
-                                 '.%s-tmp' % PROJECT_NAME))
     else: # Not set, set to default loc
         set_env_var('TMPDIR_PATH',
                     os.path.join(os.getcwd(),
