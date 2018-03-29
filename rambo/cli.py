@@ -24,21 +24,30 @@ class ConfigSectionSchema(object):
     class Base(SectionSchema):
         '''Corresponds to the main CLI entry point.'''
         cwd                   = Param(type=click.Path())
+        destroy_on_error      = Param(type=bool)
         tmpdir_path           = Param(type=click.Path())
         vagrant_cwd           = Param(type=click.Path())
         vagrant_dotfile_path  = Param(type=click.Path())
 
-    @matches_section('up')
-    class Up(SectionSchema):
-        '''Corresponds to the `up` command group.'''
-        provider           = Param(type=str)
-        guest_os           = Param(type=str)
+    @matches_section('configuration_management')
+    class ConfigurationManagement(SectionSchema):
+        sync_dir           = Param(type=click.Path())
+        provision          = Param(type=bool)
+
+    @matches_section('hardware')
+    class Hardware(SectionSchema):
         ram_size           = Param(type=int)
         drive_size         = Param(type=int)
         machine_type       = Param(type=str)
-        sync_dir           = Param(type=click.Path())
-        provision          = Param(type=bool)
-        destroy_on_error   = Param(type=bool)
+
+    @matches_section('networking')
+    class Networking(SectionSchema):
+        pass # fill later after we have networking options
+
+    @matches_section('provider')
+    class Provider(SectionSchema):
+        provider           = Param(type=str)
+        guest_os           = Param(type=str)
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -48,7 +57,10 @@ class ConfigFileProcessor(ConfigFileReader):
     # CLI > Configuration file > Environment > Default.
     config_section_primary_schemas = [
         ConfigSectionSchema.Base,
-        ConfigSectionSchema.Up,
+        ConfigSectionSchema.ConfigurationManagement,
+        ConfigSectionSchema.Hardware,
+        ConfigSectionSchema.Networking,
+        ConfigSectionSchema.Provider,
     ]
     config_section_schemas = config_section_primary_schemas
 
