@@ -5,7 +5,7 @@
 FEATURES:
 
 - Add option to set path to sync into VM.
-- Add option to set set ip address to "dhcp" or custom address.
+- Add option to set ip address to "dhcp" or custom address.
 
 IMPROVEMENTS:
 
