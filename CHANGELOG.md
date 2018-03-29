@@ -8,6 +8,7 @@ FEATURES:
 
 IMPROVEMENTS:
 
+- Remaking conf file sections into more granular and intuitive sections.
 - Now you can pass fancy pathing like `..` and symlinks to the CLI.
 - More comprehensive logging.
 
