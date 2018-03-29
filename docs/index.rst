@@ -3,7 +3,7 @@ Welcome to Rambo's documentation!
 
 |Join the chat at https://gitter.im/terminal-labs/rambo|
 
-Latest: v\ |version|
+Currently viewing version v\ |version|
 
 Quickstart
 ----------
