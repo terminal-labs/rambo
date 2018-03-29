@@ -13,7 +13,7 @@ def address_option(address=None):
     Return address (str)
     '''
     if not address:
-        address = '192.168.33.10'
+        address = '1192.168.50.4'
     set_env_var('address', address)
     return address
 
