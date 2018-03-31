@@ -1,7 +1,8 @@
-import os
-import sys
+import copy
 import json
+import os
 import pkg_resources
+import sys
 
 import click
 
@@ -15,6 +16,34 @@ from rambo.settings import SETTINGS, PROJECT_NAME
 
 version = pkg_resources.get_distribution('rambo-vagrant').version
 
+
+class advanced(object):
+    '''This is a dummy 'copy' of click, meant to provide no actual
+    functionality, so that when the main entry point is used various
+    options and arguements will effectively be 'turned off'. If
+    the 'advanced' entry point is used, this will be overwritten and
+    set to equal click, thus assuming all of click's real functionality.
+
+    Contained are nothing but dummy decorators that return the wrapped
+    function unchanged.
+    '''
+    def arguement(self, *args, **kwargs):
+        def decorator(f):
+            return f
+        return decorator
+    def command(self, *args, **kwargs):
+        def decorator(f):
+            return f
+        return decorator
+    def option(self, *args, **kwargs):
+        def decorator(f):
+            return f
+        return decorator
+
+# If 'advanced' entry point, make all of the advanced options (etc) real by copying click
+entry_point = sys.argv[0].split('/')[-1]
+if 'advanced' in entry_point:
+    advanced = click
 
 ### Config file handling
 class ConfigSectionSchema(object):
@@ -69,18 +98,18 @@ CONTEXT_SETTINGS = {
 
 ### Main command / CLI entry point
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.option('--vagrant-cwd', type=click.Path(resolve_path=True),
+@advanced.option('--vagrant-cwd', type=click.Path(resolve_path=True),
               help='Path entry point to the Vagrantfile. Defaults to '
               'the Vagrantfile provided by %s in the installed path.'
               % PROJECT_NAME.capitalize())
-@click.option('--vagrant-dotfile-path', type=click.Path(resolve_path=True),
+@advanced.option('--vagrant-dotfile-path', type=click.Path(resolve_path=True),
               help='Path location of the .vagrant directory for the '
               'virtual machine. Defaults to the current working directory.')
-@click.option('--cwd', type=click.Path(resolve_path=True),
+@advanced.option('--cwd', type=click.Path(resolve_path=True),
               help='The CWD of for this command. Defaults to '
               'actual CWD, but may be set for customization. Used to look '
               'for optional resources such as custom SaltStack code.')
-@click.option('--tmpdir-path', type=click.Path(resolve_path=True),
+@advanced.option('--tmpdir-path', type=click.Path(resolve_path=True),
               help='Path location of the .rambo-tmp directory for the virtual '
               'machine. Defaults to the current working directory')
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
@@ -260,3 +289,4 @@ def vagrant_cmd(ctx):
 
 
 main = cli
+advanced_cli = copy.deepcopy(cli)

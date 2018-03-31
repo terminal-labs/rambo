@@ -17,8 +17,6 @@ from zipfile import ZipFile
 
 import rambo
 
-here = os.path.abspath(os.path.dirname(__file__))
-
 def download_sample_states(command_subclass):
     """Customized setuptools command to download saltstack sample states
     dependencies from https://github.com/terminal-labs/sample-states
@@ -121,5 +119,6 @@ setup(
     entry_points='''
         [console_scripts]
         rambo=rambo.cli:main
+        rambo-advanced=rambo.cli:advanced_cli
      '''
 )
