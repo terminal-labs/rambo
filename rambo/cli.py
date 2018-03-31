@@ -31,10 +31,6 @@ class advanced(object):
         def decorator(f):
             return f
         return decorator
-    def command(self, *args, **kwargs):
-        def decorator(f):
-            return f
-        return decorator
     def option(self, *args, **kwargs):
         def decorator(f):
             return f
@@ -114,14 +110,14 @@ CONTEXT_SETTINGS = {
               'machine. Defaults to the current working directory')
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
 @click.pass_context
-def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
+def cli(ctx, **kwargs):
     '''The main cli entry point. Params can be passed as usual with
     click (CLI or env var) and also with an INI config file.
     Precedence is CLI > Config > Env Var > defaults.
     '''
     # These need to be very early because they may change the cwd of this Python or of Vagrant
-    app.set_init_vars(cwd, tmpdir_path)
-    app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+    app.set_init_vars(ctx.params.get('cwd'), ctx.params.get('tmpdir_path'))
+    app.set_vagrant_vars(ctx.params.get('vagrant_cwd'), ctx.params.get('vagrant_dotfile_path'))
 
     utils.write_to_log('\nNEW CMD')
     utils.write_to_log(' '.join(sys.argv))
@@ -160,12 +156,12 @@ def destroy_cmd(ctx):
     app.destroy(ctx)
 
 
-@cli.command('export-vagrant-conf', short_help="Get Vagrant configuration")
+@click.command('export-vagrant-conf', short_help="Get Vagrant configuration")
 @click.option('-f', '--force', is_flag=True,
               help='Accept attempts to overwrite and merge.')
 @click.option('-O', '--output-path', type=click.Path(resolve_path=True),
               help='The optional output path.')
-def export_vagrant_conf(output_path, force):
+def export_vagrant_conf_cmd(output_path, force):
     '''Places the default Vagrantfile and its resources (vagrant dir,
     settings.json) in the CWD for customizing.
     '''
@@ -254,15 +250,14 @@ def ssh_cmd(ctx, command):
 @click.option('-m', '--machine-type', type=str,
               help='Machine type for cloud providers.\n'
               'E.g. m5.medium for ec2, or s-8vcpu-32gb for digitalocean.\n')
-@click.option('--sync-dir', type=click.Path(resolve_path=True),
+@advanced.option('--sync-dir', type=click.Path(resolve_path=True),
               help='Path to sync into VM')
-@click.option('--provision/--no-provision', default=None,
+@advanced.option('--provision/--no-provision', default=None,
               help='Enable or disable provisioning')
-@click.option('--destroy-on-error/--no-destroy-on-error', default=None,
+@advanced.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
 @click.pass_context
-def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
-           sync_dir, provision, destroy_on_error):
+def up_cmd(ctx, **kwargs):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.
@@ -275,7 +270,7 @@ def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
 
     app.up(ctx, **ctx.params)
 
-@cli.command('vagrant', context_settings=VAGRANT_CMD_CONTEXT_SETTINGS,
+@click.command('vagrant', context_settings=VAGRANT_CMD_CONTEXT_SETTINGS,
              short_help='Run a vagrant command through rambo.')
 @click.pass_context
 def vagrant_cmd(ctx):
@@ -290,3 +285,6 @@ def vagrant_cmd(ctx):
 
 main = cli
 advanced_cli = copy.deepcopy(cli)
+
+advanced_cli.add_command(vagrant_cmd)
+advanced_cli.add_command(export_vagrant_conf_cmd)
