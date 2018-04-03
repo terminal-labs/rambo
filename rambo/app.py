@@ -377,6 +377,7 @@ def up(ctx=None, **params):
         set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
     ## Option Handling - These might modify the params dict or set env vars.
+    params['address'] = options.address_option(params.get('address'))
     params['guest_os'] = options.guest_os_option(params.get('guest_os'))
     params['machine_type'] = options.machine_type_option(params.get('machine_type'), params.get('provider'))
     params['provider'] = options.provider_option(params.get('provider'))

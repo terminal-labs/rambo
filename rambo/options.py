@@ -4,6 +4,19 @@ import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
 
+def address_option(address=None):
+    '''Validate address. If "dhcp", get an address in 172.28 network. If not supplied, set to default 192.168.33.10. Set as env var.
+
+    Args:
+        address (str): IP address to set.
+
+    Return address (str)
+    '''
+    if not address:
+        address = '1192.168.50.4'
+    set_env_var('address', address)
+    return address
+
 def guest_os_option(guest_os=None):
     '''Validate guest_os. If not supplied, set to default. Set as env var.
 
