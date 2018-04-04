@@ -122,11 +122,11 @@ Vagrant.configure("2") do |config|
           cp -a /vagrant/auth/licenses/. /vagrant/saltstack/states/files/licenses/
       fi
       if [ #{ENV["WEBSITE_BRANCH"]} ]; then
-          sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]} --log-level info
+          sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]}
       fi
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval hostname #{VM_NAME} --log-level info
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval randomtag #{RANDOMTAG} --log-level info
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-level info
+      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval hostname #{VM_NAME}
+      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval randomtag #{RANDOMTAG}
+      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate
       EOS
     config.vm.provision "shell",
       inline: $salt,
