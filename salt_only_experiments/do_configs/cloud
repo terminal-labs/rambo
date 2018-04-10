@@ -1,0 +1,13 @@
+providers:
+  do:
+    driver: digitalocean
+    personal_access_token: [api token]
+    ssh_key_file: [path to digitalocean.pem]
+    ssh_key_names: Vagrant
+    location: New York 1
+    image: ubuntu-14-04-x64
+    size: 2gb
+    deploy: True
+    script: init-ubuntu-1404
+    script_args: -n
+

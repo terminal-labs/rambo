@@ -1,0 +1,5 @@
+file_client: local
+
+failhard: True
+
+master: localhost
