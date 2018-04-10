@@ -1,7 +1,7 @@
-import salt.config
+#import salt.config
 import salt.cloud
 
-opts = salt.config.master_config('/home/user/Desktop/do_configs/master')
+#opts = salt.config.master_config('/home/user/Desktop/do_configs/master')
 
 #opts["pki_dir"] = "/home/user/Desktop/pkikeys"
 #opts["cachedir"] = "/home/user/Desktop/cache/salt/master"
