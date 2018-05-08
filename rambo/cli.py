@@ -90,9 +90,9 @@ def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
     click (CLI or env var) and also with an INI config file.
     Precedence is CLI > Config > Env Var > defaults.
     '''
-    # These need to be very early because they may change the cwd of this Python or of Vagrant
-    app.set_init_vars(cwd, tmpdir_path)
-    app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+    ## These need to be very early because they may change the cwd of this Python or of Vagrant
+    #app.set_init_vars(cwd, tmpdir_path)
+    #app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
     utils.write_to_log('\nNEW CMD')
     utils.write_to_log(' '.join(sys.argv))
