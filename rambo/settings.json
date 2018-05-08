@@ -1,19 +1,4 @@
 {
-    "PLUGINS": {
-        "Linux": [
-            "vagrant-aws",
-            "vagrant-digitalocean",
-            "vagrant-lxc",
-            "vagrant-triggers",
-            "vagrant-scp"
-        ],
-        "Darwin": [
-            "vagrant-aws",
-            "vagrant-digitalocean",
-            "vagrant-triggers",
-            "vagrant-scp"
-        ]
-    },
     "PROJECT_NAME": "rambo",
     "PROVIDERS": [
         "digitalocean",
