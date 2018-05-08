@@ -14,7 +14,7 @@ def guest_os_option(guest_os=None):
     """
     if not guest_os:
         guest_os = SETTINGS["GUEST_OSES_DEFAULT"]
-    set_env_var("guest_os", guest_os)
+    #set_env_var("guest_os", guest_os)
 
     if guest_os not in SETTINGS["GUEST_OSES"]:
         msg = (
@@ -45,7 +45,7 @@ def machine_type_option(machine_type=None, provider=None):
                 % (machine_type, provider)
             )
             utils.abort(msg)
-        set_env_var("machinetype", machine_type)
+        #set_env_var("machinetype", machine_type)
     return machine_type
 
 
@@ -59,7 +59,7 @@ def provider_option(provider=None):
     """
     if not provider:
         provider = SETTINGS["PROVIDERS_DEFAULT"]
-    set_env_var("provider", provider)
+    #set_env_var("provider", provider)
 
     if provider not in SETTINGS["PROVIDERS"]:
         msg = (
@@ -105,8 +105,8 @@ def size_option(ram_size=None, drive_size=None):
         drive_size = SETTINGS["DRIVESIZE_DEFAULT"]
     # else both exist, just try using them
 
-    set_env_var("ramsize", ram_size)
-    set_env_var("drivesize", drive_size)
+    #set_env_var("ramsize", ram_size)
+    #set_env_var("drivesize", drive_size)
 
     ## ram_size
     if ram_size not in iter(SETTINGS["SIZES"]):

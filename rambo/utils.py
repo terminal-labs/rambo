@@ -15,18 +15,18 @@ mock_var_dict["RAMBO_LOG_PATH"] = os.path.join(
 )
 
 
-def set_env_var(name, value):
-    """Set an environment variable in all caps that is prefixed with the name of the project
-    """
-    # os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = str(value)
-    mock_var_dict[PROJECT_NAME.upper() + "_" + name.upper()] = str(value)
+#def set_env_var(name, value):
+#    """Set an environment variable in all caps that is prefixed with the name of the project
+#    """
+#    # os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = str(value)
+#    mock_var_dict[PROJECT_NAME.upper() + "_" + name.upper()] = str(value)
 
 
-def get_env_var(name):
-    """Get an environment variable in all caps that is prefixed with the name of the project
-    """
-    # return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
-    mock_var_dict[PROJECT_NAME.upper() + "_" + name.upper()]
+#def get_env_var(name):
+#    """Get an environment variable in all caps that is prefixed with the name of the project
+#    """
+#    # return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
+#    mock_var_dict[PROJECT_NAME.upper() + "_" + name.upper()]
 
 
 def abort(msg):

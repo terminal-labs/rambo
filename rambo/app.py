@@ -16,7 +16,7 @@ from threading import Thread
 import rambo.options as options
 import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
-from rambo.utils import get_env_var, set_env_var
+#from rambo.utils import get_env_var, set_env_var
 
 ## Defs for cli subcommands
 def createproject(project_name, config_only=None):
