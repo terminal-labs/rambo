@@ -4,9 +4,21 @@ import sys
 from pathlib import Path
 from shutil import copyfile, move, rmtree
 
+import re
+import tempfile
+import zipfile
+import tarfile
+import shutil
+import hashlib
+
 import click
 
 from rambo.settings import PROJECT_NAME
+
+HOME = os.path.expanduser('~')
+CHUNK_SIZE=1024*32
+RAMBO_HOME_DIR = '.rambo.d'
+SLASH_ENCODING = '-VAGRANTSLASH-'
 
 mock_var_dict = {}
 mock_var_dict["RAMBO_TMPDIR_PATH"] = PROJECT_NAME + "-tmp"
@@ -80,6 +92,24 @@ def write_to_log(data=None, file_name=None):
         fd_custom = open(fd_custom_path, "a+")
         fd_custom.write(data)
         fd_custom.close()
+
+
+def init():
+    directory = HOME + '/' + RAMBO_HOME_DIR
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    directory = HOME + '/' + RAMBO_HOME_DIR + '/vboxsdk'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    directory = HOME + '/' + RAMBO_HOME_DIR + '/boxes'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    directory = HOME + '/' + RAMBO_HOME_DIR + '/raw_boxes'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 
 def dir_exists(path):

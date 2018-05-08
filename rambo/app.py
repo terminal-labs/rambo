@@ -127,6 +127,9 @@ def ssh(ctx=None, command=None, **params):
 
 def up(ctx=None, **params):
     print("stub for up")
+    utils.init()
+    print(params)
+    print(SETTINGS)
 
 
 class Run_app():

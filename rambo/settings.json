@@ -28,6 +28,7 @@
         "ubuntu-1604": {
             "do": "ubuntu-16-04-x64",
             "docker": "ubuntu/xenial64",
+            "virtualbox": "terminal-labs/tl-ubuntu-1604-64bit-30gb",
             "ec2": "ami-07585467"
         }
     },
