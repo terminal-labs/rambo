@@ -117,7 +117,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=install_requires + ["click", "sphinx_rtd_theme"],
+    install_requires=install_requires + ["salt", "click", "sphinx_rtd_theme"],
     cmdclass={
         "install": CustomInstallCommand,
         "develop": CustomDevelopCommand,
