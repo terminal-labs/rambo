@@ -1,7 +1,8 @@
 # Before anything else, bail if not Python3
 import sys
+
 if sys.version_info.major < 3:
-    sys.exit('Python 3 required but lower version found. Aborted.')
+    sys.exit("Python 3 required but lower version found. Aborted.")
 
 import json
 import os
@@ -19,6 +20,7 @@ import rambo
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+
 def download_sample_states(command_subclass):
     """Customized setuptools command to download saltstack sample states
     dependencies from https://github.com/terminal-labs/sample-states
@@ -31,56 +33,70 @@ def download_sample_states(command_subclass):
     orig_run = command_subclass.run
 
     def modified_run(self):
-        target = os.path.abspath('rambo/saltstack')
-        yes = {'yes','y', 'ye', ''}
-        no = {'no','n'}
+        target = os.path.abspath("rambo/saltstack")
+        yes = {"yes", "y", "ye", ""}
+        no = {"no", "n"}
 
         ## Special Case of sdist (upload)
-        if type(self).__name__ == 'CustomSdistCommand':
+        if type(self).__name__ == "CustomSdistCommand":
             if os.path.exists(target):
-                choice = input('%s exists. Delete and redownload before running sdist? (Y/n): ' % target).lower()
+                choice = input(
+                    "%s exists. Delete and redownload before running sdist? (Y/n): "
+                    % target
+                ).lower()
                 if choice in yes:
-                    shutil.rmtree(target) # Delete.
+                    shutil.rmtree(target)  # Delete.
                 elif choice in no:
-                    pass # Don't delete.
+                    pass  # Don't delete.
                 else:
                     print("Please respond with 'yes' or 'no'")
             else:
-                print('%s did not yet exist, so we must download it for packaging.' % target)
+                print(
+                    "%s did not yet exist, so we must download it for packaging."
+                    % target
+                )
 
         ## Download states and copy if we need to.
-        if not os.path.exists(target): # Do not overwrite existing saltstack dir. Installs don't delete!
-            url = 'https://github.com/terminal-labs/sample-states/archive/basic.zip'
-            filename = 'sample-states.zip'
+        if not os.path.exists(
+            target
+        ):  # Do not overwrite existing saltstack dir. Installs don't delete!
+            url = "https://github.com/terminal-labs/sample-states/archive/basic.zip"
+            filename = "sample-states.zip"
             with urllib.request.urlopen(url) as response, open(
-                    filename, 'wb') as out_file:
+                filename, "wb"
+            ) as out_file:
                 shutil.copyfileobj(response, out_file)
             zipfile = filename
             with ZipFile(zipfile) as zf:
                 zf.extractall()
-            shutil.move(os.path.abspath('sample-states-basic/saltstack'), target)
+            shutil.move(os.path.abspath("sample-states-basic/saltstack"), target)
             os.remove(filename)
-            shutil.rmtree('sample-states-basic')
+            shutil.rmtree("sample-states-basic")
         orig_run(self)
 
     command_subclass.run = modified_run
     return command_subclass
 
+
 @download_sample_states
 class CustomSdistCommand(sdist):
     pass
+
 
 @download_sample_states
 class CustomEggInfoCommand(egg_info):
     pass
 
+
 @download_sample_states
 class CustomDevelopCommand(develop):
     pass
 
+
 @download_sample_states
 class CustomInstallCommand(install):
     pass
+
 
 # Remove this section when we stop using our submoduled fork
 # of click_configfile
@@ -91,35 +107,32 @@ if sys.version < "3.5":
     before_py35_extra.append("configparser >= 3.5.0")
 
 setup(
-    name='Rambo-vagrant',
+    name="Rambo-vagrant",
     version=rambo.__version__,
     description=rambo.__description__,
-    url='https://github.com/terminal-labs/rambo',
-    author='Terminal Labs',
-    author_email='solutions@terminallabs.com',
+    url="https://github.com/terminal-labs/rambo",
+    author="Terminal Labs",
+    author_email="solutions@terminallabs.com",
     license=license,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=install_requires + [
-        'click',
-        'sphinx_rtd_theme',
-    ],
+    install_requires=install_requires + ["click", "sphinx_rtd_theme"],
     cmdclass={
-        'install': CustomInstallCommand,
-        'develop': CustomDevelopCommand,
-        'egg_info': CustomEggInfoCommand,
-        'sdist': CustomSdistCommand,
+        "install": CustomInstallCommand,
+        "develop": CustomDevelopCommand,
+        "egg_info": CustomEggInfoCommand,
+        "sdist": CustomSdistCommand,
     },
-    classifiers = [
-            "Programming Language :: Python :: 3.2",
-            "Programming Language :: Python :: 3.3",
-            "Programming Language :: Python :: 3.4",
-            "Programming Language :: Python :: 3.5",
-            "Programming Language :: Python :: 3.6",
+    classifiers=[
+        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
     ],
-    entry_points='''
+    entry_points="""
         [console_scripts]
         rambo=rambo.cli:main
-     '''
+     """,
 )
