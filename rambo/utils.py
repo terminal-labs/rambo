@@ -12,13 +12,16 @@ import shutil
 import hashlib
 
 import click
+import requests
 
 from rambo.settings import PROJECT_NAME
 
 HOME = os.path.expanduser('~')
+CWD = os.getcwd()
 CHUNK_SIZE=1024*32
 RAMBO_HOME_DIR = '.rambo.d'
 SLASH_ENCODING = '-VAGRANTSLASH-'
+VAGRANT_API_URL = 'https://app.vagrantup.com/api/v1/box/'
 
 mock_var_dict = {}
 mock_var_dict["RAMBO_TMPDIR_PATH"] = PROJECT_NAME + "-tmp"
@@ -92,6 +95,21 @@ def write_to_log(data=None, file_name=None):
         fd_custom = open(fd_custom_path, "a+")
         fd_custom.write(data)
         fd_custom.close()
+
+
+def create_rambo_tmp_dir():
+    dir_create(os.path.join(CWD, '.' + PROJECT_NAME + '-tmp'))
+
+
+def write_json_metadata_file(data):
+    create_rambo_tmp_dir()
+    with open(os.path.join(CWD, '.' + PROJECT_NAME + '-tmp', 'metadata.json'), 'w') as outfile:
+        json.dump(data, outfile)
+
+
+def get_vagrant_box_metadata(tag):
+    r = requests.get(VAGRANT_API_URL + tag)
+    return json.loads(r.text)
 
 
 def init():

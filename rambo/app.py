@@ -126,10 +126,21 @@ def ssh(ctx=None, command=None, **params):
 
 
 def up(ctx=None, **params):
-    print("stub for up")
     utils.init()
+    utils.create_rambo_tmp_dir()
+    metadata = {}
+    metadata['params'] = params
+
+    if params['provider'] == 'virtualbox':
+        vagrant_box_metadata = utils.get_vagrant_box_metadata(SETTINGS["GUEST_OSES"][params["guest_os"]]["virtualbox"])
+        current_version = vagrant_box_metadata['current_version']['version']
+        metadata['vagrant_box_metadata'] = vagrant_box_metadata
+
     print(params)
     print(SETTINGS)
+    print(metadata)
+
+    utils.write_json_metadata_file(metadata)
 
 
 class Run_app():
