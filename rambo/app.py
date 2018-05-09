@@ -16,7 +16,8 @@ from threading import Thread
 import rambo.options as options
 import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
-#from rambo.utils import get_env_var, set_env_var
+
+# from rambo.utils import get_env_var, set_env_var
 
 ## Defs for cli subcommands
 def createproject(project_name, config_only=None):
@@ -129,12 +130,14 @@ def up(ctx=None, **params):
     utils.init()
     utils.create_rambo_tmp_dir()
     metadata = {}
-    metadata['params'] = params
+    metadata["params"] = params
 
-    if params['provider'] == 'virtualbox':
-        vagrant_box_metadata = utils.get_vagrant_box_metadata(SETTINGS["GUEST_OSES"][params["guest_os"]]["virtualbox"])
-        current_version = vagrant_box_metadata['current_version']['version']
-        metadata['vagrant_box_metadata'] = vagrant_box_metadata
+    if params["provider"] == "virtualbox":
+        vagrant_box_metadata = utils.get_vagrant_box_metadata(
+            SETTINGS["GUEST_OSES"][params["guest_os"]]["virtualbox"]
+        )
+        current_version = vagrant_box_metadata["current_version"]["version"]
+        metadata["vagrant_box_metadata"] = vagrant_box_metadata
 
     print(params)
     print(SETTINGS)
