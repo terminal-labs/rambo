@@ -11,25 +11,28 @@
     "GUEST_OSES": {
         "debian-8": {
             "do": "debian-8-x64",
-            "ec2": "ami-a5d621e1"
+            "ec2": "ami-a5d621e1",
+            "virtualbox": "terminal-labs/tl-debian-8-64bit-30gb"
         },
         "debian-9": {
             "do": "debian-9-x64",
-            "ec2": "ami-8c828aec"
+            "ec2": "ami-8c828aec",
+            "virtualbox": "terminal-labs/tl-debian-9-64bit-30gb"
         },
         "centos-7": {
             "do": "centos-7-x64",
-            "ec2": "ami-65e0e305"
+            "ec2": "ami-65e0e305",
+            "virtualbox": "terminal-labs/tl-centos-7-64bit-30gb"
         },
         "ubuntu-1404": {
             "do": "ubuntu-14-04-x64",
-            "ec2": "ami-48030c28"
+            "ec2": "ami-48030c28",
+            "virtualbox": "terminal-labs/tl-ubuntu-1404-64bit-30gb"
         },
         "ubuntu-1604": {
             "do": "ubuntu-16-04-x64",
-            "docker": "ubuntu/xenial64",
-            "virtualbox": "terminal-labs/tl-ubuntu-1604-64bit-30gb",
-            "ec2": "ami-07585467"
+            "ec2": "ami-07585467",
+            "virtualbox": "terminal-labs/tl-ubuntu-1604-64bit-30gb"
         }
     },
     "GUEST_OSES_DEFAULT": "ubuntu-1604",
