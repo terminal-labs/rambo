@@ -17,8 +17,6 @@ import rambo.options as options
 import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 
-# from rambo.utils import get_env_var, set_env_var
-
 ## Defs for cli subcommands
 def createproject(project_name, config_only=None):
     """Create project with basic configuration files.
@@ -137,11 +135,26 @@ def up(ctx=None, **params):
             SETTINGS["GUEST_OSES"][params["guest_os"]]["virtualbox"]
         )
         current_version = vagrant_box_metadata["current_version"]["version"]
+        cached = utils.vagrant_box_is_cached(
+            SETTINGS["GUEST_OSES"][params["guest_os"]]["virtualbox"], current_version
+        )
+        if cached:
+            print("vagrant box is cached -- registering")
+        else:
+            print("vagrant box is not cached -- downloading")
+            utils.get_vagrant_box(
+                SETTINGS["GUEST_OSES"][params["guest_os"]]["virtualbox"],
+                current_version,
+            )
+
         metadata["vagrant_box_metadata"] = vagrant_box_metadata
 
-    print(params)
-    print(SETTINGS)
-    print(metadata)
+    # print(params)
+    # print(SETTINGS)
+    # print(metadata)
+    # print(utils.list_cached_vagrant_boxes())
+    # print(utils.get_cached_vagrant_boxes_versions())
+    # print(utils.vagrant_box_is_cached(SETTINGS["GUEST_OSES"][params["guest_os"]]["virtualbox"], current_version))
 
     utils.write_json_metadata_file(metadata)
 

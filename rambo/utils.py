@@ -16,32 +16,23 @@ import requests
 
 from rambo.settings import PROJECT_NAME
 
+VERSION='0.0.3.dev'
 HOME = os.path.expanduser("~")
 CWD = os.getcwd()
 CHUNK_SIZE = 1024 * 32
 RAMBO_HOME_DIR = ".rambo.d"
 SLASH_ENCODING = "-VAGRANTSLASH-"
 VAGRANT_API_URL = "https://app.vagrantup.com/api/v1/box/"
+VAGRANT_APP_URL = "https://app.vagrantup.com/"
+SDK_URL = "https://download.virtualbox.org/virtualbox/5.2.10/VirtualBoxSDK-5.2.10-122088.zip"
+
+# https://app.vagrantup.com/terminal-labs/boxes/tl-ubuntu-1604-64bit-30gb/versions/0.2/providers/virtualbox.box
 
 mock_var_dict = {}
 mock_var_dict["RAMBO_TMPDIR_PATH"] = PROJECT_NAME + "-tmp"
 mock_var_dict["RAMBO_LOG_PATH"] = os.path.join(
     mock_var_dict["RAMBO_TMPDIR_PATH"], "logs"
 )
-
-
-# def set_env_var(name, value):
-#    """Set an environment variable in all caps that is prefixed with the name of the project
-#    """
-#    # os.environ[PROJECT_NAME.upper() + "_" + name.upper()] = str(value)
-#    mock_var_dict[PROJECT_NAME.upper() + "_" + name.upper()] = str(value)
-
-
-# def get_env_var(name):
-#    """Get an environment variable in all caps that is prefixed with the name of the project
-#    """
-#    # return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
-#    mock_var_dict[PROJECT_NAME.upper() + "_" + name.upper()]
 
 
 def abort(msg):
@@ -112,6 +103,177 @@ def write_json_metadata_file(data):
 def get_vagrant_box_metadata(tag):
     r = requests.get(VAGRANT_API_URL + tag)
     return json.loads(r.text)
+
+
+def list_cached_vagrant_boxes():
+    directory = HOME + "/" + RAMBO_HOME_DIR + "/boxes"
+    dirs = os.listdir(directory)
+    dirs = [dir.replace(SLASH_ENCODING, "/") for dir in dirs]
+    return dirs
+
+
+def get_cached_vagrant_boxes_versions():
+    dirs = list_cached_vagrant_boxes()
+
+    dir_struct = {}
+
+    for dir in dirs:
+        directory = HOME + "/" + RAMBO_HOME_DIR + "/boxes" + "/" + dir.replace(
+            "/", SLASH_ENCODING
+        )
+        versions = os.listdir(directory)
+        dir_struct[dir] = versions
+    return dir_struct
+
+
+def vagrant_box_is_cached(tag, version):
+    dir_struct = get_cached_vagrant_boxes_versions()
+    if tag in dir_struct.keys() and version in dir_struct[tag]:
+        return True
+    else:
+        return False
+
+
+def download_file(url, local_filename):
+    r = requests.get(url, stream=True)
+    with open(local_filename, "wb") as f:
+        for _ in r.iter_content(chunk_size=CHUNK_SIZE):
+            if _:
+                f.write(_)
+    return local_filename
+
+
+def uncompress_box_file(local_directory, file_path):
+    try_unzip = True
+    try_untar_gzip = False
+    try_untar = False
+
+    if try_unzip:
+        try:
+            zipfile.ZipFile(file_path).extractall(local_directory)
+        except zipfile.error:
+            try_untar = True
+            try_untar_gzip = True
+
+    if try_untar_gzip:
+        tar = tarfile.open(file_path, "r:gz")
+        tar.extractall(path=local_directory)
+        tar.close()
+        try_untar = False
+
+    if try_untar:
+        tar = tarfile.open(file_path, "r:")
+        tar.extractall(path=local_directory)
+        tar.close()
+
+
+def check_integrity(local_directory):
+    for _ in os.listdir(local_directory):
+        if _.endswith(".mf"):
+            with open(os.path.join(local_directory, _)) as file_obj:
+                for _ in file_obj:
+                    if _.count("=") > 0:
+                        left_part = _.split("=")[0]
+                        left_part = left_part.strip()
+                        right_part = _.split("=")[1]
+                        right_part = right_part.strip()
+                        if "SHA256" in left_part:
+                            hashtype = "SHA256"
+                            hash_digest = right_part
+                            file_path = os.path.join(
+                                local_directory, left_part.split("(")[1].split(")")[0]
+                            )
+                            compare_hash(hashtype, hash_digest, file_path)
+
+
+def sha256_checksum(filename, block_size=65536):
+    sha256 = hashlib.sha256()
+    with open(filename, "rb") as f:
+        for block in iter(lambda: f.read(block_size), b""):
+            sha256.update(block)
+    return sha256.hexdigest()
+
+
+def compare_hash(hashtype, hash_digest, file_path):
+    print(hashtype, hash_digest, file_path)
+    print(sha256_checksum(file_path))
+
+
+def prepair_box_name(box_name):
+    return box_name.replace("/", SLASH_ENCODING)
+
+
+def resolve_vagrant_box_url(box_tag, box_version):
+    box_url = VAGRANT_APP_URL + box_tag.split("/")[
+        0
+    ] + "/boxes/" + box_tag.split(
+        "/"
+    )[
+        1
+    ] + "/versions/" + box_version + "/providers/virtualbox.box"
+    return box_url
+
+
+def get_sdk():
+    download_file(
+        SDK_URL, os.path.join(HOME + "/" + RAMBO_HOME_DIR + "/vboxsdk", "sdk.zip")
+    )
+    zipfile.ZipFile(
+        os.path.join(HOME + "/" + RAMBO_HOME_DIR + "/vboxsdk", "sdk.zip")
+    ).extractall(
+        HOME + "/" + RAMBO_HOME_DIR + "/vboxsdk"
+    )
+
+
+def get_vagrant_box(box_tag, box_version):
+    box_name = box_tag
+    box_name = prepair_box_name(box_name)
+
+    box_url = resolve_vagrant_box_url(box_tag, box_version)
+    box_filename = os.path.basename(box_url)
+
+    directory = HOME + "/" + RAMBO_HOME_DIR + "/boxes" + "/" + box_name
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    directory = HOME + "/" + RAMBO_HOME_DIR + "/raw_boxes" + "/" + box_name
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    directory = HOME + "/" + RAMBO_HOME_DIR + "/boxes" + "/" + box_name + "/" + box_version
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    with tempfile.TemporaryDirectory() as td_path:
+        print(td_path)
+        download_file(box_url, os.path.join(td_path, "box"))
+        shutil.copy(
+            os.path.join(td_path, "box"),
+            HOME
+            + "/"
+            + RAMBO_HOME_DIR
+            + "/raw_boxes"
+            + "/"
+            + box_name
+            + "/"
+            + box_filename,
+        )
+        uncompress_box_file(
+            os.path.join(td_path, "contents"), os.path.join(td_path, "box")
+        )
+        shutil.copytree(
+            os.path.join(td_path, "contents"),
+            HOME
+            + "/"
+            + RAMBO_HOME_DIR
+            + "/boxes"
+            + "/"
+            + box_name
+            + "/"
+            + box_version
+            + "/virtualbox",
+        )
+        check_integrity(os.path.join(td_path, "contents"))
 
 
 def init():
