@@ -143,9 +143,11 @@ def render_salt_cloud_configs(context):
             data = infile.read()
 
             for key in context.keys():
-                data = data.replace("{{ " + key + " }}",context[key])
+                data = data.replace("{{ " + key + " }}", context[key])
 
-            with open(os.path.join(CWD, "." + PROJECT_NAME + "-tmp", "salt", filename), 'w') as outfile:
+            with open(
+                os.path.join(CWD, "." + PROJECT_NAME + "-tmp", "salt", filename), "w"
+            ) as outfile:
                 outfile.write(data)
 
 

@@ -125,7 +125,7 @@ def ssh(ctx=None, command=None, **params):
 
 
 def up(ctx=None, **params):
-    context = {"id":"1223456", "key":"abcdef"}
+    context = {"id": "1223456", "key": "abcdef"}
     utils.init()
     utils.get_sdk()
     utils.create_rambo_tmp_dir()
