@@ -125,12 +125,19 @@ def ssh(ctx=None, command=None, **params):
 
 
 def up(ctx=None, **params):
+    context = {"id":"1223456", "key":"abcdef"}
     utils.init()
+    utils.get_sdk()
     utils.create_rambo_tmp_dir()
+    utils.render_salt_cloud_configs(context)
     metadata = {}
     metadata["params"] = params
 
     if params["provider"] == "virtualbox":
+        if utils.vagrant_is_installed():
+            print("vagrant is installed")
+        else:
+            print("vagrant is not installed")
         vagrant_box_metadata = utils.get_vagrant_box_metadata(
             SETTINGS["GUEST_OSES"][params["guest_os"]]["virtualbox"]
         )

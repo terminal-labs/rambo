@@ -16,11 +16,12 @@ import requests
 
 from rambo.settings import PROJECT_NAME
 
-VERSION='0.0.3.dev'
+VERSION = "0.0.3.dev"
 HOME = os.path.expanduser("~")
 CWD = os.getcwd()
 CHUNK_SIZE = 1024 * 32
 RAMBO_HOME_DIR = ".rambo.d"
+VAGRANT_HOME_DIR = ".vagrant.d"
 SLASH_ENCODING = "-VAGRANTSLASH-"
 VAGRANT_API_URL = "https://app.vagrantup.com/api/v1/box/"
 VAGRANT_APP_URL = "https://app.vagrantup.com/"
@@ -134,6 +135,28 @@ def vagrant_box_is_cached(tag, version):
         return False
 
 
+def render_salt_cloud_configs(context):
+    dir_create(os.path.join(CWD, "." + PROJECT_NAME + "-tmp", "salt"))
+    configfiles = os.listdir(os.path.join(CWD, "saltstack", "cloud"))
+    for filename in configfiles:
+        with open(os.path.join(CWD, "saltstack", "cloud", filename)) as infile:
+            data = infile.read()
+
+            for key in context.keys():
+                data = data.replace("{{ " + key + " }}",context[key])
+
+            with open(os.path.join(CWD, "." + PROJECT_NAME + "-tmp", "salt", filename), 'w') as outfile:
+                outfile.write(data)
+
+
+def vagrant_is_installed():
+    directory = HOME + "/" + VAGRANT_HOME_DIR
+    if dir_exists(directory):
+        return True
+    else:
+        return False
+
+
 def download_file(url, local_filename):
     r = requests.get(url, stream=True)
     with open(local_filename, "wb") as f:
@@ -204,11 +227,7 @@ def prepair_box_name(box_name):
 
 
 def resolve_vagrant_box_url(box_tag, box_version):
-    box_url = VAGRANT_APP_URL + box_tag.split("/")[
-        0
-    ] + "/boxes/" + box_tag.split(
-        "/"
-    )[
+    box_url = VAGRANT_APP_URL + box_tag.split("/")[0] + "/boxes/" + box_tag.split("/")[
         1
     ] + "/versions/" + box_version + "/providers/virtualbox.box"
     return box_url
