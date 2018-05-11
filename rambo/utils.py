@@ -135,11 +135,11 @@ def vagrant_box_is_cached(tag, version):
         return False
 
 
-def render_salt_cloud_configs(context):
+def render_salt_cloud_configs(context, provider):
     dir_create(os.path.join(CWD, "." + PROJECT_NAME + "-tmp", "salt"))
-    configfiles = os.listdir(os.path.join(CWD, "saltstack", "cloud"))
+    configfiles = os.listdir(os.path.join(CWD, "saltstack", "cloud", provider))
     for filename in configfiles:
-        with open(os.path.join(CWD, "saltstack", "cloud", filename)) as infile:
+        with open(os.path.join(CWD, "saltstack", "cloud", provider,  filename)) as infile:
             data = infile.read()
 
             for key in context.keys():

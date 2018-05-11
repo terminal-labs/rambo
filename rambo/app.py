@@ -129,7 +129,7 @@ def up(ctx=None, **params):
     utils.init()
     utils.get_sdk()
     utils.create_rambo_tmp_dir()
-    utils.render_salt_cloud_configs(context)
+    utils.render_salt_cloud_configs(context, params["provider"])
     metadata = {}
     metadata["params"] = params
 
