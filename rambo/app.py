@@ -127,8 +127,10 @@ def ssh(ctx=None, command=None, **params):
 def up(ctx=None, **params):
     context = {"id": "1223456", "key": "abcdef"}
     utils.init()
+    utils.delete_df_store_files()
     utils.get_sdk()
     utils.create_rambo_tmp_dir()
+    print(utils.resolve_secrets())
     utils.render_salt_cloud_configs(context, params["provider"])
     metadata = {}
     metadata["params"] = params

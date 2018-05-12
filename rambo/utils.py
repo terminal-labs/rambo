@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import glob
 from pathlib import Path
 from shutil import copyfile, move, rmtree
 
@@ -139,7 +140,9 @@ def render_salt_cloud_configs(context, provider):
     dir_create(os.path.join(CWD, "." + PROJECT_NAME + "-tmp", "salt"))
     configfiles = os.listdir(os.path.join(CWD, "saltstack", "cloud", provider))
     for filename in configfiles:
-        with open(os.path.join(CWD, "saltstack", "cloud", provider,  filename)) as infile:
+        with open(
+            os.path.join(CWD, "saltstack", "cloud", provider, filename)
+        ) as infile:
             data = infile.read()
 
             for key in context.keys():
@@ -295,6 +298,26 @@ def get_vagrant_box(box_tag, box_version):
             + "/virtualbox",
         )
         check_integrity(os.path.join(td_path, "contents"))
+
+
+def delete_df_store_files():
+    files = glob.glob(HOME + "/" + RAMBO_HOME_DIR + "/**/.DS_Store", recursive=True)
+    for file in files:
+        file_delete(file)
+
+
+def resolve_secrets():
+    secrets_source = "none"
+
+    directory = HOME + "/" + RAMBO_HOME_DIR
+    if os.path.exists(directory + "/" + "secrets/secrets.yaml"):
+        secrets_source = RAMBO_HOME_DIR
+
+    directory = CWD
+    if os.path.exists(directory + "/" + "secrets/secrets.yaml"):
+        secrets_source = "cwd"
+
+    return secrets_source
 
 
 def init():
