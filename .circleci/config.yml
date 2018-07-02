@@ -24,6 +24,11 @@ jobs:
             bash .circleci/install_miniconda.sh
 
       - run:
+          name: pip install
+          command: |
+            bash .circleci/pip_install.sh
+
+      - run:
           name: build steps
           command: |
             bash .circleci/builds.sh
