@@ -14,31 +14,31 @@ jobs:
       - checkout
 
       - run:
-          name: install venv
+          name: Install venv
           command: |
             bash .circleci/install_venv.sh
 
       - run:
-          name: create venv env
+          name: Create venv env
           command: |
             bash .circleci/create_venv_env.sh
 
       - run:
-          name: install miniconda
+          name: Install miniconda
           command: |
             bash .circleci/install_miniconda.sh
 
       - run:
-          name: create miniconda env
+          name: Create miniconda env
           command: |
             bash .circleci/create_miniconda_env.sh
 
       - run:
-          name: miniconda pip install
+          name: Miniconda pip install
           command: |
             bash .circleci/miniconda_pip_install.sh
 
       - run:
-          name: miniconda test
+          name: Miniconda test
           command: |
             bash .circleci/miniconda_test.sh
