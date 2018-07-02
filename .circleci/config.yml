@@ -11,10 +11,13 @@ jobs:
     working_directory: ~/repo
 
     steps:
-      - checkout:
-        post:
-        - git submodule sync --recursive
-        - git submodule update --recursive --init
+      - checkout
+
+      - run:
+          name: Clone git submodules
+          command: |
+            cd ~/repo
+            git submodule update --init
 
       - run:
           name: Install venv
