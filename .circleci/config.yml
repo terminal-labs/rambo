@@ -19,6 +19,11 @@ jobs:
             bash .circleci/deps.sh
 
       - run:
+          name: install miniconda
+          command: |
+            bash .circleci/install_miniconda.sh
+
+      - run:
           name: build steps
           command: |
             bash .circleci/builds.sh
