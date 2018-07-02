@@ -38,6 +38,11 @@ jobs:
           name: Venv pip install
           command: |
             bash .circleci/venv_pip_install.sh
+            
+      - run:
+          name: Venv test
+          command: |
+            bash .circleci/venv_test.sh
 
       - run:
           name: Install miniconda
