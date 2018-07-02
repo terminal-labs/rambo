@@ -11,7 +11,10 @@ jobs:
     working_directory: ~/repo
 
     steps:
-      - checkout
+      - checkout:
+        post:
+        - git submodule sync --recursive
+        - git submodule update --recursive --init
 
       - run:
           name: Install venv
