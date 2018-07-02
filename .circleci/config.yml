@@ -19,6 +19,11 @@ jobs:
             bash .circleci/deps.sh
 
       - run:
+          name: create venv
+          command: |
+            bash .circleci/create_venv.sh
+
+      - run:
           name: install miniconda
           command: |
             bash .circleci/install_miniconda.sh
