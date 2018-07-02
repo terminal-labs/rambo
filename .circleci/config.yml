@@ -29,6 +29,6 @@ jobs:
             bash .circleci/pip_install.sh
 
       - run:
-          name: build steps
+          name: run test
           command: |
-            bash .circleci/builds.sh
+            bash .circleci/test.sh
