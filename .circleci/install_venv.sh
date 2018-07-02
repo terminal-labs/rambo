@@ -1,6 +1,5 @@
-# core deps
 sudo apt update
-sudo apt upgrade
+sudo apt -y upgrade
 sudo apt -y install build-essential
 sudo apt -y install python
 sudo apt -y install python-dev
