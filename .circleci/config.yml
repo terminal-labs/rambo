@@ -20,6 +20,11 @@ jobs:
             git submodule update --init
 
       - run:
+          name: Install core deps
+          command: |
+            bash .circleci/core_deps.sh
+
+      - run:
           name: Install venv
           command: |
             bash .circleci/install_venv.sh
