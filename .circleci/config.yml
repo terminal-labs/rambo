@@ -39,6 +39,6 @@ jobs:
             bash .circleci/miniconda_pip_install.sh
 
       - run:
-          name: run test
+          name: miniconda test
           command: |
-            bash .circleci/test.sh
+            bash .circleci/miniconda_test.sh
