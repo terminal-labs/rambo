@@ -4,6 +4,19 @@ import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
 
+def box_option(box=None):
+    '''Set box
+
+    Args:
+        box (str): Vagrant box to use.
+
+    Return box (str)
+    '''
+    if box:
+        set_env_var('box', box)
+    return box
+
+
 def guest_os_option(guest_os=None):
     '''Validate guest_os. If not supplied, set to default. Set as env var.
 
