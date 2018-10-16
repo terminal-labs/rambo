@@ -1,3 +1,5 @@
+require 'securerandom'
+
 def random_tag
   host = `hostname`.strip # Get the hostname from the shell and removing trailing \n
   tmp_dir = get_env_var_rb('TMPDIR_PATH') || File.join(Dir.pwd, '.' + PROJECT_NAME + '-tmp')
