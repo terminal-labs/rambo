@@ -360,6 +360,7 @@ def up(ctx=None, **params):
 
     In params, this looks for:
         provider (str): Provider to use.
+        box (str): Vagrant box to use.
         guest_os (str): Guest OS to use.
         ram_size (int): RAM in MB to use.
         drive_size (int): Drive size in GB to use.
@@ -378,6 +379,7 @@ def up(ctx=None, **params):
 
     ## Option Handling - These might modify the params dict or set env vars.
     params['guest_os'] = options.guest_os_option(params.get('guest_os'))
+    params['box'] = options.box_option(params.get('box'))
     params['machine_type'] = options.machine_type_option(params.get('machine_type'), params.get('provider'))
     params['provider'] = options.provider_option(params.get('provider'))
     params['ram_size'], params['drive_size'] = options.size_option(

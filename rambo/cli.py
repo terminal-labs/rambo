@@ -31,6 +31,7 @@ class ConfigSectionSchema(object):
     @matches_section('up')
     class Up(SectionSchema):
         '''Corresponds to the `up` command group.'''
+        box                = Param(type=str)
         provider           = Param(type=str)
         guest_os           = Param(type=str)
         ram_size           = Param(type=int)
@@ -212,6 +213,8 @@ def ssh_cmd(ctx, command):
               'These guest OSs are supported: %s. Default %s.'
               % (list(SETTINGS['GUEST_OSES'].keys()),
                  SETTINGS['GUEST_OSES_DEFAULT']))
+@click.option('-b', '--box', type=str,
+              help='Vagrant Box to use.')
 @click.option('-r', '--ram-size', type=int,
               help='Amount of RAM of the virtual machine in MB. '
               'These RAM sizes are supported: %s. Default %s.'
@@ -232,7 +235,7 @@ def ssh_cmd(ctx, command):
 @click.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
 @click.pass_context
-def up_cmd(ctx, provider, guest_os, ram_size, drive_size, machine_type,
+def up_cmd(ctx, provider, box, guest_os, ram_size, drive_size, machine_type,
            sync_dir, provision, destroy_on_error):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
