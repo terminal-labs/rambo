@@ -4,20 +4,20 @@ import os
 import platform
 import pty
 import shutil
-import subprocess
 import sys
-import time
 from distutils.dir_util import copy_tree
 from distutils.errors import DistutilsFileError
 from select import select
 from subprocess import Popen
-from threading import Thread
+
+import click
 
 import rambo.options as options
 import rambo.utils as utils
 import rambo.vagrant_providers as vagrant_providers
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 from rambo.utils import get_env_var, set_env_var
+
 
 def _invoke_vagrant(cmd=None):
     '''Pass a command to vagrant. This outputs in near real-time,
@@ -206,7 +206,7 @@ def export(resource=None, export_path=None, force=None):
 
     for src, dst in zip(srcs, dsts):
         try:
-            distutils.dir_util.copy_tree(src, dst) # Merge copy tree with overwrites.
+            copy_tree(src, dst) # Merge copy tree with overwrites.
         except DistutilsFileError: # It's a file, not a dir.
             try:
                 shutil.copy(src, dst) # Copy file with overwrites.
