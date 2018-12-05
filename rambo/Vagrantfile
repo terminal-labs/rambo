@@ -14,7 +14,6 @@ end
 require_relative "vagrant/modules.rb" # for random_tag
 
 ## Default Settings
-
 SETTINGS = JSON.parse(File.read('settings.json'))
 PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 RANDOMTAG = random_tag()
@@ -37,7 +36,7 @@ unless get_env_var_rb("ENV")
        "***/CAUTION***", ""
 end
 
-Vagrant.require_version ">= 1.9.7"
+Vagrant.require_version ">= 2.1.0"
 
 orphan_links = `find . -xtype l`.split(/\n+/)
 for link in orphan_links
@@ -138,10 +137,10 @@ end
 
 # clean up files on the host after the guest is destroyed
 Vagrant.configure("2") do |config|
-  config.trigger.after :up do
-    puts "Vagrant done with up."
+  config.trigger.after :up do |trigger|
+    trigger.info = "Vagrant done with up."
   end
-  config.trigger.after :destroy do
-    puts "Vagrant done with destroy."
+  config.trigger.after :destroy do |trigger|
+    trigger.info = "Vagrant done with destroy."
   end
 end
