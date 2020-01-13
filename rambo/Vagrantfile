@@ -18,6 +18,7 @@ SETTINGS = JSON.parse(File.read('settings.json'))
 PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 RANDOMTAG = random_tag()
 VM_NAME = PROJECT_NAME + "-" + RANDOMTAG
+VM_NAME = VM_NAME.sub! '_', 'UNDERSCORE'
 FORWARD_SSH = true
 CUSTOM_PKG_SRC = true
 PROVISION_WITH_SALT = true
