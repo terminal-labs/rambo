@@ -8,7 +8,10 @@ def random_tag
   if File.file?(random_tag_path)
     tag = File.read(random_tag_path)
   else
-    tag = host + '-' + File.basename(File.dirname(tmp_dir)) + '-' + SecureRandom.hex(6)
+    # 95 is unlikely to be used. It is the ascii code for an underscore
+    guest_hostname = host + '-' + File.basename(File.dirname(tmp_dir)).sub("_", "95")
+    guest_hostname = truncate(guest_hostname, 43) # 64 - 15 for the next line - 6 for "rambo-"
+    tag = guest_hostname + '-' + SecureRandom.hex(6)
     File.write(random_tag_path, tag)
   end
   return tag
@@ -42,4 +45,8 @@ end
 def get_env_var_rb(name)
   # Get an environment variable in all caps that is prefixed with the name of the project
   return ENV[PROJECT_NAME.upcase + "_" + name.upcase]
+end
+
+def truncate(string, max)
+  string.length > max ? "#{string[0...max]}" : string
 end
