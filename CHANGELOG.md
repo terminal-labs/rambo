@@ -13,6 +13,8 @@ IMPROVEMENTS:
 
 BUGFIX:
 
+- Fixes guest hostname generation when given underscores in the path, casting it to "95", it's ascii code.
+- Fixes guest hostname generation when too long, truncating the part preceding the hash so total length stays below 64 chars.
 - Fix bug when setting machine-type.
 - Fix ability to set cwd.
 
