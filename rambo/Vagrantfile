@@ -78,14 +78,7 @@ unless get_env_var_rb('sync_dir')
   set_env_var_rb('sync_dir', '.')
 end
 
-custom_code_dirs = [
-  'ansible',
-  'chef',
-  'puppet',
-  'saltstack',
-  'shell',
-  'vagrant',
-]
+
 
 # Provisioning
 Vagrant.configure("2") do |config|
@@ -96,10 +89,30 @@ Vagrant.configure("2") do |config|
     config.vm.hostname = VM_NAME
   end
 
+  # Syncing / Shared folders
   if get_env_var_rb('SYNC') != 'disabled'
+    # Sync rambo project dir to /vagrant
     config.vm.synced_folder get_env_var_rb('sync_dir'), "/vagrant",
       type: get_env_var_rb('SYNC'),
       rsync__exclude: ['saltstack/'] # only provisioning code in project dir
+    # Sync saltstack/{etc,srv}
+    if Dir.exist?(File.join(get_env_var_rb("CWD"), "saltstack/etc"))
+       config.vm.synced_folder File.join(get_env_var_rb("CWD"), "saltstack/etc"),
+         "/etc/salt", type: get_env_var_rb('SYNC')
+    end
+    if Dir.exist?(File.join(get_env_var_rb("CWD"), "saltstack/srv"))
+       config.vm.synced_folder File.join(get_env_var_rb("CWD"), "saltstack/srv"),
+         "/srv", type: get_env_var_rb('SYNC')
+    end
+    # Sync all other code dirs
+    custom_code_dirs = [
+      'ansible',
+      'chef',
+      'puppet',
+      'saltstack',
+      'shell',
+      'vagrant',
+    ]
     for custom_code_dir in custom_code_dirs
       if Dir.exist?(File.join(get_env_var_rb("CWD"), custom_code_dir))
         config.vm.synced_folder File.join(get_env_var_rb("CWD"), custom_code_dir),
@@ -109,6 +122,7 @@ Vagrant.configure("2") do |config|
   else # Disable all syncing. Breaks default method of provisioning.
     config.vm.synced_folder get_env_var_rb("CWD"), "/vagrant", disabled: true
   end
+
   if CUSTOM_PKG_SRC == true
     config.vm.provision "shell",
       inline: "if [ -f /etc/apt/sources.list ]; then wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + get_env_var_rb("GUEST_OS") + "/official/sources.list || true; fi",
