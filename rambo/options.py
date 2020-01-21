@@ -39,6 +39,26 @@ def guest_os_option(guest_os=None):
         utils.warn(msg)
     return guest_os
 
+def hostname_option(hostname=None):
+    """Validate hostname
+
+    Args:
+        hostname (str): Hostname to set in VM / container
+
+    Return hostname (str)
+
+    """
+    if len(hostname) > 64:
+        utils.warn(
+            "Hostnames of many OSes are limited to 64 characters."
+            f"The current hostname {hostname} is {len(hostname)}."
+        )
+
+    if hostname:
+        set_env_var('hostname', hostname)
+
+    return hostname
+
 def machine_type_option(machine_type=None, provider=None):
     '''Validate machine_type. If not supplied, set to default. Set as env var.
 
@@ -77,6 +97,19 @@ def provider_option(provider=None):
             msg = msg + '%s\n' % supported_provider
         utils.abort(msg)
     return provider
+
+def provision_script_path_option(provision_script_path=None):
+    '''Load provision_script_path into env var.
+
+    Args:
+        provision_script_path (str): Path to file that will be ran at provisioning.
+
+    Return provision_script_path (str)
+    '''
+    if provision_script_path:
+        set_env_var('provision_script_path', provision_script_path)
+
+    return provision_script_path
 
 def size_option(ram_size=None, drive_size=None):
     '''Validate ram and drive sizes. Pair them if possible. If not
@@ -148,3 +181,16 @@ def sync_dir_option(sync_dir=None):
     set_env_var('sync_dir', sync_dir)
 
     return sync_dir
+
+def vm_name_option(vm_name=None):
+    """Set vm_name
+
+    Args:
+        vm_name (str): Vm_Name to set in VM / container
+
+    Return vm_name (str)
+
+    """
+    if vm_name:
+        set_env_var('vm_name', vm_name)
+    return vm_name

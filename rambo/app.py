@@ -377,14 +377,19 @@ def up(ctx=None, **params):
         set_init_vars(params.get('cwd'), params.get('tmpdir_path'))
         set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
-    ## Option Handling - These might modify the params dict or set env vars.
+    ## Option Handling - These might modify the params dict and/or set env vars.
     params['guest_os'] = options.guest_os_option(params.get('guest_os'))
     params['box'] = options.box_option(params.get('box'))
+    params['hostname'] = options.hostname_option(params.get('hostname'))
     params['machine_type'] = options.machine_type_option(params.get('machine_type'), params.get('provider'))
     params['provider'] = options.provider_option(params.get('provider'))
+    params['provision_script_path'] = options.provision_script_path_option(params.get('provision_script_path'))
     params['ram_size'], params['drive_size'] = options.size_option(
         params.get('ram_size'), params.get('drive_size')) # both ram and drive size
     params['sync_dir'] = options.sync_dir_option(params.get('sync_dir'))
+    params['vm_name'] = options.vm_name_option(params.get('vm_name'))
+
+    cmd = 'up'
 
     ## Provider specific handling.
     ## Must come after all else, because logic may be done on params above.
@@ -394,9 +399,10 @@ def up(ctx=None, **params):
         vagrant_providers.docker()
     elif params['provider'] == 'ec2':
         vagrant_providers.ec2()
+    else:
+        cmd += " --provider={}".format(params['provider'])
 
     ## Add straight pass-through flags. Keep test for True/False explicit as only those values should work
-    cmd = 'up'
     if params.get('provision') is True:
         cmd = '{} {}'.format(cmd, '--provision')
     elif params.get('provision') is False:

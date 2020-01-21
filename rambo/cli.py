@@ -40,6 +40,9 @@ class ConfigSectionSchema(object):
         sync_dir           = Param(type=click.Path())
         provision          = Param(type=bool)
         destroy_on_error   = Param(type=bool)
+        hostname = Param(type=str)
+        provision_script_path = Param(type=click.Path())
+        vm_name = Param(type=str)
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -215,6 +218,8 @@ def ssh_cmd(ctx, command):
                  SETTINGS['GUEST_OSES_DEFAULT']))
 @click.option('-b', '--box', type=str,
               help='Vagrant Box to use.')
+@click.option('--hostname', type=str,
+              help='Hostname to set.')
 @click.option('-r', '--ram-size', type=int,
               help='Amount of RAM of the virtual machine in MB. '
               'These RAM sizes are supported: %s. Default %s.'
@@ -232,11 +237,15 @@ def ssh_cmd(ctx, command):
               help='Path to sync into VM')
 @click.option('--provision/--no-provision', default=None,
               help='Enable or disable provisioning')
+@click.option('-s', '--provision-script-path', type=click.Path(resolve_path=True),
+              help='Path on host to script to start provisioning with')
 @click.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
+@click.option('--vm_name', type=str,
+              help='The name of the VirtualMachine / Container.')
 @click.pass_context
-def up_cmd(ctx, provider, box, guest_os, ram_size, drive_size, machine_type,
-           sync_dir, provision, destroy_on_error):
+def up_cmd(ctx, provider, box, hostname, guest_os, ram_size, drive_size, machine_type,
+           sync_dir, provision, provision_script_path, destroy_on_error, vm_name):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.

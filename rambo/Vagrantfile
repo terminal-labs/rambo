@@ -17,11 +17,15 @@ require_relative "vagrant/modules.rb" # for random_tag
 SETTINGS = JSON.parse(File.read('settings.json'))
 PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 RANDOMTAG = random_tag()
-VM_NAME = PROJECT_NAME + "-" + RANDOMTAG
 FORWARD_SSH = true
 CUSTOM_PKG_SRC = true
 PROVISION_WITH_SALT = true
 PROVISION_WITH_CMD = false
+if get_env_var_rb('vm_name')
+  VM_NAME = get_env_var_rb('vm_name')
+else
+  VM_NAME = PROJECT_NAME + "-" + RANDOMTAG
+end
 unless get_env_var_rb('SYNC')
   set_env_var_rb('SYNC', 'rsync')
 end
@@ -85,6 +89,13 @@ custom_code_dirs = [
 
 # Provisioning
 Vagrant.configure("2") do |config|
+  # Set hostname
+  if get_env_var_rb('hostname')
+    config.vm.hostname = get_env_var_rb('hostname')
+  else
+    config.vm.hostname = VM_NAME
+  end
+
   if get_env_var_rb('SYNC') != 'disabled'
     config.vm.synced_folder get_env_var_rb('sync_dir'), "/vagrant",
       type: get_env_var_rb('SYNC'),
