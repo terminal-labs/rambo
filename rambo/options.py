@@ -158,7 +158,7 @@ def size_option(ram_size=None, drive_size=None):
             drive_size = SETTINGS['DRIVESIZE_DEFAULT']
     elif drive_size and not ram_size:
         try:
-            ram_size = list(SETTINGS['SIZES'].keys())[
+            ram_size = SETTINGS['SIZES'][
                 list(SETTINGS['SIZES'].values()).index(drive_size)]
         except ValueError: # Doesn't match, but we'll let them try it.
             ram_size = SETTINGS['RAMSIZE_DEFAULT']
@@ -171,22 +171,22 @@ def size_option(ram_size=None, drive_size=None):
     set_env_var('drivesize', drive_size)
 
     ## ram_size
-    if ram_size not in iter(SETTINGS['SIZES']):
+    if ram_size not in SETTINGS['SIZES']:
         msg = ('RAM Size "%s" is not in the RAM sizes list.\n'
                'Did you have a typo? We\'ll try anyway.\n'
                'Here is as list of avalible RAM sizes:\n\n'
                % ram_size)
-        for supported_ram_size in iter(SETTINGS['SIZES']):
+        for supported_ram_size in SETTINGS['SIZES']:
             msg = msg + '%s\n' % supported_ram_size
         utils.warn(msg)
 
     ## drive_size
-    if drive_size not in iter(SETTINGS['SIZES'].values()):
+    if drive_size not in SETTINGS['SIZES'].values():
         msg = ('DRIVE Size "%s" is not in the DRIVE sizes list.\n'
                'Did you have a typo? We\'ll try anyway.\n'
                'Here is as list of avalible DRIVE sizes:\n\n'
                % drive_size)
-        for supported_drive_size in iter(SETTINGS['SIZES'].values()):
+        for supported_drive_size in SETTINGS['SIZES'].values():
             msg = msg + '%s\n' % supported_drive_size
         utils.warn(msg)
     return (ram_size, drive_size)
@@ -205,6 +205,25 @@ def sync_dir_option(sync_dir=None):
     set_env_var('sync_dir', sync_dir)
 
     return sync_dir
+
+def sync_type_option(sync_type=None):
+    '''Validate and set sync_type.
+
+    Args:
+        sync_type: Type of syncing to use.
+
+    Return sync_type (str)
+    '''
+    if sync_type in SETTINGS["SYNC_TYPES"]:
+        set_env_var('sync_type', sync_type)
+    elif sync_type:
+        utils.warn(
+            f"Sync type {sync_type} not in approved list. Using Vagrant's default."
+            f"Supported alternate sync types are {SETTINGS['SYNC_TYPES']}."
+        )
+        synce_type = None
+
+    return sync_type
 
 def vm_name_option(vm_name=None):
     """Set vm_name

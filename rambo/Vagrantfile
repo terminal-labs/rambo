@@ -27,9 +27,6 @@ if get_env_var_rb('vm_name')
 else
   VM_NAME = PROJECT_NAME + "-" + RANDOMTAG
 end
-unless get_env_var_rb('SYNC')
-  set_env_var_rb('SYNC', 'rsync')
-end
 unless get_env_var_rb('cwd')
   set_env_var_rb('cwd', Dir.pwd)
 end
@@ -91,19 +88,19 @@ Vagrant.configure("2") do |config|
   end
 
   # Syncing / Shared folders
-  if get_env_var_rb('SYNC') != 'disabled'
+  if get_env_var_rb('sync_type') != 'disabled'
     # Sync rambo project dir to /vagrant
     config.vm.synced_folder get_env_var_rb('sync_dir'), "/vagrant",
-      type: get_env_var_rb('SYNC'),
+      type: get_env_var_rb('sync_type'),
       rsync__exclude: ['saltstack/'] # only provisioning code in project dir
     # Sync saltstack/{etc,srv}
     if Dir.exist?(File.join(get_env_var_rb("CWD"), "saltstack/etc"))
        config.vm.synced_folder File.join(get_env_var_rb("CWD"), "saltstack/etc"),
-         "/etc/salt", type: get_env_var_rb('SYNC')
+         "/etc/salt", type: get_env_var_rb('sync_type')
     end
     if Dir.exist?(File.join(get_env_var_rb("CWD"), "saltstack/srv"))
        config.vm.synced_folder File.join(get_env_var_rb("CWD"), "saltstack/srv"),
-         "/srv", type: get_env_var_rb('SYNC')
+         "/srv", type: get_env_var_rb('sync_type')
     end
     # Sync all other code dirs
     custom_code_dirs = [
@@ -117,7 +114,7 @@ Vagrant.configure("2") do |config|
     for custom_code_dir in custom_code_dirs
       if Dir.exist?(File.join(get_env_var_rb("CWD"), custom_code_dir))
         config.vm.synced_folder File.join(get_env_var_rb("CWD"), custom_code_dir),
-          File.join("/vagrant", custom_code_dir), type: get_env_var_rb('SYNC')
+          File.join("/vagrant", custom_code_dir), type: get_env_var_rb('sync_type')
       end
     end
   else # Disable all syncing. Breaks default method of provisioning.

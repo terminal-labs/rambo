@@ -361,15 +361,20 @@ def up(ctx=None, **params):
     In params, this looks for:
         provider (str): Provider to use.
         box (str): Vagrant box to use.
+        cpus (int): Number of CPUs to give VirtualBox VM.
         guest_os (str): Guest OS to use.
         ram_size (int): RAM in MB to use.
         drive_size (int): Drive size in GB to use.
         machine_type (str): Machine type to use for cloud providers.
         sync_dir (path): Path to sync into VM.
+        sync_type (str): Type of syncing to use.
         provision (bool): vagrant provisioning flag.
+        provision_cmd (str): Command used at beginning of provisioning.
+        provision_script (path): Path to script to use for provisioning.
         destroy_on_error (bool): vagrant destroy-on-error flag.
         vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
+        vm_name (str): Name of the VM or container.
     '''
     # TODO: Add registering of VM for all of this installation to see
 
@@ -389,6 +394,7 @@ def up(ctx=None, **params):
     params['ram_size'], params['drive_size'] = options.size_option(
         params.get('ram_size'), params.get('drive_size')) # both ram and drive size
     params['sync_dir'] = options.sync_dir_option(params.get('sync_dir'))
+    params['sync_type'] = options.sync_type_option(params.get('sync_type'))
     params['vm_name'] = options.vm_name_option(params.get('vm_name'))
 
     cmd = 'up'

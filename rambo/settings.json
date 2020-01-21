@@ -52,6 +52,12 @@
         "4096": "60",
         "8192": "80"
     },
+    "SYNC_TYPES": [
+        "disabled",
+        "rsync",
+        "nfs",
+        "smb"
+    ],
     "RAMSIZE_DEFAULT": "1024",
     "DRIVESIZE_DEFAULT": "30"
 }

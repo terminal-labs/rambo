@@ -10,6 +10,7 @@ FEATURES:
 - Add option to set VM name
 - Add option to set hostname
 - Add option to set cpus in virtualbox
+- Add option to set sync_type and defauting to Vagrant's default.
 
 IMPROVEMENTS:
 
