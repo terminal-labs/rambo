@@ -9,6 +9,7 @@ FEATURES:
 - Add option to start provisioning with command
 - Add option to set VM name
 - Add option to set hostname
+- Add option to set cpus in virtualbox
 
 IMPROVEMENTS:
 

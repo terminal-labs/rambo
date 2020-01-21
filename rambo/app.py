@@ -380,6 +380,7 @@ def up(ctx=None, **params):
     ## Option Handling - These might modify the params dict and/or set env vars.
     params['guest_os'] = options.guest_os_option(params.get('guest_os'))
     params['box'] = options.box_option(params.get('box'))
+    params['cpus'] = options.cpus_option(params.get('cpus'))
     params['hostname'] = options.hostname_option(params.get('hostname'))
     params['machine_type'] = options.machine_type_option(params.get('machine_type'), params.get('provider'))
     params['provider'] = options.provider_option(params.get('provider'))

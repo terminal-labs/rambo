@@ -44,6 +44,7 @@ class ConfigSectionSchema(object):
         provision_cmd = Param(type=click.Path())
         provision_script = Param(type=click.Path())
         vm_name = Param(type=str)
+        cpus = Param(type=int)
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -226,6 +227,8 @@ def ssh_cmd(ctx, command):
               'These RAM sizes are supported: %s. Default %s.'
               % (list(SETTINGS['SIZES'].keys()),
                  SETTINGS['RAMSIZE_DEFAULT']))
+@click.option('--cpus', type=int,
+              help='Number of CPUs in a virtualbox VM.')
 @click.option('-d', '--drive-size', type=int,
               help='The drive size of the virtual machine in GB. '
               'These drive sizes are supported: %s. Default %s.'
@@ -247,7 +250,7 @@ def ssh_cmd(ctx, command):
 @click.option('--vm_name', type=str,
               help='The name of the VirtualMachine / Container.')
 @click.pass_context
-def up_cmd(ctx, provider, box, hostname, guest_os, ram_size, drive_size, machine_type,
+def up_cmd(ctx, provider, box, hostname, guest_os, ram_size, cpus, drive_size, machine_type,
            sync_dir, provision, provision_cmd, provision_script, destroy_on_error, vm_name):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.

@@ -6,6 +6,7 @@ Vagrant.configure("2") do |config|
     # set unique vm name
     provider.name = VM_NAME
     provider.memory = get_env_var_rb("RAMSIZE")
+    provider.cpus = get_env_var_rb("CPUS")
     if get_env_var_rb("BOX")
       box = get_env_var_rb("BOX")
     else

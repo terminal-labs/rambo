@@ -16,6 +16,17 @@ def box_option(box=None):
         set_env_var('box', box)
     return box
 
+def cpus_option(cpus=None):
+    '''Set cpus
+
+    Args:
+        cpus (int): CPUs for VirtualBox VM
+
+    Return cpus (int)
+    '''
+    if cpus:
+        set_env_var('cpus', cpus)
+    return cpus
 
 def guest_os_option(guest_os=None):
     '''Validate guest_os. If not supplied, set to default. Set as env var.
