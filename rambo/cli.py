@@ -44,6 +44,8 @@ class ConfigSectionSchema(object):
         hostname = Param(type=str)
         provision_cmd = Param(type=click.Path())
         provision_script = Param(type=click.Path())
+        provision_with_salt = Param(type=bool)
+        salt_bootstrap_args = Param(type=str)
         vm_name = Param(type=str)
         cpus = Param(type=int)
 
@@ -238,6 +240,8 @@ def ssh_cmd(ctx, command):
 @click.option('-m', '--machine-type', type=str,
               help='Machine type for cloud providers.\n'
               'E.g. m5.medium for ec2, or s-8vcpu-32gb for digitalocean.\n')
+@click.option('--salt-bootstrap-args', type=str,
+              help='Args to pass to salt-bootstrap when provisioning with Salt.')
 @click.option('--sync-dir', type=click.Path(resolve_path=True),
               help='Path to sync into VM')
 @click.option('--sync-type', type=str,
@@ -248,13 +252,15 @@ def ssh_cmd(ctx, command):
               help='Command to start provisioning with')
 @click.option('-s', '--provision-script', type=click.Path(resolve_path=True),
               help='Path on host to script provision with')
+@click.option('--provision-with-salt', is_flag=True,
+              help='Provision with Salt')
 @click.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
 @click.option('--vm_name', type=str,
               help='The name of the VirtualMachine / Container.')
 @click.pass_context
 def up_cmd(ctx, provider, box, hostname, guest_os, ram_size, cpus, drive_size, machine_type,
-           sync_dir, sync_type, provision, provision_cmd, provision_script, destroy_on_error, vm_name):
+           salt_bootstrap_args, sync_dir, sync_type, provision, provision_cmd, provision_script, provision_with_salt, destroy_on_error, vm_name):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.

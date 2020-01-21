@@ -135,6 +135,33 @@ def provision_script_option(provision_script=None):
 
     return provision_script
 
+def provision_with_salt_option(provision_with_salt=None):
+    '''Set provision_with_salt env var.
+
+    Args:
+        provision_with_salt (bool): Flag to cause Salt provisioning.
+
+    Return provision_with_salt (bool)
+    '''
+    if provision_with_salt:
+        set_env_var('provision_with_salt', provision_with_salt)
+
+    return provision_with_salt
+
+def salt_bootstrap_args_option(salt_bootstrap_args=None):
+    '''Set salt_bootstrap_args env var.
+
+    Args:
+        salt_bootstrap_args (str): salt-bootstrap args
+
+    Return salt_bootstrap_args (str)
+    '''
+    if not salt_bootstrap_args:
+        salt_bootstrap_args =  ""
+    set_env_var('salt_bootstrap_args', salt_bootstrap_args)
+
+    return salt_bootstrap_args
+
 def size_option(ram_size=None, drive_size=None):
     '''Validate ram and drive sizes. Pair them if possible. If not
     supplied, set to default. Set as env var. Reset in params as strings.

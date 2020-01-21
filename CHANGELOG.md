@@ -11,6 +11,8 @@ FEATURES:
 - Add option to set hostname
 - Add option to set cpus in virtualbox
 - Add option to set sync_type and defauting to Vagrant's default.
+- Add option to provision with Salt
+- Add option to set salt-bootstrap args
 
 IMPROVEMENTS:
 

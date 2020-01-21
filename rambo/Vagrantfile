@@ -19,9 +19,6 @@ PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 RANDOMTAG = random_tag()
 FORWARD_SSH = true
 CUSTOM_PKG_SRC = true
-PROVISION_CMD = get_env_var_rb('provision_cmd')
-PROVISION_SCRIPT = get_env_var_rb('provision_script')
-PROVISION_WITH_SALT = true
 if get_env_var_rb('vm_name')
   VM_NAME = get_env_var_rb('vm_name')
 else
@@ -126,17 +123,19 @@ Vagrant.configure("2") do |config|
       inline: "if [ -f /etc/apt/sources.list ]; then wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + get_env_var_rb("GUEST_OS") + "/official/sources.list || true; fi",
       keep_color: true
   end
-  if PROVISION_CMD
+
+  # Provisioning
+  if get_env_var_rb('provision_cmd')
     config.vm.provision "shell",
-      inline: PROVISION_CMD, keep_color: true
+      inline: get_env_var_rb('provision_cmd'), keep_color: true
   end
-  if PROVISION_SCRIPT
+  if get_env_var_rb('provision_script')
     config.vm.provision "shell",
-      path: PROVISION_SCRIPT, keep_color: true
+      path: get_env_var_rb('provision_script'), keep_color: true
   end
-  if PROVISION_WITH_SALT and Dir.exist?(File.join(get_env_var_rb("CWD"), 'saltstack'))
+  if get_env_var_rb('provision_with_salt') and Dir.exist?(File.join(get_env_var_rb("CWD"), 'saltstack'))
     config.vm.provision :salt do |salt|
-      salt.bootstrap_options = "-x python3 git develop"
+      salt.bootstrap_options = get_env_var_rb('salt_bootstrap_args')
       salt.verbose = true
     end
     # Bash to set, prepare, and initiate Salt provisioning.
