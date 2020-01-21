@@ -383,7 +383,8 @@ def up(ctx=None, **params):
     params['hostname'] = options.hostname_option(params.get('hostname'))
     params['machine_type'] = options.machine_type_option(params.get('machine_type'), params.get('provider'))
     params['provider'] = options.provider_option(params.get('provider'))
-    params['provision_script_path'] = options.provision_script_path_option(params.get('provision_script_path'))
+    params['provision_cmd'] = options.provision_cmd_option(params.get('provision_cmd'))
+    params['provision_script'] = options.provision_script_option(params.get('provision_script'))
     params['ram_size'], params['drive_size'] = options.size_option(
         params.get('ram_size'), params.get('drive_size')) # both ram and drive size
     params['sync_dir'] = options.sync_dir_option(params.get('sync_dir'))

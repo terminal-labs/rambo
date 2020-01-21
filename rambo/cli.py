@@ -41,7 +41,8 @@ class ConfigSectionSchema(object):
         provision          = Param(type=bool)
         destroy_on_error   = Param(type=bool)
         hostname = Param(type=str)
-        provision_script_path = Param(type=click.Path())
+        provision_cmd = Param(type=click.Path())
+        provision_script = Param(type=click.Path())
         vm_name = Param(type=str)
 
 
@@ -237,15 +238,17 @@ def ssh_cmd(ctx, command):
               help='Path to sync into VM')
 @click.option('--provision/--no-provision', default=None,
               help='Enable or disable provisioning')
-@click.option('-s', '--provision-script-path', type=click.Path(resolve_path=True),
-              help='Path on host to script to start provisioning with')
+@click.option('-c', '--provision-cmd', type=str,
+              help='Command to start provisioning with')
+@click.option('-s', '--provision-script', type=click.Path(resolve_path=True),
+              help='Path on host to script provision with')
 @click.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
 @click.option('--vm_name', type=str,
               help='The name of the VirtualMachine / Container.')
 @click.pass_context
 def up_cmd(ctx, provider, box, hostname, guest_os, ram_size, drive_size, machine_type,
-           sync_dir, provision, provision_script_path, destroy_on_error, vm_name):
+           sync_dir, provision, provision_cmd, provision_script, destroy_on_error, vm_name):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.

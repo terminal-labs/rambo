@@ -19,8 +19,9 @@ PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 RANDOMTAG = random_tag()
 FORWARD_SSH = true
 CUSTOM_PKG_SRC = true
+PROVISION_CMD = get_env_var_rb('provision_cmd')
+PROVISION_SCRIPT = get_env_var_rb('provision_script')
 PROVISION_WITH_SALT = true
-PROVISION_WITH_CMD = false
 if get_env_var_rb('vm_name')
   VM_NAME = get_env_var_rb('vm_name')
 else
@@ -128,10 +129,13 @@ Vagrant.configure("2") do |config|
       inline: "if [ -f /etc/apt/sources.list ]; then wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + get_env_var_rb("GUEST_OS") + "/official/sources.list || true; fi",
       keep_color: true
   end
-  if PROVISION_WITH_CMD
+  if PROVISION_CMD
     config.vm.provision "shell",
-      inline: "", # TODO: Pass in path to bash file as cli arg
-      keep_color: true
+      inline: PROVISION_CMD, keep_color: true
+  end
+  if PROVISION_SCRIPT
+    config.vm.provision "shell",
+      path: PROVISION_SCRIPT, keep_color: true
   end
   if PROVISION_WITH_SALT and Dir.exist?(File.join(get_env_var_rb("CWD"), 'saltstack'))
     config.vm.provision :salt do |salt|
@@ -155,8 +159,7 @@ Vagrant.configure("2") do |config|
       sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate
       EOS
     config.vm.provision "shell",
-      inline: $salt,
-      keep_color: true
+      inline: $salt, keep_color: true
   end
 end
 

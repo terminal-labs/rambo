@@ -5,14 +5,20 @@
 FEATURES:
 
 - Add option to set path to sync into VM.
+- Add option to provision from script with path
+- Add option to start provisioning with command
+- Add option to set VM name
+- Add option to set hostname
 
 IMPROVEMENTS:
 
 - Now you can pass fancy pathing like `..` and symlinks to the CLI.
 - More comprehensive logging.
+- Splitting expected saltstack dir into saltstack/etc and saltstack/srv to more easily work with the common pattern of having Salt code in /etc/salt and /srv.
 
-BUGFIX:
+BUGFIXES:
 
+- Passes provider explicitly as cmd arg to Vagrant.
 - Fixes guest hostname generation when given underscores in the path, casting it to "95", it's ascii code.
 - Fixes guest hostname generation when too long, truncating the part preceding the hash so total length stays below 64 chars.
 - Fix bug when setting machine-type.

@@ -98,18 +98,31 @@ def provider_option(provider=None):
         utils.abort(msg)
     return provider
 
-def provision_script_path_option(provision_script_path=None):
-    '''Load provision_script_path into env var.
+def provision_cmd_option(provision_cmd=None):
+    '''Load provision_cmd into env var.
 
     Args:
-        provision_script_path (str): Path to file that will be ran at provisioning.
+        provision_cmd (str): Command to run at the begginning of provisioning.
 
-    Return provision_script_path (str)
+    Return provision_cmd (str)
     '''
-    if provision_script_path:
-        set_env_var('provision_script_path', provision_script_path)
+    if provision_cmd:
+        set_env_var('provision_cmd', provision_cmd)
 
-    return provision_script_path
+    return provision_cmd
+
+def provision_script_option(provision_script=None):
+    '''Load provision_script into env var.
+
+    Args:
+        provision_script (str): Path to file that will be ran at provisioning.
+
+    Return provision_script (str)
+    '''
+    if provision_script:
+        set_env_var('provision_script', provision_script)
+
+    return provision_script
 
 def size_option(ram_size=None, drive_size=None):
     '''Validate ram and drive sizes. Pair them if possible. If not
