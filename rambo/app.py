@@ -389,6 +389,7 @@ def up(ctx=None, **params):
     params['cpus'] = options.cpus_option(params.get('cpus'))
     params['hostname'] = options.hostname_option(params.get('hostname'))
     params['machine_type'] = options.machine_type_option(params.get('machine_type'), params.get('provider'))
+    params['project_dir'] = options.project_dir_option(params.get('project_dir'))
     params['provider'] = options.provider_option(params.get('provider'))
     params['provision_cmd'] = options.provision_cmd_option(params.get('provision_cmd'))
     params['provision_script'] = options.provision_script_option(params.get('provision_script'))
@@ -396,7 +397,7 @@ def up(ctx=None, **params):
     params['ram_size'], params['drive_size'] = options.size_option(
         params.get('ram_size'), params.get('drive_size')) # both ram and drive size
     params['salt_bootstrap_args'] = options.salt_bootstrap_args_option(params.get('salt_bootstrap_args'))
-    params['sync_dir'] = options.sync_dir_option(params.get('sync_dir'))
+    params['sync_dirs'] = options.sync_dirs_option(params.get('sync_dirs'))
     params['sync_type'] = options.sync_type_option(params.get('sync_type'))
     params['vm_name'] = options.vm_name_option(params.get('vm_name'))
 

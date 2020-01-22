@@ -69,9 +69,6 @@ end
 unless get_env_var_rb('DRIVESIZE')
   set_env_var_rb('DRIVESIZE', SETTINGS['DRIVESIZE_DEFAULT'])
 end
-unless get_env_var_rb('sync_dir')
-  set_env_var_rb('sync_dir', '.')
-end
 
 
 
@@ -85,20 +82,27 @@ Vagrant.configure("2") do |config|
   end
 
   # Syncing / Shared folders
+  if get_env_var_rb('project_dir')
+    sync_dir = get_env_var_rb('project_dir')
+  else
+    sync_dir = get_env_var_rb('cwd')
+  end
+
   if get_env_var_rb('sync_type') != 'disabled'
     # Sync rambo project dir to /vagrant
-    config.vm.synced_folder get_env_var_rb('sync_dir'), "/vagrant",
+    config.vm.synced_folder sync_dir, "/vagrant",
       type: get_env_var_rb('sync_type'),
       rsync__exclude: ['saltstack/'] # only provisioning code in project dir
     # Sync saltstack/{etc,srv}
-    if Dir.exist?(File.join(get_env_var_rb("CWD"), "saltstack/etc"))
-       config.vm.synced_folder File.join(get_env_var_rb("CWD"), "saltstack/etc"),
+    if Dir.exist?(File.join(sync_dir, "saltstack/etc"))
+       config.vm.synced_folder File.join(sync_dir, "saltstack/etc"),
          "/etc/salt", type: get_env_var_rb('sync_type')
     end
-    if Dir.exist?(File.join(get_env_var_rb("CWD"), "saltstack/srv"))
-       config.vm.synced_folder File.join(get_env_var_rb("CWD"), "saltstack/srv"),
+    if Dir.exist?(File.join(sync_dir, "saltstack/srv"))
+       config.vm.synced_folder File.join(sync_dir, "saltstack/srv"),
          "/srv", type: get_env_var_rb('sync_type')
     end
+
     # Sync all other code dirs
     custom_code_dirs = [
       'ansible',
@@ -109,13 +113,22 @@ Vagrant.configure("2") do |config|
       'vagrant',
     ]
     for custom_code_dir in custom_code_dirs
-      if Dir.exist?(File.join(get_env_var_rb("CWD"), custom_code_dir))
-        config.vm.synced_folder File.join(get_env_var_rb("CWD"), custom_code_dir),
+      if Dir.exist?(File.join(sync_dir, custom_code_dir))
+        config.vm.synced_folder File.join(sync_dir, custom_code_dir),
           File.join("/vagrant", custom_code_dir), type: get_env_var_rb('sync_type')
       end
     end
+
+    # Sync custom dirs
+    if get_env_var_rb('sync_dirs')
+      sync_dirs = eval(get_env_var_rb('sync_dirs'))
+      for sd in sync_dirs
+        config.vm.synced_folder sd[0], sd[1], type: get_env_var_rb('sync_type')
+      end
+    end
+
   else # Disable all syncing. Breaks default method of provisioning.
-    config.vm.synced_folder get_env_var_rb("CWD"), "/vagrant", disabled: true
+    config.vm.synced_folder sync_dir, "/vagrant", disabled: true
   end
 
   if CUSTOM_PKG_SRC == true
@@ -133,7 +146,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell",
       path: get_env_var_rb('provision_script'), keep_color: true
   end
-  if get_env_var_rb('provision_with_salt') and Dir.exist?(File.join(get_env_var_rb("CWD"), 'saltstack'))
+  if get_env_var_rb('provision_with_salt') and Dir.exist?(File.join(sync_dir, 'saltstack'))
     config.vm.provision :salt do |salt|
       salt.bootstrap_options = get_env_var_rb('salt_bootstrap_args')
       salt.verbose = true

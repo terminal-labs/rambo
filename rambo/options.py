@@ -1,3 +1,4 @@
+import ast
 import os
 
 import rambo.utils as utils
@@ -87,6 +88,21 @@ def machine_type_option(machine_type=None, provider=None):
             utils.abort(msg)
         set_env_var('machinetype', machine_type)
     return machine_type
+
+def project_dir_option(project_dir=None):
+    '''Validate project_dir. If not supplied, set to default. Set as env var.
+
+    Args:
+        project_dir: Path to sync into VM.
+
+    Return project_dir (path)
+    '''
+    if not project_dir:
+        project_dir = os.getcwd()
+
+    set_env_var('project_dir', project_dir)
+
+    return project_dir
 
 def provider_option(provider=None):
     '''Validate provider. If not supplied, set to default. Set as env var.
@@ -218,20 +234,33 @@ def size_option(ram_size=None, drive_size=None):
         utils.warn(msg)
     return (ram_size, drive_size)
 
-def sync_dir_option(sync_dir=None):
-    '''Validate sync_dir. If not supplied, set to default. Set as env var.
+def sync_dirs_option(sync_dirs=None):
+    '''Validate sync_dirs. If not supplied, set to default. Set as env var.
 
     Args:
-        sync_dir: Path to sync into VM.
+        sync_dirs: Paths to sync into VM, supplied as list of lists.
 
-    Return sync_dir (path)
+    Return sync_dirs (list)
     '''
-    if not sync_dir:
-        sync_dir = os.getcwd()
+    try:
+        sync_dirs = ast.literal_eval(sync_dirs)
+    except SyntaxError:
+        utils.abort("sync_dirs cannot be evaluated as valid Python.")
+    if type(sync_dirs) is not list:
+        utils.abort(
+            f"sync_dirs was not evaluated as a Python dict, but as '{type(sync_dirs)}'"
+        )
+    for sd in sync_dirs:
+        if type(sd) is not list:
+            utils.abort(
+                f"sync_dirs element {sd} was not evaluated as a Python dict, but as "
+                f"'{type(sd)}'"
+            )
 
-    set_env_var('sync_dir', sync_dir)
-
-    return sync_dir
+    # Normalize source dirs. Target Dirs must be absolute / handled by Vagrant.
+    sync_dirs = [[os.path.realpath(os.path.expanduser(lst[0])), lst[1]] for lst in sync_dirs]
+    set_env_var('sync_dirs', sync_dirs)
+    return sync_dirs
 
 def sync_type_option(sync_type=None):
     '''Validate and set sync_type.

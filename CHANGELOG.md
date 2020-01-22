@@ -13,9 +13,11 @@ FEATURES:
 - Add option to set sync_type and defauting to Vagrant's default.
 - Add option to provision with Salt
 - Add option to set salt-bootstrap args
+- Add option to sync all listed dirs
 
 IMPROVEMENTS:
 
+- Renamed sync_dir to project_dir
 - Now you can pass fancy pathing like `..` and symlinks to the CLI.
 - More comprehensive logging.
 - Splitting expected saltstack dir into saltstack/etc and saltstack/srv to more easily work with the common pattern of having Salt code in /etc/salt and /srv.
