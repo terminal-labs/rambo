@@ -3,12 +3,14 @@
         "Linux": [
             "vagrant-aws",
             "vagrant-digitalocean",
+            "vagrant-disksize",
             "vagrant-lxc",
             "vagrant-scp"
         ],
         "Darwin": [
             "vagrant-aws",
             "vagrant-digitalocean",
+            "vagrant-disksize",
             "vagrant-scp"
         ]
     },

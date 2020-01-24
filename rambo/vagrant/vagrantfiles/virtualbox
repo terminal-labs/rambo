@@ -9,6 +9,7 @@ Vagrant.configure("2") do |config|
     provider.cpus = get_env_var_rb("CPUS")
     if get_env_var_rb("BOX")
       box = get_env_var_rb("BOX")
+      config.disksize.size = get_env_var_rb("DRIVESIZE") + "GB"
     else
       box = "terminal-labs/tl-" + get_env_var_rb("GUEST_OS") + "-64bit-" + get_env_var_rb("DRIVESIZE") + 'gb'
     end
