@@ -237,6 +237,8 @@ def size_option(ram_size=None, drive_size=None):
 def sync_dirs_option(sync_dirs=None):
     '''Validate sync_dirs. If not supplied, set to default. Set as env var.
 
+    sync_dirs must be list of lists of form: `"[['source', 'target'], ['source2', 'target2']]"`
+
     Args:
         sync_dirs: Paths to sync into VM, supplied as list of lists.
 

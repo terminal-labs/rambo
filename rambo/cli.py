@@ -244,7 +244,7 @@ def ssh_cmd(ctx, command):
 @click.option('--salt-bootstrap-args', type=str,
               help='Args to pass to salt-bootstrap when provisioning with Salt.')
 @click.option('--sync-dirs', type=str,
-              help='Paths to sync into VM, passed as a Python list of lists of the form "[['source', 'target'], ['source2', 'target2']]".')
+              help="""Paths to sync into VM, passed as a Python list of lists of the form "[['source', 'target'], ['source2', 'target2']]".""")
 @click.option('--sync-type', type=str,
               help='Sync type')
 @click.option('--project-dir', type=click.Path(resolve_path=True),
