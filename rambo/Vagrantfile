@@ -18,7 +18,6 @@ SETTINGS = JSON.parse(File.read('settings.json'))
 PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 RANDOMTAG = random_tag()
 FORWARD_SSH = true
-CUSTOM_PKG_SRC = true
 if get_env_var_rb('vm_name')
   VM_NAME = get_env_var_rb('vm_name')
 else
@@ -129,12 +128,6 @@ Vagrant.configure("2") do |config|
 
   else # Disable all syncing. Breaks default method of provisioning.
     config.vm.synced_folder sync_dir, "/vagrant", disabled: true
-  end
-
-  if CUSTOM_PKG_SRC == true
-    config.vm.provision "shell",
-      inline: "if [ -f /etc/apt/sources.list ]; then wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + get_env_var_rb("GUEST_OS") + "/official/sources.list || true; fi",
-      keep_color: true
   end
 
   # Provisioning
