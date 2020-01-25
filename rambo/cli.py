@@ -27,6 +27,7 @@ class ConfigSectionSchema(object):
         tmpdir_path           = Param(type=click.Path())
         vagrant_cwd           = Param(type=click.Path())
         vagrant_dotfile_path  = Param(type=click.Path())
+        vm_name = Param(type=str)
 
     @matches_section('up')
     class Up(SectionSchema):
@@ -47,7 +48,6 @@ class ConfigSectionSchema(object):
         provision_script = Param(type=click.Path())
         provision_with_salt = Param(type=bool)
         salt_bootstrap_args = Param(type=str)
-        vm_name = Param(type=str)
         cpus = Param(type=int)
 
 
@@ -131,14 +131,16 @@ def createproject_cmd(project_name):
     app.createproject(project_name)
 
 
-@cli.command('destroy', short_help='Destroy VM and metadata.')
+@cli.command('destroy', context_settings=CONTEXT_SETTINGS, short_help='Destroy VM and metadata.')
+@click.option('--vm_name', type=str,
+              help='The name of the VirtualMachine / Container.')
 @click.pass_context
-def destroy_cmd(ctx):
+def destroy_cmd(ctx, vm_name):
     '''Destroy a VM / container. This will tell vagrant to forcibly destroy
     a VM, and to also destroy its Rambo metadata (provider and random_tag),
     and Vagrant metadata (.vagrant dir).
     '''
-    app.destroy(ctx)
+    app.destroy(ctx, **ctx.params)
 
 
 @cli.command('export-vagrant-conf', short_help="Get Vagrant configuration")

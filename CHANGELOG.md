@@ -14,9 +14,13 @@ FEATURES:
 - Add option to provision with Salt
 - Add option to set salt-bootstrap args
 - Add option to sync all listed dirs
+- Add optional setting overrides with my_rambo.conf
+- Add option to resize base VirtualBox drive size with vagrant plugin.
 
 IMPROVEMENTS:
 
+- `rambo destroy` will now use vboxmanage to fully poweroff and delete VirtualBox VMs
+- No longer using any custom sources.list
 - Renamed sync_dir to project_dir
 - Now you can pass fancy pathing like `..` and symlinks to the CLI.
 - More comprehensive logging.

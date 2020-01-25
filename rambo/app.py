@@ -163,6 +163,11 @@ def destroy(ctx=None, **params):
         set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
     vagrant_general_command('destroy --force')
+    if "vm_name" in params:
+        os.system(f"vboxmanage controlvm {params['vm_name']} poweroff")
+        os.system(f"vboxmanage unregistervm {params['vm_name']} --delete")
+
+
     utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'provider'))
     utils.file_delete(os.path.join(get_env_var('TMPDIR_PATH'), 'random_tag'))
     utils.dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
