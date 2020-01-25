@@ -52,7 +52,7 @@ class ConfigSectionSchema(object):
 
 
 class ConfigFileProcessor(ConfigFileReader):
-    config_files = ['%s.conf' % PROJECT_NAME]
+    config_files = [f"my_{PROJECT_NAME}.conf", f"{PROJECT_NAME}.conf"]
     # Specify additional schemas to merge with the primary so that they
     # are added to the top level of default_map, for easy precedence of
     # CLI > Configuration file > Environment > Default.

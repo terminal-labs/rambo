@@ -1,7 +1,7 @@
 # Before anything else, bail if not Python3
 import sys
-if sys.version_info.major < 3:
-    sys.exit('Python 3 required but lower version found. Aborted.')
+if sys.version_info < (3, 6, 0):
+    sys.exit('Python 3.6+ required but lower version found. Aborted.')
 
 import json
 import os
@@ -85,10 +85,6 @@ class CustomInstallCommand(install):
 # Remove this section when we stop using our submoduled fork
 # of click_configfile
 install_requires = ["click >= 6.6", "six >= 1.10"]
-before_py35_extra = []
-if sys.version < "3.5":
-    install_requires.append("configparser >= 3.5.0")
-    before_py35_extra.append("configparser >= 3.5.0")
 
 setup(
     name='Rambo-vagrant',
@@ -112,11 +108,10 @@ setup(
         'sdist': CustomSdistCommand,
     },
     classifiers = [
-            "Programming Language :: Python :: 3.2",
-            "Programming Language :: Python :: 3.3",
-            "Programming Language :: Python :: 3.4",
-            "Programming Language :: Python :: 3.5",
-            "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     entry_points='''
         [console_scripts]
