@@ -371,8 +371,9 @@ def up(ctx=None, **params):
         ram_size (int): RAM in MB to use.
         drive_size (int): Drive size in GB to use.
         machine_type (str): Machine type to use for cloud providers.
-        sync_dir (path): Path to sync into VM.
+        sync_dirs (path): Paths to sync into VM.
         sync_type (str): Type of syncing to use.
+        ports (str): Ports to forward.
         provision (bool): vagrant provisioning flag.
         provision_cmd (str): Command used at beginning of provisioning.
         provision_script (path): Path to script to use for provisioning.
@@ -404,6 +405,7 @@ def up(ctx=None, **params):
     params['salt_bootstrap_args'] = options.salt_bootstrap_args_option(params.get('salt_bootstrap_args'))
     params['sync_dirs'] = options.sync_dirs_option(params.get('sync_dirs'))
     params['sync_type'] = options.sync_type_option(params.get('sync_type'))
+    params['ports'] = options.ports_option(params.get('ports'))
     params['vm_name'] = options.vm_name_option(params.get('vm_name'))
 
     cmd = 'up'

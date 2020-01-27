@@ -89,6 +89,40 @@ def machine_type_option(machine_type=None, provider=None):
         set_env_var('machinetype', machine_type)
     return machine_type
 
+def ports_option(ports=None):
+    '''Validate ports. If not supplied, set to default. Set as env var.
+
+    ports must be list of lists of form:
+    `[['guest_port', 'host_port'], ['guest_port2', 'host_port2']]`
+
+    Args:
+        ports: Paths to sync into VM, supplied as list of lists.
+
+    Return ports (list)
+    '''
+    try:
+        ports = ast.literal_eval(ports)
+    except SyntaxError:
+        utils.abort("ports cannot be evaluated as valid Python.")
+    if type(ports) is not list:
+        utils.abort(
+            f"`ports` was not evaluated as a Python list, but as '{type(ports)}'."
+        )
+    for port_pair in ports:
+        if type(port_pair) is not list:
+            utils.abort(
+                f"`ports` element {port_pair} was not evaluated as a Python list, but as "
+                f"'{type(port_pair)}'."
+            )
+        if len(port_pair) != 2:
+            utils.abort(f"Not the right number of ports to forward in {port_pair}.")
+        for port in port_pair:
+            if type(port_pair) != int and not 0 < port < 65535:
+                utils.abort(f"{port} in `ports` is not an int in a valid port range.")
+
+    set_env_var('ports', ports)
+    return ports
+
 def project_dir_option(project_dir=None):
     '''Validate project_dir. If not supplied, set to default. Set as env var.
 
@@ -237,7 +271,8 @@ def size_option(ram_size=None, drive_size=None):
 def sync_dirs_option(sync_dirs=None):
     '''Validate sync_dirs. If not supplied, set to default. Set as env var.
 
-    sync_dirs must be list of lists of form: `"[['source', 'target'], ['source2', 'target2']]"`
+    sync_dirs must be list of lists of form:
+    `"[['guest_dir', 'host_dir'], ['guest_dir2', 'host_dir2']]"`
 
     Args:
         sync_dirs: Paths to sync into VM, supplied as list of lists.
@@ -250,12 +285,12 @@ def sync_dirs_option(sync_dirs=None):
         utils.abort("sync_dirs cannot be evaluated as valid Python.")
     if type(sync_dirs) is not list:
         utils.abort(
-            f"sync_dirs was not evaluated as a Python dict, but as '{type(sync_dirs)}'"
+            f"sync_dirs was not evaluated as a Python list, but as '{type(sync_dirs)}'"
         )
     for sd in sync_dirs:
         if type(sd) is not list:
             utils.abort(
-                f"sync_dirs element {sd} was not evaluated as a Python dict, but as "
+                f"sync_dirs element {sd} was not evaluated as a Python list, but as "
                 f"'{type(sd)}'"
             )
 
