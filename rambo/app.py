@@ -164,6 +164,7 @@ def destroy(ctx=None, **params):
 
     vagrant_general_command('destroy --force')
     if "vm_name" in params:
+        utils.echo(f"Now removing base VirtualBox data for VM {params['vm_name']}.")
         os.system(f"vboxmanage controlvm {params['vm_name']} poweroff")
         os.system(f"vboxmanage unregistervm {params['vm_name']} --delete")
 
