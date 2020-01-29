@@ -77,13 +77,20 @@ def set_init_vars(cwd=None, tmpdir_path=None):
 
     # effective CWD (likely real CWD, but may be changed by user.
     if cwd: # cli / api
-        set_env_var('CWD', cwd)
-    elif not get_env_var('CWD'): # Not previously set env var either
-        try:
-            set_env_var('CWD', os.getcwd())
-        except FileNotFoundError:
-            utils.abort('Your current working directory no longer exists. '
-                  'Did you delete it? Check for it with `ls ..`')
+        set_env_var('cwd', cwd)
+    elif get_env_var('cwd'):
+        pass # Already set - keep it.
+    else:
+        found_project = utils.find_conf(os.getcwd())
+        if found_project:
+            set_env_var('cwd', found_project)
+        else: # No project found
+            utils.abort(
+                f"There were no project conf files found in {os.getcwd()} "
+                "or any of its parent directories.",
+                log=False # Can't log because we have no project or log dir.
+            )
+
     os.chdir(get_env_var('cwd'))
 
     # loc of tmpdir_path

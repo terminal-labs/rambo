@@ -10,7 +10,7 @@ from rambo.click_configfile import matches_section
 
 import rambo.app as app
 import rambo.utils as utils
-from rambo.settings import SETTINGS, PROJECT_NAME
+from rambo.settings import CONF_FILES, SETTINGS, PROJECT_NAME
 
 
 version = pkg_resources.get_distribution('rambo-vagrant').version
@@ -53,7 +53,7 @@ class ConfigSectionSchema(object):
 
 
 class ConfigFileProcessor(ConfigFileReader):
-    config_files = [f"my_{PROJECT_NAME}.conf", f"{PROJECT_NAME}.conf"]
+    config_files = CONF_FILES
     # Specify additional schemas to merge with the primary so that they
     # are added to the top level of default_map, for easy precedence of
     # CLI > Configuration file > Environment > Default.
