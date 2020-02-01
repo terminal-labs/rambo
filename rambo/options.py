@@ -25,9 +25,16 @@ def cpus_option(cpus=None):
 
     Return cpus (int)
     '''
-    if cpus:
+    if cpus and 1 <= cpus <= 32:
         set_env_var('cpus', cpus)
-    return cpus
+        return cpus
+    elif cpus:
+        utils.warn("CPUs must be an int in [1, 32]. Falling back to 1.")
+
+    set_env_var('cpus', 1)
+    return 1
+
+
 
 def guest_os_option(guest_os=None):
     '''Validate guest_os. If not supplied, set to default. Set as env var.
@@ -60,7 +67,7 @@ def hostname_option(hostname=None):
     Return hostname (str)
 
     """
-    if len(hostname) > 64:
+    if hostname and len(hostname) > 64:
         utils.warn(
             "Hostnames of many OSes are limited to 64 characters."
             f"The current hostname {hostname} is {len(hostname)}."
@@ -100,6 +107,9 @@ def ports_option(ports=None):
 
     Return ports (list)
     '''
+    if not ports:
+        return None
+
     try:
         ports = ast.literal_eval(ports)
     except SyntaxError:
@@ -279,6 +289,9 @@ def sync_dirs_option(sync_dirs=None):
 
     Return sync_dirs (list)
     '''
+    if not sync_dirs:
+        return None
+
     try:
         sync_dirs = ast.literal_eval(sync_dirs)
     except SyntaxError:
