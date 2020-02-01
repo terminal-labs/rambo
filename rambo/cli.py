@@ -24,7 +24,7 @@ class ConfigSectionSchema(object):
     class Base(SectionSchema):
         '''Corresponds to the main CLI entry point.'''
         cwd                   = Param(type=click.Path())
-        tmpdir_path           = Param(type=click.Path())
+        tmpdir           = Param(type=click.Path())
         vagrant_cwd           = Param(type=click.Path())
         vagrant_dotfile_path  = Param(type=click.Path())
         vm_name = Param(type=str)
@@ -91,31 +91,35 @@ CONTEXT_SETTINGS = {
               help='The CWD of for this command. Defaults to '
               'actual CWD, but may be set for customization. Used to look '
               'for optional resources such as custom SaltStack code.')
-@click.option('--tmpdir-path', type=click.Path(resolve_path=True),
+@click.option('--tmpdir', type=click.Path(resolve_path=True),
               help='Path location of the .rambo-tmp directory for the virtual '
               'machine. Defaults to the current working directory')
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
 @click.pass_context
-def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
-    '''The main cli entry point. Params can be passed as usual with
+def cli(ctx, cwd, tmpdir, vagrant_cwd, vagrant_dotfile_path):
+    """The main cli entry point. Params can be passed as usual with
     click (CLI or env var) and also with an INI config file.
     Precedence is CLI > Config > Env Var > defaults.
-    '''
-    # These need to be very early because they may change the cwd of this Python or of Vagrant
-    app.set_init_vars(cwd, tmpdir_path)
-    app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+    """
+    if ctx.invoked_subcommand not in ["createproject"]:
+        # These need to be very early because they may change the cwd of this Python or of Vagrant
+        app.set_init_vars(cwd, tmpdir)
+        app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    utils.write_to_log('\nNEW CMD')
-    utils.write_to_log(' '.join(sys.argv))
+        utils.write_to_log('\nNEW CMD')
+        utils.write_to_log(' '.join(sys.argv))
 
-    utils.write_to_log('\nNEW CMD', 'stderr')
-    utils.write_to_log(' '.join(sys.argv), 'stderr')
+        utils.write_to_log('\nNEW CMD', 'stderr')
+        utils.write_to_log(' '.join(sys.argv), 'stderr')
 
 
 ### Subcommands
 @cli.command('createproject')
 @click.argument('project_name')
-def createproject_cmd(project_name):
+@click.option('-c', '--config-only', is_flag=True,
+              help='Only create project dir with config file.')
+@click.pass_context
+def createproject_cmd(ctx, project_name, config_only):
     '''Create project takes an arguement for the name to give to the project
     it creates. It will create a directory in the CWD for this project. Upon
     creation, this project directory will contain a rambo.conf file, an auth
@@ -129,7 +133,7 @@ def createproject_cmd(project_name):
     - saltstack is a basic set of SaltStack configuration code that Rambo offers.
         It can be modified for custom configuration.
     '''
-    app.createproject(project_name)
+    app.createproject(project_name, ctx.parent.params['cwd'], ctx.parent.params['tmpdir'], config_only, ctx)
 
 
 @cli.command('destroy', context_settings=CONTEXT_SETTINGS, short_help='Destroy VM and metadata.')
