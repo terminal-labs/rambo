@@ -2,6 +2,7 @@ image: verhulstm/circleci-ubuntu1804:0.0.5
 
 full-build:
   script:
+    - git submodule update --init --recursive    
     - sudo bash .gitlabci/mock_vagrant.sh
     - sudo bash .gitlabci/download_python_environment_manager.sh
     - cd /vagrant; sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/conda/install_apt_dependencies.sh rambo vagrant vagrant
