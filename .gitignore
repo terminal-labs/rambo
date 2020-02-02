@@ -19,6 +19,7 @@ syntax: glob
 
 ## paths
 dist
+activate.sh
 env.sh
 digitalocean.env.sh
 aws.env.sh
