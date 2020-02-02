@@ -2,8 +2,6 @@
 
 [![Join the chat at https://gitter.im/terminal-labs/rambo](https://badges.gitter.im/terminal-labs/rambo.svg)](https://gitter.im/terminal-labs/rambo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![CircleCI](https://circleci.com/gh/terminal-labs/rambo.svg?style=svg)](https://circleci.com/gh/terminal-labs/rambo)
-
 ## Quickstart
 To get started fast, see: [Quickstart](http://terminallabs-rambo.readthedocs.io/en/latest/core/quickstart/), or go to our [docs homepage](http://terminallabs-rambo.readthedocs.io/en/latest/)
 
