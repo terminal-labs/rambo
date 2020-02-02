@@ -1,0 +1,16 @@
+libssl-dev
+zlib1g-dev
+libbz2-dev
+libreadline-dev
+libsqlite3-dev
+libffi-dev
+zip
+unzip
+tree
+wget
+nano
+emacs
+python3
+python3-pip
+python3-dev
+python3-venv
