@@ -32,3 +32,9 @@ linux-pyenv: download_python_environment_manager
 linux-conda: download_python_environment_manager
 	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/conda/build.sh $(APPNAME) $(SUDO_USER) linux
 	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/conda/emit_activation_script.sh $(APPNAME) $(SUDO_USER) linux
+
+mac-docs: mac-conda
+	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/conda/docs.sh $(APPNAME) $(SUDO_USER) mac
+
+linux-docs: linux-conda
+	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/conda/docs.sh $(APPNAME) $(SUDO_USER) linux
