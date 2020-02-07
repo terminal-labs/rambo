@@ -414,7 +414,6 @@ def up(ctx=None, **params):
         vm_name (str): Name of the VM or container.
     '''
     # TODO: Add registering of VM for all of this installation to see
-
     if not ctx: # Using API. Else handled by cli.
         set_init_vars(params.get('cwd'), params.get('tmpdir'))
         set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))

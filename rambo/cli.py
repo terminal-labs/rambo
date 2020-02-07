@@ -1,3 +1,4 @@
+import configparser
 import os
 import sys
 import json
@@ -5,63 +6,12 @@ import pkg_resources
 
 import click
 
-from rambo.click_configfile import ConfigFileReader, Param, SectionSchema
-from rambo.click_configfile import matches_section
-
 import rambo.app as app
 import rambo.utils as utils
 from rambo.settings import CONF_FILES, SETTINGS, PROJECT_NAME
 
 
 version = pkg_resources.get_distribution('rambo-vagrant').version
-
-
-### Config file handling
-class ConfigSectionSchema(object):
-    '''Describes all config sections of this configuration file.'''
-
-    @matches_section('base')
-    class Base(SectionSchema):
-        '''Corresponds to the main CLI entry point.'''
-        cwd                   = Param(type=click.Path())
-        tmpdir           = Param(type=click.Path())
-        vagrant_cwd           = Param(type=click.Path())
-        vagrant_dotfile_path  = Param(type=click.Path())
-        vm_name = Param(type=str)
-
-    @matches_section('up')
-    class Up(SectionSchema):
-        '''Corresponds to the `up` command group.'''
-        box                = Param(type=str)
-        provider           = Param(type=str)
-        guest_os           = Param(type=str)
-        ram_size           = Param(type=int)
-        drive_size         = Param(type=int)
-        machine_type       = Param(type=str)
-        sync_dirs           = Param(type=str)
-        sync_type           = Param(type=str)
-        provision          = Param(type=bool)
-        ports = Param(type=str)
-        destroy_on_error   = Param(type=bool)
-        hostname = Param(type=str)
-        project_dir = Param(type=click.Path())
-        provision_cmd = Param(type=str)
-        provision_script = Param(type=click.Path())
-        provision_with_salt = Param(type=bool)
-        salt_bootstrap_args = Param(type=str)
-        cpus = Param(type=int)
-
-
-class ConfigFileProcessor(ConfigFileReader):
-    config_files = CONF_FILES
-    # Specify additional schemas to merge with the primary so that they
-    # are added to the top level of default_map, for easy precedence of
-    # CLI > Configuration file > Environment > Default.
-    config_section_primary_schemas = [
-        ConfigSectionSchema.Base,
-        ConfigSectionSchema.Up,
-    ]
-    config_section_schemas = config_section_primary_schemas
 
 
 # Only used for the `vagrant` subcommand
@@ -73,13 +23,47 @@ VAGRANT_CMD_CONTEXT_SETTINGS = {
 # Used for all commands and subcommands
 CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],
-    'default_map': ConfigFileProcessor.read_config(),
     'auto_envvar_prefix': PROJECT_NAME.upper()
 }
 
+def load_config_section(section):
+    """Generic section load
+    """
+    parser = configparser.ConfigParser()
+    parser.read('rambo.conf')
+
+    if section in parser:
+        return dict(parser[section])
+
+# Support for injecting config vars into click context
+# https://stackoverflow.com/questions/46358797/python-click-supply-arguments-and-options-from-a-configuration-file
+def load_config_for_command(ctx, section):
+    parser = configparser.ConfigParser()
+    parser.read(CONF_FILES)
+
+    if section == "cli":
+        section = "base"
+    if section in parser:
+        for param, value in ctx.params.items():
+            if value is None:
+                if param in parser[section]:
+                    ctx.params[param] = parser[section][param]
+    return ctx
+
+class GroupWithConfig(click.Group):
+    def invoke(self, ctx):
+        ctx = load_config_for_command(ctx, self.name)
+        super().invoke(ctx)
+
+
+class CommandWithConfig(click.Command):
+    def invoke(self, ctx):
+        ctx = load_config_for_command(ctx, self.name)
+        return super().invoke(ctx)
+
 
 ### Main command / CLI entry point
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(context_settings=CONTEXT_SETTINGS, cls=GroupWithConfig)
 @click.option('--vagrant-cwd', type=click.Path(resolve_path=True),
               help='Path entry point to the Vagrantfile. Defaults to '
               'the Vagrantfile provided by %s in the installed path.'
@@ -219,7 +203,7 @@ def ssh_cmd(ctx, command):
 
 
 @cli.command('up', context_settings=CONTEXT_SETTINGS,
-             short_help='Create or start VM.')
+             short_help='Create or start VM.', cls=CommandWithConfig)
 @click.option('-p', '--provider', type=str,
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default %s.'
