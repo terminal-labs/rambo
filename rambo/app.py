@@ -191,18 +191,21 @@ def destroy(ctx=None, **params):
         set_init_vars(params.get('cwd'), params.get('tmpdir'))
         set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
-    vagrant_general_command('destroy --force')
-    if "vm_name" in params:
-        utils.echo(f"Now removing base VirtualBox data for VM {params['vm_name']}.")
-        os.system(f"vboxmanage controlvm {params['vm_name']} poweroff")
-        os.system(f"vboxmanage unregistervm {params['vm_name']} --delete")
+    destroy_cmd = vagrant_general_command('destroy --force')
 
+    # If there's any error code from Vagrant, don't delete the metadata.
+    if not destroy_cmd:
+        utils.file_delete(os.path.join(get_env_var('TMPDIR'), 'provider'))
+        utils.file_delete(os.path.join(get_env_var('TMPDIR'), 'random_tag'))
+        utils.dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
+        utils.echo('Temporary files removed')
+        utils.echo('Destroy complete.')
 
-    utils.file_delete(os.path.join(get_env_var('TMPDIR'), 'provider'))
-    utils.file_delete(os.path.join(get_env_var('TMPDIR'), 'random_tag'))
-    utils.dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
-    utils.echo('Temporary files removed')
-    utils.echo('Destroy complete.')
+        if params.get("vm_name"):
+            utils.echo(f"Now removing base VirtualBox data for VM {params['vm_name']}.")
+            os.system(f"vboxmanage controlvm {params['vm_name']} poweroff")
+            os.system(f"vboxmanage unregistervm {params['vm_name']} --delete")
+
 
 def export(resource=None, export_path=None, force=None):
     '''Drop default code in the CWD / user defined space. Operate on saltstack
@@ -470,7 +473,7 @@ def vagrant_general_command(cmd):
         cmd (str): String to append to command `vagrant ...`
     '''
     # Modify cmd in private function to keep enforcement of being a vagrant cmd there.
-    _invoke_vagrant(cmd)
+    return _invoke_vagrant(cmd)
 
 
 class Run_app():
