@@ -1,5 +1,6 @@
 import ast
 import os
+from pathlib import Path
 
 import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
@@ -25,7 +26,8 @@ def cpus_option(cpus=None):
 
     Return cpus (int)
     '''
-    if cpus and 1 <= cpus <= 32:
+    breakpoint()
+    if cpus and 1 <= int(cpus) <= 32:
         set_env_var('cpus', cpus)
         return cpus
     elif cpus:
@@ -191,7 +193,7 @@ def provision_script_option(provision_script=None):
     Return provision_script (str)
     '''
     if provision_script:
-        set_env_var('provision_script', provision_script)
+        set_env_var('provision_script', str(Path(provision_script).resolve()))
 
     return provision_script
 

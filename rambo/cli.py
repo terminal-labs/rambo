@@ -240,6 +240,12 @@ def ssh_cmd(ctx, command):
                   """"[['guest_dir', 'host_dir'], ['guest_dir2', 'host_dir2']]"."""
               )
               )
+@click.option('--ec2-security-groups', type=str,
+              help=(
+                  "A list of security groups to add to the EC2 VM, passed as a Python list of the form "
+                  """"['salted_server', 'security_group_2]"."""
+              )
+              )
 @click.option('--sync-type', type=str,
               help='Sync type')
 @click.option('--ports', type=str,
@@ -261,7 +267,7 @@ def ssh_cmd(ctx, command):
               help='The name of the VirtualMachine / Container.')
 @click.pass_context
 def up_cmd(ctx, provider, box, hostname, guest_os, ram_size, cpus, drive_size, machine_type,
-           salt_bootstrap_args, sync_dirs, sync_type, ports, project_dir, provision, provision_cmd, provision_script, provision_with_salt, destroy_on_error, vm_name):
+           salt_bootstrap_args, sync_dirs, ec2_security_groups, sync_type, ports, project_dir, provision, provision_cmd, provision_script, provision_with_salt, destroy_on_error, vm_name):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.

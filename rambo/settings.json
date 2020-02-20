@@ -44,6 +44,11 @@
             "do": "ubuntu-16-04-x64",
             "docker": "ubuntu/xenial64",
             "ec2": "ami-07585467"
+        },
+        "ubuntu-1804": {
+            "do": "ubuntu-18-04-x64",
+            "docker": "ubuntu/bionic64",
+            "ec2": "ami-03ba3948f6c37a4b0"
         }
     },
     "GUEST_OSES_DEFAULT": "ubuntu-1604",

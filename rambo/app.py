@@ -449,7 +449,7 @@ def up(ctx=None, **params):
     elif params['provider'] == 'docker':
         vagrant_providers.docker()
     elif params['provider'] == 'ec2':
-        vagrant_providers.ec2()
+        vagrant_providers.ec2(**params)
     else:
         cmd += " --provider={}".format(params['provider'])
 
