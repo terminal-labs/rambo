@@ -209,6 +209,19 @@ def provision_with_salt_option(provision_with_salt=None):
 
     return provision_with_salt
 
+def provision_with_salt_legacy_option(provision_with_salt_legacy=None):
+    '''Set provision_with_salt_legacy env var.
+
+    Args:
+        provision_with_salt_legacy (bool): Flag to cause Salt_Legacy provisioning.
+
+    Return provision_with_salt_legacy (bool)
+    '''
+    if provision_with_salt_legacy:
+        set_env_var('provision_with_salt_legacy', provision_with_salt_legacy)
+
+    return provision_with_salt_legacy
+
 def salt_bootstrap_args_option(salt_bootstrap_args=None):
     '''Set salt_bootstrap_args env var.
 

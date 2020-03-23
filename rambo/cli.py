@@ -265,13 +265,15 @@ def ssh_cmd(ctx, command):
               help='Path on host to script provision with')
 @click.option('--provision-with-salt', is_flag=True,
               help='Provision with Salt')
+@click.option('--provision-with-salt-legacy', is_flag=True,
+              help='Provision with Salt (Legacy Style)')
 @click.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
 @click.option('--vm_name', type=str,
               help='The name of the VirtualMachine / Container.')
 @click.pass_context
 def up_cmd(ctx, provider, box, hostname, guest_os, ram_size, cpus, drive_size, machine_type,
-           salt_bootstrap_args, sync_dirs, ec2_security_groups, sync_type, ports, project_dir, provision, provision_cmd, provision_script, provision_with_salt, destroy_on_error, vm_name):
+           salt_bootstrap_args, sync_dirs, ec2_security_groups, sync_type, ports, project_dir, provision, provision_cmd, provision_script, provision_with_salt, provision_with_salt_legacy, destroy_on_error, vm_name):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.

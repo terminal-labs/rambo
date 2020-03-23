@@ -26,6 +26,7 @@ IMPROVEMENTS:
 - Now you can pass fancy pathing like `..` and symlinks to the CLI.
 - More comprehensive logging.
 - Splitting expected saltstack dir into saltstack/etc and saltstack/srv to more easily work with the common pattern of having Salt code in /etc/salt and /srv.
+- Left legacy style salt provisioning, but added a flag to use it instead of the newer style.
 
 BUGFIXES:
 

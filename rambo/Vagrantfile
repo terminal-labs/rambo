@@ -144,22 +144,28 @@ Vagrant.configure("2") do |config|
       salt.bootstrap_options = get_env_var_rb('salt_bootstrap_args')
       salt.verbose = true
     end
-    # Bash to set, prepare, and initiate Salt provisioning.
-    $salt = <<-EOS
-      # mv /etc/salt/minion{,-dist}
-      # cp /vagrant/saltstack/minions/minion.#{provider}  /etc/salt/minion
-      # cp /vagrant/saltstack/grains/grains /etc/salt/grains
-      # mkdir -p /vagrant/saltstack/srv/salt/files/licenses
-      # if [ -d "/vagrant/auth/licenses/" ]; then
-      #     cp -a /vagrant/auth/licenses/. /vagrant/saltstack/srv/salt/files/licenses/
-      # fi
-      # if [ #{ENV["WEBSITE_BRANCH"]} ]; then
-      #     sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]}
-      # fi
-      # sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval id #{get_env_var_rb('hostname')}
-      # sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval randomtag #{RANDOMTAG}
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate
-      EOS
+    # Bash to set, prepare, and initiate Legacy Salt provisioning.
+    if get_env_var_rb('provision_with_salt_legacy')
+      $salt = <<-EOS
+        mv /etc/salt/minion{,-dist}
+        cp /vagrant/saltstack/minions/minion.#{provider}  /etc/salt/minion
+        cp /vagrant/saltstack/grains/grains /etc/salt/grains
+        mkdir -p /vagrant/saltstack/srv/salt/files/licenses
+        if [ -d "/vagrant/auth/licenses/" ]; then
+            cp -a /vagrant/auth/licenses/. /vagrant/saltstack/srv/salt/files/licenses/
+        fi
+        if [ #{ENV["WEBSITE_BRANCH"]} ]; then
+            sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]}
+        fi
+        sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval id #{config.vm.hostname}
+        sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval randomtag #{RANDOMTAG}
+        sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate
+        EOS
+    else
+      $salt = <<-EOS
+        sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate
+        EOS
+    end
     config.vm.provision "shell",
       inline: $salt, keep_color: true
   end
