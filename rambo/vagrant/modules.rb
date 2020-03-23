@@ -9,7 +9,9 @@ def random_tag
     tag = File.read(random_tag_path)
   else
     # 95 is unlikely to be used. It is the ascii code for an underscore
-    guest_hostname = host + '-' + File.basename(File.dirname(tmp_dir)).sub("_", "95")
+    replacements = {'_' => '95'}
+    guest_hostname = host + '-' + File.basename(File.dirname(tmp_dir))
+    guest_hostname = guest_hostname.gsub(Regexp.union(replacements.keys), replacements)
     guest_hostname = truncate(guest_hostname, 43) # 64 - 15 for the next line - 6 for "rambo-"
     tag = guest_hostname + '-' + SecureRandom.hex(6)
     File.write(random_tag_path, tag)
