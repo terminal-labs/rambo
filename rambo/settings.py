@@ -9,4 +9,4 @@ with open(os.path.join(PROJECT_LOCATION, 'settings.json'), 'r') as f:
     SETTINGS = json.load(f)
 PROVIDERS = SETTINGS['PROVIDERS']
 PROJECT_NAME = SETTINGS['PROJECT_NAME']
-CONF_FILES = [f"my_{PROJECT_NAME}.conf", f"{PROJECT_NAME}.conf"]
+CONF_FILES = [f"{PROJECT_NAME}.conf", f"my_{PROJECT_NAME}.conf"]

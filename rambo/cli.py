@@ -120,11 +120,15 @@ def createproject_cmd(ctx, project_name, config_only):
     app.createproject(project_name, ctx.parent.params['cwd'], ctx.parent.params['tmpdir'], config_only, ctx)
 
 
-@cli.command('destroy', context_settings=CONTEXT_SETTINGS, short_help='Destroy VM and metadata.')
+@cli.command(
+    'destroy',
+    context_settings=CONTEXT_SETTINGS,
+    short_help='Destroy VM and metadata.',
+)
 @click.option('--vm_name', type=str,
               help='The name of the VirtualMachine / Container.')
 @click.pass_context
-def destroy_cmd(ctx, vm_name):
+def destroy_cmd(ctx, vm_name, **params):
     '''Destroy a VM / container. This will tell vagrant to forcibly destroy
     a VM, and to also destroy its Rambo metadata (provider and random_tag),
     and Vagrant metadata (.vagrant dir).

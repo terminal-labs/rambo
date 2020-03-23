@@ -19,14 +19,13 @@ def box_option(box=None):
     return box
 
 def cpus_option(cpus=None):
-    '''Set cpus
+    """Set cpus
 
     Args:
         cpus (int): CPUs for VirtualBox VM
 
     Return cpus (int)
-    '''
-    breakpoint()
+    """
     if cpus and 1 <= int(cpus) <= 32:
         set_env_var('cpus', cpus)
         return cpus
