@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 
 import rambo.utils as utils
-from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
-from rambo.utils import get_env_var, set_env_var
+from rambo.settings import SETTINGS
+from rambo.utils import set_env_var
 
 def box_option(box=None):
     '''Set box

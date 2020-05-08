@@ -8,6 +8,8 @@
 
 import pkg_resources
 
+from recommonmark.parser import CommonMarkParser
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -172,8 +174,6 @@ texinfo_documents = [
 
 
 # -- Extension configuration -------------------------------------------------
-
-from recommonmark.parser import CommonMarkParser
 
 source_parsers = {
     '.md': CommonMarkParser,

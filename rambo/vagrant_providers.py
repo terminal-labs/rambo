@@ -1,6 +1,3 @@
-import json
-import os
-
 from rambo.settings import SETTINGS
 from rambo.utils import abort, get_env_var, set_env_var
 
