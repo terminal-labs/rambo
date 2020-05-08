@@ -30,6 +30,7 @@ IMPROVEMENTS:
 
 BUGFIXES:
 
+- Fix bug incorrectly setting cwd, leading to nested temp dirs.
 - Passes provider explicitly as cmd arg to Vagrant.
 - Fixes guest hostname generation when given underscores in the path, casting it to "95", it's ascii code.
 - Fixes guest hostname generation when too long, truncating the part preceding the hash so total length stays below 64 chars.
