@@ -1,4 +1,3 @@
-import distutils
 import errno
 import os
 import platform
@@ -199,12 +198,13 @@ def destroy(ctx=None, **params):
         utils.file_delete(os.path.join(get_env_var('TMPDIR'), 'random_tag'))
         utils.dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
         utils.echo('Temporary files removed')
-        utils.echo('Destroy complete.')
 
         if params.get("vm_name"):
             utils.echo(f"Now removing base VirtualBox data for VM {params['vm_name']}.")
             os.system(f"vboxmanage controlvm {params['vm_name']} poweroff")
             os.system(f"vboxmanage unregistervm {params['vm_name']} --delete")
+
+    utils.echo('Destroy complete.')
 
 
 def export(resource=None, export_path=None, force=None):
