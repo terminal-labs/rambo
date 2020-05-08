@@ -341,7 +341,7 @@ def sync_type_option(sync_type=None):
             f"Sync type {sync_type} not in approved list. Using Vagrant's default."
             f"Supported alternate sync types are {SETTINGS['SYNC_TYPES']}."
         )
-        synce_type = None
+        sync_type = None
 
     return sync_type
 

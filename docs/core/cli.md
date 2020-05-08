@@ -85,10 +85,18 @@ is equivalent to:
 rambo up --provider digitalocean --guest-os centos-7
 ```
 
+An optional `my_rambo.conf` is also used, so you can have personallized and untracked configuration.
+
 For a more detailed description, see the separate [rambo.conf docs](conf).
 
 ## Environment Variables
 
-**This is advanced and shouldn't be used without good reason.**
+### RAMBO_ env vars
 
-Like the config file, options can also be specified as environment variables. However, this is much more complex, and we strongly recommend not using these manually, as we think it's much easier to lose track of what's going on and cause undue headache. If you really need to know, look at this specific page for [Environment Variables](env_vars).
+Like the config file, options can also be specified as environment variables. All CLI options that you can pass to Rambo are available to set by environment variables. They take the form of the CLI option, but are all upper-cased, use underscores instead of dashes, and are prefixed with `RAMBO_`. E.g. `RAMBO_GUEST_OS` is the environment variable for the CLI option `--guest-os`.
+
+### VAGRANT_ env vars
+
+**This is strongly discouraged.**
+
+Rambo uses Vagrant, so Vagrant specific environment variables can be used. Rambo itself sets some of these after its CLI invocation, so these may be overridden by Rambo. We do not support using these env vars manually with Rambo.

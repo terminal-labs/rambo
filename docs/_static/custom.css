@@ -4,8 +4,14 @@
 }
 /* links */
 .wy-nav-content a {
-    color: #2F9A41;
+  color: #2F9A41;
 }
 .wy-nav-content a:visited {
-    color: #2980B9;
+  color: #2980B9;
+}
+
+.rst-content blockquote {
+  padding: 0 1em;
+  color: #6a737d;
+  border-left: .25em solid #dfe2e5;
 }

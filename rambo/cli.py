@@ -1,7 +1,6 @@
 import configparser
 import os
 import sys
-import json
 import pkg_resources
 
 import click
@@ -26,6 +25,7 @@ CONTEXT_SETTINGS = {
     'auto_envvar_prefix': PROJECT_NAME.upper()
 }
 
+
 def load_config_section(section):
     """Generic section load
     """
@@ -34,6 +34,7 @@ def load_config_section(section):
 
     if section in parser:
         return dict(parser[section])
+
 
 # Support for injecting config vars into click context
 # https://stackoverflow.com/questions/46358797/python-click-supply-arguments-and-options-from-a-configuration-file
@@ -50,6 +51,7 @@ def load_config_for_command(ctx, section):
                     ctx.params[param] = parser[section][param]
     return ctx
 
+
 class GroupWithConfig(click.Group):
     def invoke(self, ctx):
         ctx = load_config_for_command(ctx, self.name)
@@ -62,7 +64,7 @@ class CommandWithConfig(click.Command):
         return super().invoke(ctx)
 
 
-### Main command / CLI entry point
+# Main command / CLI entry point
 @click.group(context_settings=CONTEXT_SETTINGS, cls=GroupWithConfig)
 @click.option('--vagrant-cwd', type=click.Path(resolve_path=True),
               help='Path entry point to the Vagrantfile. Defaults to '
@@ -97,7 +99,7 @@ def cli(ctx, cwd, tmpdir, vagrant_cwd, vagrant_dotfile_path):
         utils.write_to_log(' '.join(sys.argv), 'stderr')
 
 
-### Subcommands
+# Subcommands
 @cli.command('createproject')
 @click.argument('project_name')
 @click.option('-c', '--config-only', is_flag=True,
@@ -168,7 +170,7 @@ def install_plugins(force, plugins):
     all default Vagrant plugins from host platform specific list.
     '''
     # If auth and plugins are both not specified, run both.
-    if not plugins: # No args means all default plugins.
+    if not plugins:  # No args means all default plugins.
         plugins = ('all',)
     app.install_plugins(force, plugins)
 
@@ -254,7 +256,9 @@ def ssh_cmd(ctx, command):
               help='Sync type')
 @click.option('--ports', type=str,
               help=("Additional ports to sync into VM, passed as a Python list of lists of the form "
-              """[['guest_port', 'host_port'], ['guest_port2', 'host_port2']]"."""))
+                    """[['guest_port', 'host_port'], ['guest_port2', 'host_port2']]"."""
+                    )
+              )
 @click.option('--project-dir', type=click.Path(resolve_path=True),
               help='List of path to sync into VM')
 @click.option('--provision/--no-provision', default=None,
@@ -278,11 +282,12 @@ def up_cmd(ctx, provider, box, hostname, guest_os, ram_size, cpus, drive_size, m
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.
     '''
-    if not os.path.isfile('%s.conf' % PROJECT_NAME):
-        utils.abort('Config file %s.conf must be present in working directory.\n'
-              'A config file is automatically created when you run \n'
-              'createproject. You can also make a config file manually.'
-              % PROJECT_NAME)
+    if not os.path.isfile(f'{PROJECT_NAME}.conf'):
+        utils.abort(
+            f'Config file {PROJECT_NAME}.conf must be present in working directory.\n'
+            'A config file is automatically created when you run \n'
+            'createproject. You can also make a config file manually.'
+        )
 
     app.up(ctx, **ctx.params)
 
