@@ -6,7 +6,7 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/stable/config
 
-from rambo import __version__
+import pkg_resources
 
 # -- Path setup --------------------------------------------------------------
 
@@ -22,13 +22,13 @@ from rambo import __version__
 # -- Project information -----------------------------------------------------
 
 project = 'Rambo'
-copyright = '2018, Terminal Labs'
+copyright = '2018-2020, Terminal Labs'
 author = 'Terminal Labs'
 
 # The short X.Y version
-version = __version__
+version = pkg_resources.get_distribution('rambo-vagrant').version
 # The full version, including alpha/beta/rc tags
-release = __version__
+release = version
 
 
 # -- General configuration ---------------------------------------------------

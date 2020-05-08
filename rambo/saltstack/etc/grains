@@ -1,0 +1,28 @@
+roles:
+  - project
+  - dev
+deescalated_user: vagrant
+# domain: [domain.tld]
+project: website
+pip_req_path: requirements.txt
+
+dvcs: git
+
+anaconda_license: anaconda_license_bundle.txt
+repository: git@github.com:project/repo.git
+repo_host: github.com
+# fingerprint: 97:8c:1b:f2:6f:14:6b:5c:3b:ec:aa:46:46:74:7c:40 # BitBucket
+# fingerprint: 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48 # GitHub
+# fingerprint: 12:34:45... # Custom
+
+# artifact_server_address: 123.45.67.89
+# artifact_server_fingerprint: [put fingerprint here of the form 00:01:02...]
+# artifact_files: path/to/artifacts/*
+# artifact_drop_path: served_files/media
+# artifact_db_path: path/to/db_artifact
+
+# db_dump: default.sql
+# postgres_password: [pwd here]
+# secret_key: [key here]
+# nevercache_key: [key here]
+# cluster_nodes: # Value is dict like {'hostname1': 'ipaddr1', ...}
