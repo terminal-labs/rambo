@@ -193,18 +193,20 @@ def destroy(ctx=None, **params):
     destroy_cmd = vagrant_general_command('destroy --force')
 
     # If there's any error code from Vagrant, don't delete the metadata.
-    if not destroy_cmd:
+    if not destroy_cmd:  # I.e. we succeeded - ret code == 0
         utils.file_delete(os.path.join(get_env_var('TMPDIR'), 'provider'))
         utils.file_delete(os.path.join(get_env_var('TMPDIR'), 'random_tag'))
         utils.dir_delete(os.environ.get('VAGRANT_DOTFILE_PATH'))
         utils.echo('Temporary files removed')
 
-        if params.get("vm_name"):
+        if params.get("vm_name"):  # Additionally remove the box if we can.
             utils.echo(f"Now removing base VirtualBox data for VM {params['vm_name']}.")
             os.system(f"vboxmanage controlvm {params['vm_name']} poweroff")
             os.system(f"vboxmanage unregistervm {params['vm_name']} --delete")
 
-    utils.echo('Destroy complete.')
+        utils.echo('Destroy complete.')
+    else:
+        utils.echo('We received an error. Destroy may not be complete.')
 
 
 def export(resource=None, export_path=None, force=None):
