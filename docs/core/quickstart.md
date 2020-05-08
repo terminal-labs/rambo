@@ -19,7 +19,7 @@ We expect it's likely you can get Rambo to work on any Unix-like system, but you
 
 ## Installation
 
-1. Install / Use Python 3.2+ and pip (for example with a Virtual Environment).
+1. Install / Use Python 3.6+ and pip (for example with a Virtual Environment).
 
 1. Download and install [VirtualBox](https://www.virtualbox.org/) 5.1 or newer.
 
@@ -28,7 +28,7 @@ We expect it's likely you can get Rambo to work on any Unix-like system, but you
 1. Install Rambo with pip,
 
     - [latest release](https://github.com/terminal-labs/rambo/releases) with pypi: `pip install rambo-vagrant`, or
-    - [from source](https://github.com/terminal-labs/rambo): `git clone git@github.com:terminal-labs/rambo.git --recursive; cd rambo; pip install -e .`
+    - [from source](https://github.com/terminal-labs/rambo): go into the repository and `pip install -e .`
 
 1. Install plugins with `rambo install-plugins`
 
@@ -61,10 +61,6 @@ Rambo supports various providers, and aims to let you switch between them as eas
 If you never specify any provider, Rambo will use the VirtualBox as its default choice, and is simply
 
 `rambo up`
-
-or the identical, more verbose command
-
-`rambo up -p virtualbox`
 
 ## Provisioners / Configuration Management
 
