@@ -19,6 +19,7 @@ import rambo
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+
 def download_sample_states(command_subclass):
     """Customized setuptools command to download saltstack sample states
     dependencies from https://github.com/terminal-labs/sample-states
@@ -35,12 +36,12 @@ def download_sample_states(command_subclass):
         yes = {"yes", "y", "ye", ""}
         no = {"no", "n"}
 
-        ## Special Case of sdist (upload)
+        # Special Case of sdist (upload)
         if type(self).__name__ == "CustomSdistCommand":
             if os.path.exists(target):
                 choice = input(
-                    "%s exists. Delete and redownload before running sdist? (Y/n): "
-                    % target
+                    f"{target} exists. Delete and redownload before running sdist? "
+                    "(Y/n): "
                 ).lower()
                 if choice in yes:
                     shutil.rmtree(target)  # Delete.
@@ -50,15 +51,14 @@ def download_sample_states(command_subclass):
                     print("Please respond with 'yes' or 'no'")
             else:
                 print(
-                    "%s did not yet exist, so we must download it for packaging."
-                    % target
+                    f"{target} did not yet exist, so we must download it for packaging."
                 )
 
-        ## Download states and copy if we need to.
+        # Download states and copy if we need to.
         if not os.path.exists(
             target
         ):  # Do not overwrite existing saltstack dir. Installs don't delete!
-            url = "https://github.com/terminal-labs/sample-states/archive/basic.zip"
+            url = "https://github.com/terminal-labs/sample-states/archive/rambo.zip"
             filename = "sample-states.zip"
             with urllib.request.urlopen(url) as response, open(
                 filename, "wb"
@@ -96,10 +96,13 @@ class CustomInstallCommand(install):
     pass
 
 
-# Remove this section when we stop using our submoduled fork
-# of click_configfile
-install_requires = ["click >= 6.6", "six >= 1.10"]
-dev_requires = ["black", "ipdb"]
+install_requires = ["click"]
+docs_require = [
+    "recommonmark",  # Higher versions break relative paths in links.
+    "sphinx-markdown-tables",
+    "sphinx_rtd_theme",
+]
+dev_require = docs_require + ["black", "ipdb"]
 
 setup(
     author="Terminal Labs",
@@ -121,9 +124,9 @@ setup(
         [console_scripts]
         rambo=rambo.cli:main
      """,
-    extras_require={"ipython": ["ipython"], "dev": dev_requires,},
+    extras_require={"dev": dev_require, "docs": docs_require},
     include_package_data=True,
-    install_requires=install_requires + ["click", "sphinx_rtd_theme",],
+    install_requires=install_requires,
     license=license,
     name="Rambo-vagrant",
     packages=find_packages(),
