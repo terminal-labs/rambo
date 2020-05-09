@@ -134,8 +134,12 @@ Vagrant.configure("2") do |config|
     end
   # Bash to set, prepare, and initiate Legacy Salt provisioning.
   elsif get_env_var_rb('provision_with_salt_legacy') and Dir.exist?(File.join(sync_dir, 'saltstack'))
+    config.vm.provision :salt do |salt|
+      salt.bootstrap_options = get_env_var_rb('salt_bootstrap_args')
+      salt.verbose = true
+      salt.colorize = true
+    end
     $salt = <<-EOS
-      mv /etc/salt/minion{,-dist}
       cp /vagrant/saltstack/minions/minion.#{provider}  /etc/salt/minion
       cp /vagrant/saltstack/grains/grains /etc/salt/grains
       mkdir -p /vagrant/saltstack/srv/salt/files/licenses
@@ -147,7 +151,7 @@ Vagrant.configure("2") do |config|
       fi
       sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval id #{config.vm.hostname}
       sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval randomtag #{RANDOMTAG}
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate
+      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-file-level info
       EOS
     config.vm.provision "shell", inline: $salt, keep_color: true
   end
