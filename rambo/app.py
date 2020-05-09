@@ -109,8 +109,7 @@ def set_tmpdir(tmpdir=None):
     '''
     # loc of tmpdir
     if tmpdir: # cli / api
-        set_env_var('TMPDIR',
-                    os.path.join(tmpdir, '.%s-tmp' % PROJECT_NAME))
+        set_env_var('TMPDIR', tmpdir)
     elif get_env_var('TMPDIR'): # Previously set env var
         set_env_var('TMPDIR',
                     os.path.join(get_env_var('TMPDIR'),
