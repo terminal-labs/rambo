@@ -1,8 +1,10 @@
+import ast
 import os
+from pathlib import Path
 
 import rambo.utils as utils
-from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
-from rambo.utils import get_env_var, set_env_var
+from rambo.settings import SETTINGS
+from rambo.utils import set_env_var
 
 def box_option(box=None):
     '''Set box
@@ -15,6 +17,24 @@ def box_option(box=None):
     if box:
         set_env_var('box', box)
     return box
+
+def cpus_option(cpus=None):
+    """Set cpus
+
+    Args:
+        cpus (int): CPUs for VirtualBox VM
+
+    Return cpus (int)
+    """
+    if cpus and 1 <= int(cpus) <= 32:
+        set_env_var('cpus', cpus)
+        return cpus
+    elif cpus:
+        utils.warn("CPUs must be an int in [1, 32]. Falling back to 1.")
+
+    set_env_var('cpus', 1)
+    return 1
+
 
 
 def guest_os_option(guest_os=None):
@@ -39,6 +59,26 @@ def guest_os_option(guest_os=None):
         utils.warn(msg)
     return guest_os
 
+def hostname_option(hostname=None):
+    """Validate hostname
+
+    Args:
+        hostname (str): Hostname to set in VM / container
+
+    Return hostname (str)
+
+    """
+    if hostname and len(hostname) > 64:
+        utils.warn(
+            "Hostnames of many OSes are limited to 64 characters."
+            f"The current hostname {hostname} is {len(hostname)}."
+        )
+
+    if hostname:
+        set_env_var('hostname', hostname)
+
+    return hostname
+
 def machine_type_option(machine_type=None, provider=None):
     '''Validate machine_type. If not supplied, set to default. Set as env var.
 
@@ -56,6 +96,58 @@ def machine_type_option(machine_type=None, provider=None):
             utils.abort(msg)
         set_env_var('machinetype', machine_type)
     return machine_type
+
+def ports_option(ports=None):
+    '''Validate ports. If not supplied, set to default. Set as env var.
+
+    ports must be list of lists of form:
+    `[['guest_port', 'host_port'], ['guest_port2', 'host_port2']]`
+
+    Args:
+        ports: Paths to sync into VM, supplied as list of lists.
+
+    Return ports (list)
+    '''
+    if not ports:
+        return None
+
+    try:
+        ports = ast.literal_eval(ports)
+    except SyntaxError:
+        utils.abort("ports cannot be evaluated as valid Python.")
+    if type(ports) is not list:
+        utils.abort(
+            f"`ports` was not evaluated as a Python list, but as '{type(ports)}'."
+        )
+    for port_pair in ports:
+        if type(port_pair) is not list:
+            utils.abort(
+                f"`ports` element {port_pair} was not evaluated as a Python list, but as "
+                f"'{type(port_pair)}'."
+            )
+        if len(port_pair) != 2:
+            utils.abort(f"Not the right number of ports to forward in {port_pair}.")
+        for port in port_pair:
+            if type(port_pair) != int and not 0 < port < 65535:
+                utils.abort(f"{port} in `ports` is not an int in a valid port range.")
+
+    set_env_var('ports', ports)
+    return ports
+
+def project_dir_option(project_dir=None):
+    '''Validate project_dir. If not supplied, set to default. Set as env var.
+
+    Args:
+        project_dir: Path to sync into VM.
+
+    Return project_dir (path)
+    '''
+    if not project_dir:
+        project_dir = os.getcwd()
+
+    set_env_var('project_dir', project_dir)
+
+    return project_dir
 
 def provider_option(provider=None):
     '''Validate provider. If not supplied, set to default. Set as env var.
@@ -77,6 +169,72 @@ def provider_option(provider=None):
             msg = msg + '%s\n' % supported_provider
         utils.abort(msg)
     return provider
+
+def provision_cmd_option(provision_cmd=None):
+    '''Load provision_cmd into env var.
+
+    Args:
+        provision_cmd (str): Command to run at the begginning of provisioning.
+
+    Return provision_cmd (str)
+    '''
+    if provision_cmd:
+        set_env_var('provision_cmd', provision_cmd)
+
+    return provision_cmd
+
+def provision_script_option(provision_script=None):
+    '''Load provision_script into env var.
+
+    Args:
+        provision_script (str): Path to file that will be ran at provisioning.
+
+    Return provision_script (str)
+    '''
+    if provision_script:
+        set_env_var('provision_script', str(Path(provision_script).resolve()))
+
+    return provision_script
+
+def provision_with_salt_option(provision_with_salt=None):
+    '''Set provision_with_salt env var.
+
+    Args:
+        provision_with_salt (bool): Flag to cause Salt provisioning.
+
+    Return provision_with_salt (bool)
+    '''
+    if provision_with_salt:
+        set_env_var('provision_with_salt', provision_with_salt)
+
+    return provision_with_salt
+
+def provision_with_salt_legacy_option(provision_with_salt_legacy=None):
+    '''Set provision_with_salt_legacy env var.
+
+    Args:
+        provision_with_salt_legacy (bool): Flag to cause Salt_Legacy provisioning.
+
+    Return provision_with_salt_legacy (bool)
+    '''
+    if provision_with_salt_legacy:
+        set_env_var('provision_with_salt_legacy', provision_with_salt_legacy)
+
+    return provision_with_salt_legacy
+
+def salt_bootstrap_args_option(salt_bootstrap_args=None):
+    '''Set salt_bootstrap_args env var.
+
+    Args:
+        salt_bootstrap_args (str): salt-bootstrap args
+
+    Return salt_bootstrap_args (str)
+    '''
+    if not salt_bootstrap_args:
+        salt_bootstrap_args =  ""
+    set_env_var('salt_bootstrap_args', salt_bootstrap_args)
+
+    return salt_bootstrap_args
 
 def size_option(ram_size=None, drive_size=None):
     '''Validate ram and drive sizes. Pair them if possible. If not
@@ -101,7 +259,7 @@ def size_option(ram_size=None, drive_size=None):
             drive_size = SETTINGS['DRIVESIZE_DEFAULT']
     elif drive_size and not ram_size:
         try:
-            ram_size = list(SETTINGS['SIZES'].keys())[
+            ram_size = SETTINGS['SIZES'][
                 list(SETTINGS['SIZES'].values()).index(drive_size)]
         except ValueError: # Doesn't match, but we'll let them try it.
             ram_size = SETTINGS['RAMSIZE_DEFAULT']
@@ -114,37 +272,88 @@ def size_option(ram_size=None, drive_size=None):
     set_env_var('drivesize', drive_size)
 
     ## ram_size
-    if ram_size not in iter(SETTINGS['SIZES']):
+    if ram_size not in SETTINGS['SIZES']:
         msg = ('RAM Size "%s" is not in the RAM sizes list.\n'
                'Did you have a typo? We\'ll try anyway.\n'
                'Here is as list of avalible RAM sizes:\n\n'
                % ram_size)
-        for supported_ram_size in iter(SETTINGS['SIZES']):
+        for supported_ram_size in SETTINGS['SIZES']:
             msg = msg + '%s\n' % supported_ram_size
         utils.warn(msg)
 
     ## drive_size
-    if drive_size not in iter(SETTINGS['SIZES'].values()):
+    if drive_size not in SETTINGS['SIZES'].values():
         msg = ('DRIVE Size "%s" is not in the DRIVE sizes list.\n'
                'Did you have a typo? We\'ll try anyway.\n'
                'Here is as list of avalible DRIVE sizes:\n\n'
                % drive_size)
-        for supported_drive_size in iter(SETTINGS['SIZES'].values()):
+        for supported_drive_size in SETTINGS['SIZES'].values():
             msg = msg + '%s\n' % supported_drive_size
         utils.warn(msg)
     return (ram_size, drive_size)
 
-def sync_dir_option(sync_dir=None):
-    '''Validate sync_dir. If not supplied, set to default. Set as env var.
+def sync_dirs_option(sync_dirs=None):
+    '''Validate sync_dirs. If not supplied, set to default. Set as env var.
+
+    sync_dirs must be list of lists of form:
+    `"[['guest_dir', 'host_dir'], ['guest_dir2', 'host_dir2']]"`
 
     Args:
-        sync_dir: Path to sync into VM.
+        sync_dirs: Paths to sync into VM, supplied as list of lists.
 
-    Return sync_dir (path)
+    Return sync_dirs (list)
     '''
-    if not sync_dir:
-        sync_dir = os.getcwd()
+    if not sync_dirs:
+        return None
 
-    set_env_var('sync_dir', sync_dir)
+    try:
+        sync_dirs = ast.literal_eval(sync_dirs)
+    except SyntaxError:
+        utils.abort("sync_dirs cannot be evaluated as valid Python.")
+    if type(sync_dirs) is not list:
+        utils.abort(
+            f"sync_dirs was not evaluated as a Python list, but as '{type(sync_dirs)}'"
+        )
+    for sd in sync_dirs:
+        if type(sd) is not list:
+            utils.abort(
+                f"sync_dirs element {sd} was not evaluated as a Python list, but as "
+                f"'{type(sd)}'"
+            )
 
-    return sync_dir
+    # Normalize source dirs. Target Dirs must be absolute / handled by Vagrant.
+    sync_dirs = [[os.path.realpath(os.path.expanduser(lst[0])), lst[1]] for lst in sync_dirs]
+    set_env_var('sync_dirs', sync_dirs)
+    return sync_dirs
+
+def sync_type_option(sync_type=None):
+    '''Validate and set sync_type.
+
+    Args:
+        sync_type: Type of syncing to use.
+
+    Return sync_type (str)
+    '''
+    if sync_type in SETTINGS["SYNC_TYPES"]:
+        set_env_var('sync_type', sync_type)
+    elif sync_type:
+        utils.warn(
+            f"Sync type {sync_type} not in approved list. Using Vagrant's default."
+            f"Supported alternate sync types are {SETTINGS['SYNC_TYPES']}."
+        )
+        sync_type = None
+
+    return sync_type
+
+def vm_name_option(vm_name=None):
+    """Set vm_name
+
+    Args:
+        vm_name (str): Vm_Name to set in VM / container
+
+    Return vm_name (str)
+
+    """
+    if vm_name:
+        set_env_var('vm_name', vm_name)
+    return vm_name

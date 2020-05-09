@@ -3,6 +3,9 @@
 
 Vagrant.configure('2') do |config|
   config.vm.provider :digital_ocean do |provider, config|
+    if not ENV['DIGITALOCEAN_PRIVATE_KEY_PATH']
+      puts "You need to set a private key path for DigitalOcean."
+    end
     # set unique vm name
     config.vm.hostname = VM_NAME
     provider.token = ENV['DIGITALOCEAN_TOKEN']

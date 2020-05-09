@@ -1,6 +1,20 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# Recent vagrant broke this plugin without this class
+# https://github.com/mitchellh/vagrant-aws/issues/566#issuecomment-580812210
+class Hash
+  def slice(*keep_keys)
+    h = {}
+    keep_keys.each { |key| h[key] = fetch(key) if has_key?(key) }
+    h
+  end unless Hash.method_defined?(:slice)
+  def except(*less_keys)
+    slice(*keys - less_keys)
+  end unless Hash.method_defined?(:except)
+end
+
+
 Vagrant.configure('2') do |config|
   config.vm.provider :aws do |provider|
     # set unique vm name
@@ -11,7 +25,11 @@ Vagrant.configure('2') do |config|
     provider.access_key_id = ENV['AWS_ACCESS_KEY_ID']
     provider.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
     provider.keypair_name = ENV['AWS_KEYPAIR_NAME']
-    provider.security_groups = 'salted_server'
+    if get_env_var_rb('ec2_security_groups')
+      provider.security_groups = eval(get_env_var_rb('ec2_security_groups'))
+    else
+      provider.security_groups = 'salted_server'
+    end
     provider.availability_zone = 'us-west-1c'
     provider.region = 'us-west-1'
     provider.ami = get_env_var_rb('ami') ? get_env_var_rb('ami') :

@@ -17,14 +17,11 @@ require_relative "vagrant/modules.rb" # for random_tag
 SETTINGS = JSON.parse(File.read('settings.json'))
 PROJECT_NAME = SETTINGS["PROJECT_NAME"]
 RANDOMTAG = random_tag()
-VM_NAME = PROJECT_NAME + "-" + RANDOMTAG
-VM_NAME = VM_NAME.sub! '_', 'UNDERSCORE'
 FORWARD_SSH = true
-CUSTOM_PKG_SRC = true
-PROVISION_WITH_SALT = true
-PROVISION_WITH_CMD = false
-unless get_env_var_rb('SYNC')
-  set_env_var_rb('SYNC', 'rsync')
+if get_env_var_rb('vm_name')
+  VM_NAME = get_env_var_rb('vm_name')
+else
+  VM_NAME = PROJECT_NAME + "-" + RANDOMTAG
 end
 unless get_env_var_rb('cwd')
   set_env_var_rb('cwd', Dir.pwd)
@@ -71,68 +68,92 @@ end
 unless get_env_var_rb('DRIVESIZE')
   set_env_var_rb('DRIVESIZE', SETTINGS['DRIVESIZE_DEFAULT'])
 end
-unless get_env_var_rb('sync_dir')
-  set_env_var_rb('sync_dir', '.')
-end
 
-custom_code_dirs = [
-  'ansible',
-  'chef',
-  'puppet',
-  'saltstack',
-  'shell',
-  'vagrant',
-]
+
 
 # Provisioning
 Vagrant.configure("2") do |config|
-  if get_env_var_rb('SYNC') != 'disabled'
-    config.vm.synced_folder get_env_var_rb('sync_dir'), "/vagrant",
-      type: get_env_var_rb('SYNC'),
-      rsync__exclude: ['saltstack/'] # only provisioning code in project dir
-    for custom_code_dir in custom_code_dirs
-      if Dir.exist?(File.join(get_env_var_rb("CWD"), custom_code_dir))
-        config.vm.synced_folder File.join(get_env_var_rb("CWD"), custom_code_dir),
-          File.join("/vagrant", custom_code_dir), type: get_env_var_rb('SYNC')
+  # Set hostname
+  if get_env_var_rb('hostname')
+    config.vm.hostname = get_env_var_rb('hostname')
+  else
+    config.vm.hostname = VM_NAME
+  end
+
+  # Syncing / Shared folders
+  if get_env_var_rb('project_dir')
+    sync_dir = get_env_var_rb('project_dir')
+  else
+    sync_dir = get_env_var_rb('cwd')
+  end
+
+  if get_env_var_rb('sync_type') != 'disabled'
+    # Sync rambo project dir to /vagrant
+    config.vm.synced_folder sync_dir, "/vagrant", type: get_env_var_rb('sync_type')
+
+    # Sync saltstack/{etc,srv}
+    if get_env_var_rb('provision_with_salt') or get_env_var_rb('provision_with_salt_legacy')
+      if Dir.exist?(File.join(sync_dir, "saltstack/etc"))
+         config.vm.synced_folder File.join(sync_dir, "saltstack/etc"),
+           "/etc/salt", type: get_env_var_rb('sync_type')
+      end
+      if Dir.exist?(File.join(sync_dir, "saltstack/srv"))
+        config.vm.synced_folder File.join(sync_dir, "saltstack/srv"),
+          "/srv", type: get_env_var_rb('sync_type')
       end
     end
-  else # Disable all syncing. Breaks default method of provisioning.
-    config.vm.synced_folder get_env_var_rb("CWD"), "/vagrant", disabled: true
-  end
-  if CUSTOM_PKG_SRC == true
-    config.vm.provision "shell",
-      inline: "if [ -f /etc/apt/sources.list ]; then wget -O /etc/apt/sources.list https://raw.githubusercontent.com/terminal-labs/package-sources/master/" + get_env_var_rb("GUEST_OS") + "/official/sources.list || true; fi",
-      keep_color: true
-  end
-  if PROVISION_WITH_SALT and Dir.exist?(File.join(get_env_var_rb("CWD"), 'saltstack'))
-    config.vm.provision :salt do |salt|
-      salt.bootstrap_options = "-P"
-      salt.verbose = true
+
+    # Sync custom dirs
+    if get_env_var_rb('sync_dirs')
+      sync_dirs = eval(get_env_var_rb('sync_dirs'))
+      for sd in sync_dirs
+        config.vm.synced_folder sd[0], sd[1], type: get_env_var_rb('sync_type')
+      end
     end
-    # Bash to set prepare and initiate Salt provisioning.
+
+  else # Disable all syncing. Breaks default method of provisioning.
+    config.vm.synced_folder sync_dir, "/vagrant", disabled: true
+  end
+
+  # Custom Provisioning
+  if get_env_var_rb('provision_cmd')
+    puts get_env_var_rb('provision_cmd')
+    config.vm.provision "shell",
+      inline: get_env_var_rb('provision_cmd'), keep_color: true
+  end
+  if get_env_var_rb('provision_script')
+    config.vm.provision "shell",
+      path: get_env_var_rb('provision_script'), keep_color: true
+  end
+  if get_env_var_rb('provision_with_salt') and Dir.exist?(File.join(sync_dir, 'saltstack'))
+    config.vm.provision :salt do |salt|
+      salt.bootstrap_options = get_env_var_rb('salt_bootstrap_args')
+      salt.verbose = true
+      salt.colorize = true
+      salt.run_highstate = true
+    end
+  # Bash to set, prepare, and initiate Legacy Salt provisioning.
+  elsif get_env_var_rb('provision_with_salt_legacy') and Dir.exist?(File.join(sync_dir, 'saltstack'))
+    config.vm.provision :salt do |salt|
+      salt.bootstrap_options = get_env_var_rb('salt_bootstrap_args')
+      salt.verbose = true
+      salt.colorize = true
+    end
     $salt = <<-EOS
-      mv /etc/salt/minion{,-dist}
       cp /vagrant/saltstack/minions/minion.#{provider}  /etc/salt/minion
       cp /vagrant/saltstack/grains/grains /etc/salt/grains
-      mkdir -p /vagrant/saltstack/states/files/licenses
+      mkdir -p /vagrant/saltstack/srv/salt/files/licenses
       if [ -d "/vagrant/auth/licenses/" ]; then
-          cp -a /vagrant/auth/licenses/. /vagrant/saltstack/states/files/licenses/
+          cp -a /vagrant/auth/licenses/. /vagrant/saltstack/srv/salt/files/licenses/
       fi
       if [ #{ENV["WEBSITE_BRANCH"]} ]; then
           sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]}
       fi
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval hostname #{VM_NAME}
+      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval id #{config.vm.hostname}
       sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval randomtag #{RANDOMTAG}
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate
+      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-file-level info
       EOS
-    config.vm.provision "shell",
-      inline: $salt,
-      keep_color: true
-  end
-  if PROVISION_WITH_CMD
-    config.vm.provision "shell",
-      inline: "", # TODO: Pass in path to bash file as cli arg
-      keep_color: true
+    config.vm.provision "shell", inline: $salt, keep_color: true
   end
 end
 

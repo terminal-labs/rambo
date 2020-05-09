@@ -3,12 +3,14 @@
         "Linux": [
             "vagrant-aws",
             "vagrant-digitalocean",
+            "vagrant-disksize",
             "vagrant-lxc",
             "vagrant-scp"
         ],
         "Darwin": [
             "vagrant-aws",
             "vagrant-digitalocean",
+            "vagrant-disksize",
             "vagrant-scp"
         ]
     },
@@ -42,6 +44,11 @@
             "do": "ubuntu-16-04-x64",
             "docker": "ubuntu/xenial64",
             "ec2": "ami-07585467"
+        },
+        "ubuntu-1804": {
+            "do": "ubuntu-18-04-x64",
+            "docker": "ubuntu/bionic64",
+            "ec2": "ami-03ba3948f6c37a4b0"
         }
     },
     "GUEST_OSES_DEFAULT": "ubuntu-1604",
@@ -52,6 +59,12 @@
         "4096": "60",
         "8192": "80"
     },
+    "SYNC_TYPES": [
+        "disabled",
+        "rsync",
+        "nfs",
+        "smb"
+    ],
     "RAMSIZE_DEFAULT": "1024",
     "DRIVESIZE_DEFAULT": "30"
 }

@@ -26,6 +26,13 @@ To get started fast, see `Quickstart <docs/Quickstart>`__.
    providers/*
 
 .. toctree::
+   :caption: Provisioner Specific Documentation
+   :maxdepth: 2
+   :glob:
+
+   provisioners/*
+
+.. toctree::
    :caption: Changelog:
    :maxdepth: 1
    :glob:
@@ -48,17 +55,16 @@ drive.
 
 One of the goals of this project is be able to run a simple command and
 have a new VM be created on your provider of choice. Once the VM is
-initialized SaltStack is used to deploy code to and provision your
-machine. The SaltStack machine configuration code (states) will run the
-same regardless of which provider is actually running the machine. You
-can easily cycle your VMs by destroying and rebuilding them.
+initialized a provisioner is used to deploy code to and provision your
+machine. The provisioning configuration code will run the same regardless of which
+provider is actually running the machine. You can easily cycle your VMs by destroying
+and rebuilding them.
 
 Another goal of this repo is to have the spawned VMs be maximally
 similar across providers. Usually, your configuration will not need to
 change at all and will simply run on all providers.
 
-By default Rambo offers a basic VM configuration with SaltStack, but you
-can customize this. See `Customizing Rambo <docs/customizing>`__
+By default Rambo offers a basic VM configuration with [SaltStack](https://github.com/saltstack/salt/), but you can customize this. See `Customizing Rambo <docs/customizing>`__
 for that.
 
 Basic Usage
