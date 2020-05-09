@@ -13,12 +13,6 @@ from rambo.settings import CONF_FILES, SETTINGS, PROJECT_NAME
 version = pkg_resources.get_distribution("rambo-vagrant").version
 
 
-# Only used for the `vagrant` subcommand
-VAGRANT_CMD_CONTEXT_SETTINGS = {
-    "ignore_unknown_options": True,
-    "allow_extra_args": True,
-}
-
 # Used for all commands and subcommands
 CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"], "auto_envvar_prefix": PROJECT_NAME.upper()}
 
@@ -64,16 +58,6 @@ class CommandWithConfig(click.Command):
 # Main command / CLI entry point
 @click.group(context_settings=CONTEXT_SETTINGS, cls=GroupWithConfig)
 @click.option(
-    "--vagrant-cwd",
-    type=click.Path(resolve_path=True),
-    help="Path entry point to the Vagrantfile. Defaults to " "the Vagrantfile provided by %s in the installed path." % PROJECT_NAME.capitalize(),
-)
-@click.option(
-    "--vagrant-dotfile-path",
-    type=click.Path(resolve_path=True),
-    help="Path location of the .vagrant directory for the " "virtual machine. Defaults to the current working directory.",
-)
-@click.option(
     "--cwd",
     type=click.Path(resolve_path=True),
     help="The CWD of for this command. Defaults to "
@@ -87,15 +71,14 @@ class CommandWithConfig(click.Command):
 )
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
 @click.pass_context
-def cli(ctx, cwd, tmpdir, vagrant_cwd, vagrant_dotfile_path):
+def cli(ctx, cwd, tmpdir):
     """The main cli entry point. Params can be passed as usual with
     click (CLI or env var) and also with an INI config file.
     Precedence is CLI > Config > Env Var > defaults.
     """
     if ctx.invoked_subcommand not in ["createproject"]:
-        # These need to be very early because they may change the cwd of this Python or of Vagrant
+        # These need to be very early because they may change the cwd of this Python
         app.set_init_vars(cwd, tmpdir)
-        app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
         utils.write_to_log("\nNEW CMD")
         utils.write_to_log(" ".join(sys.argv))
@@ -139,17 +122,7 @@ def destroy_cmd(ctx, vm_name, **params):
     app.destroy(ctx, **ctx.params)
 
 
-@cli.command("export-vagrant-conf", short_help="Get Vagrant configuration")
-@click.option("-f", "--force", is_flag=True, help="Accept attempts to overwrite and merge.")
-@click.option("-O", "--output-path", type=click.Path(resolve_path=True), help="The optional output path.")
-def export_vagrant_conf(output_path, force):
-    """Places the default Vagrantfile and its resources (vagrant dir,
-    settings.json) in the CWD for customizing.
-    """
-    app.export("vagrant", output_path, force)
-
-
-@cli.command("halt", context_settings=VAGRANT_CMD_CONTEXT_SETTINGS, short_help="Halt VM.")
+@cli.command("halt", short_help="Halt VM.")
 @click.pass_context
 def halt_cmd(ctx):
     """Tells Vagrant to 'halt' the VM. Useful to free the Host's
@@ -158,20 +131,7 @@ def halt_cmd(ctx):
     app.halt(ctx)
 
 
-@cli.command("install-plugins", context_settings=CONTEXT_SETTINGS, short_help="Install Vagrant plugins")
-@click.option("-f", "--force", is_flag=True, help="Install plugins without confirmation.")
-@click.argument("plugins", nargs=-1, type=str)
-def install_plugins(force, plugins):
-    """Install passed args as Vagrant plugins. `all` or no args installs
-    all default Vagrant plugins from host platform specific list.
-    """
-    # If auth and plugins are both not specified, run both.
-    if not plugins:  # No args means all default plugins.
-        plugins = ("all",)
-    app.install_plugins(force, plugins)
-
-
-@cli.command("scp", context_settings=VAGRANT_CMD_CONTEXT_SETTINGS, short_help="Transfer files with scp.")
+@cli.command("scp", short_help="Transfer files with scp.")
 @click.pass_context
 def scp_cmd(ctx):
     """Transfer files or directories with scp. Accepts two args in one of the
@@ -302,18 +262,5 @@ def up_cmd(
         )
 
     app.up(ctx, **ctx.params)
-
-
-@cli.command("vagrant", context_settings=VAGRANT_CMD_CONTEXT_SETTINGS, short_help="Run a vagrant command through rambo.")
-@click.pass_context
-def vagrant_cmd(ctx):
-    """Accepts any args and forwards them to Vagrant directly, allowing you to
-    run any vagrant command. Rambo has first-class duplicates or wrappers for
-    the most common Vagrant commands, but for less common commands or commands
-    that are not customized, they don't need to be duplicated, so we call them
-    directly.
-    """
-    app.vagrant_general_command(" ".join(ctx.args))
-
 
 main = cli

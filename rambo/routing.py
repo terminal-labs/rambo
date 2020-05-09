@@ -1,1 +1,1 @@
-pure_providers = ["synthetic", "local"]
+pure_providers = ["digitalocean", "synthetic", "local"]
