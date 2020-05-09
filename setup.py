@@ -8,7 +8,7 @@ if sys.version_info < (3, 6, 0):
 with io.open("README.md", "rt", encoding="utf8") as f:
     readme = f.read()
 
-install_requires = ["black", "click"]
+install_requires = ["black", "click", "python-digitalocean"]
 docs_require = [
     "recommonmark",  # Higher versions break relative paths in links.
     "sphinx-markdown-tables",

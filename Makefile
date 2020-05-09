@@ -12,12 +12,12 @@ download_python_environment_manager:
 	fi
 
 vagrant: download_python_environment_manager
-	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/conda/build.sh $(APPNAME) $(SUDO_USER) vagrant
+	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/build.sh $(APPNAME) $(SUDO_USER) vagrant
 
 mac: download_python_environment_manager
-	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/conda/build.sh $(APPNAME) $(SUDO_USER) mac
-	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/conda/emit_activation_script.sh $(APPNAME) $(SUDO_USER) mac
+	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/build.sh $(APPNAME) $(SUDO_USER) mac
+	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/emit_activation_script.sh $(APPNAME) $(SUDO_USER) mac
 
 linux: download_python_environment_manager
-	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/conda/build.sh $(APPNAME) $(SUDO_USER) linux
-	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/conda/emit_activation_script.sh $(APPNAME) $(SUDO_USER) linux
+	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/build.sh $(APPNAME) $(SUDO_USER) linux
+	@sudo bash .tmp/python-environment-manager-master/makefile_resources/scripts_python/emit_activation_script.sh $(APPNAME) $(SUDO_USER) linux
