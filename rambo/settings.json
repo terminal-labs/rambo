@@ -20,7 +20,8 @@
         "docker",
         "ec2",
         "lxc",
-        "virtualbox"
+        "virtualbox",
+        "synthetic"
     ],
     "PROVIDERS_DEFAULT": "virtualbox",
     "GUEST_OSES": {
