@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 from pathlib import Path
@@ -6,7 +5,7 @@ from shutil import copyfile, move, rmtree
 
 import click
 
-from rambo.settings import PROJECT_NAME
+from rambo.settings import PROJECT_NAME, CONF_FILES
 
 
 def set_env_var(name, value):
@@ -19,9 +18,10 @@ def get_env_var(name):
     '''
     return os.environ.get(PROJECT_NAME.upper() + "_" + name.upper())
 
-def abort(msg):
+def abort(msg, log=True):
     msg = click.style(''.join(['ABORTED - ', msg]), fg='red', bold=True)
-    write_to_log(msg, 'stderr')
+    if log:
+        write_to_log(msg, 'stderr')
     sys.exit(msg)
 
 def echo(msg, err=None):
@@ -35,6 +35,13 @@ def echo(msg, err=None):
 def warn(msg):
     msg = click.style(''.join(['WARNING - ', msg]), fg='yellow')
     echo(msg)
+
+def find_conf(path):
+    if any(cf in os.listdir(path) for cf in CONF_FILES):
+        return path
+    for parent in Path(path).parents:
+        if any(cf in os.listdir(parent) for cf in CONF_FILES):
+            return parent
 
 def write_to_log(data=None, file_name=None):
     '''Write data to log files. Will append data to a single combined log.

@@ -70,6 +70,10 @@ You MUST get both the **Access key ID** and the **Secret access key**.
 
 **NOTE: AWS will only show you this key ONCE.**
 
+## Create SSH Key
+
+Now you need to create or upload an ssh key. This key is not your user's general key in IAM, but the one in the EC2 -> Key Pairs section.
+
 ## Edit Script to Load Environment Variables
 
 Here is the contents of the aws.env.sh file. Edit it by replacing the placeholder tags with your keys and tokens.
@@ -78,23 +82,25 @@ Here is the contents of the aws.env.sh file. Edit it by replacing the placeholde
 #!/bin/bash
 
 # for aws
+# associated with your aws user
 export AWS_ACCESS_KEY_ID=<YOUR AWS KEY ID>
 export AWS_SECRET_ACCESS_KEY=<YOUR AWS ACCESS KEY>
-export AWS_KEYPAIR_NAME="Vagrant"
-export AWS_SSH_PRIVKEY="auth/keys/aws.pem"
+# associated with ec2 specifically (not your user's general ssh key)
+export AWS_KEYPAIR_NAME="name"
+export AWS_SSH_PRIVKEY="auth/keys/name.pem"
 ```
 
-Put your aws access key token in the line:
+Put your aws access key token in the line.
 `export AWS_ACCESS_KEY_ID=<YOUR AWS KEY ID>`
 
 Put your aws secret acces key token in the line:
 `export AWS_SECRET_ACCESS_KEY=<YOUR AWS ACCESS KEY>`
 
 Put the **name** of your aws ssh private key in the line:
-`export AWS_KEYPAIR_NAME="aws"`
+`export AWS_KEYPAIR_NAME="name"`
 
 Put the **path** to your aws ssh private key in the line:
-`export AWS_SSH_PRIVKEY="auth/keys/aws.pem"`
+`export AWS_SSH_PRIVKEY="auth/keys/name.pem"`
 
 After editing, your aws.env.sh file will look similar to this:
 
@@ -102,10 +108,12 @@ After editing, your aws.env.sh file will look similar to this:
 #!/bin/bash
 
 # for aws
+# associated with your aws user
 export AWS_ACCESS_KEY_ID="AKIAITT673DAF4YNV7MA"
 export AWS_SECRET_ACCESS_KEY="m25AyjXtiYB2cCWMv1vQeyZtWqiWg0nqxi2Wm2QX"
-export AWS_KEYPAIR_NAME="aws"
-export AWS_SSH_PRIVKEY="auth/keys/aws.pem"
+# associated with ec2 specifically (not your user's general ssh key)
+export AWS_KEYPAIR_NAME="name"
+export AWS_SSH_PRIVKEY="auth/keys/name.pem"
 ```
 
 Note: the public key must be in the same dir as the private key and the public key must share the same base name as the private key (just append ".pub" on the public key file's name).

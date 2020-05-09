@@ -5,14 +5,33 @@
 FEATURES:
 
 - Add option to set path to sync into VM.
+- Add option to provision from script with path.
+- Add option to start provisioning with command.
+- Add option to set VM name.
+- Add option to set hostname.
+- Add option to set cpus in virtualbox.
+- Add option to set sync_type and defauting to Vagrant's default.
+- Add option to provision with Salt.
+- Add option to set salt-bootstrap args.
+- Add option to sync all listed dirs.
+- Add optional setting overrides with my_rambo.conf.
+- Add option to resize base VirtualBox drive size with vagrant plugin.
+- Add option to set ports that are forwarded.
 
 IMPROVEMENTS:
 
+- `rambo destroy` will now use vboxmanage to fully poweroff and delete VirtualBox VMs.
+- No longer using any custom sources.list.
+- Renamed sync_dir to project_dir.
 - Now you can pass fancy pathing like `..` and symlinks to the CLI.
 - More comprehensive logging.
+- Splitting expected saltstack dir into saltstack/etc and saltstack/srv to more easily work with the common pattern of having Salt code in /etc/salt and /srv.
+- Left legacy style salt provisioning, but added a flag to use it instead of the newer style.
 
-BUGFIX:
+BUGFIXES:
 
+- Fix bug incorrectly setting cwd, leading to nested temp dirs.
+- Passes provider explicitly as cmd arg to Vagrant.
 - Fixes guest hostname generation when given underscores in the path, casting it to "95", it's ascii code.
 - Fixes guest hostname generation when too long, truncating the part preceding the hash so total length stays below 64 chars.
 - Fix bug when setting machine-type.

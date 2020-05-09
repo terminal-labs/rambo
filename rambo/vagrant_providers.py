@@ -1,6 +1,3 @@
-import json
-import os
-
 from rambo.settings import SETTINGS
 from rambo.utils import abort, get_env_var, set_env_var
 
@@ -29,7 +26,7 @@ def docker():
     if get_env_var('guest_os'): # only set during `up`
         set_env_var('docker_box', SETTINGS['GUEST_OSES'][get_env_var('guest_os')]['docker'])
 
-def ec2():
+def ec2(**params):
     '''EC2 specific preparation for Vagrant. Setting and validating env vars.
 
     Set env vars: ami
@@ -42,3 +39,6 @@ def ec2():
         abort('Sorry, we really need a RAM size from our whitelist for '
               'digitalocean. \nThe only way around that is if you specify '
               'a machine-type like m3.medium.')
+
+    if params.get("ec2_security_groups"):
+        set_env_var("ec2_security_groups", params["ec2_security_groups"])

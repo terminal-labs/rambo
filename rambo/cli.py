@@ -1,57 +1,16 @@
+import configparser
 import os
 import sys
-import json
 import pkg_resources
 
 import click
 
-from rambo.click_configfile import ConfigFileReader, Param, SectionSchema
-from rambo.click_configfile import matches_section
-
 import rambo.app as app
 import rambo.utils as utils
-from rambo.settings import SETTINGS, PROJECT_NAME
+from rambo.settings import CONF_FILES, SETTINGS, PROJECT_NAME
 
 
 version = pkg_resources.get_distribution('rambo-vagrant').version
-
-
-### Config file handling
-class ConfigSectionSchema(object):
-    '''Describes all config sections of this configuration file.'''
-
-    @matches_section('base')
-    class Base(SectionSchema):
-        '''Corresponds to the main CLI entry point.'''
-        cwd                   = Param(type=click.Path())
-        tmpdir_path           = Param(type=click.Path())
-        vagrant_cwd           = Param(type=click.Path())
-        vagrant_dotfile_path  = Param(type=click.Path())
-
-    @matches_section('up')
-    class Up(SectionSchema):
-        '''Corresponds to the `up` command group.'''
-        box                = Param(type=str)
-        provider           = Param(type=str)
-        guest_os           = Param(type=str)
-        ram_size           = Param(type=int)
-        drive_size         = Param(type=int)
-        machine_type       = Param(type=str)
-        sync_dir           = Param(type=click.Path())
-        provision          = Param(type=bool)
-        destroy_on_error   = Param(type=bool)
-
-
-class ConfigFileProcessor(ConfigFileReader):
-    config_files = ['%s.conf' % PROJECT_NAME]
-    # Specify additional schemas to merge with the primary so that they
-    # are added to the top level of default_map, for easy precedence of
-    # CLI > Configuration file > Environment > Default.
-    config_section_primary_schemas = [
-        ConfigSectionSchema.Base,
-        ConfigSectionSchema.Up,
-    ]
-    config_section_schemas = config_section_primary_schemas
 
 
 # Only used for the `vagrant` subcommand
@@ -63,13 +22,50 @@ VAGRANT_CMD_CONTEXT_SETTINGS = {
 # Used for all commands and subcommands
 CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],
-    'default_map': ConfigFileProcessor.read_config(),
     'auto_envvar_prefix': PROJECT_NAME.upper()
 }
 
 
-### Main command / CLI entry point
-@click.group(context_settings=CONTEXT_SETTINGS)
+def load_config_section(section):
+    """Generic section load
+    """
+    parser = configparser.ConfigParser()
+    parser.read('rambo.conf')
+
+    if section in parser:
+        return dict(parser[section])
+
+
+# Support for injecting config vars into click context
+# https://stackoverflow.com/questions/46358797/python-click-supply-arguments-and-options-from-a-configuration-file
+def load_config_for_command(ctx, section):
+    parser = configparser.ConfigParser()
+    parser.read(CONF_FILES)
+
+    if section == "cli":
+        section = "base"
+    if section in parser:
+        for param, value in ctx.params.items():
+            if value is None:
+                if param in parser[section]:
+                    ctx.params[param] = parser[section][param]
+    return ctx
+
+
+class GroupWithConfig(click.Group):
+    def invoke(self, ctx):
+        ctx = load_config_for_command(ctx, self.name)
+        super().invoke(ctx)
+
+
+class CommandWithConfig(click.Command):
+    def invoke(self, ctx):
+        ctx = load_config_for_command(ctx, self.name)
+        return super().invoke(ctx)
+
+
+# Main command / CLI entry point
+@click.group(context_settings=CONTEXT_SETTINGS, cls=GroupWithConfig)
 @click.option('--vagrant-cwd', type=click.Path(resolve_path=True),
               help='Path entry point to the Vagrantfile. Defaults to '
               'the Vagrantfile provided by %s in the installed path.'
@@ -81,31 +77,35 @@ CONTEXT_SETTINGS = {
               help='The CWD of for this command. Defaults to '
               'actual CWD, but may be set for customization. Used to look '
               'for optional resources such as custom SaltStack code.')
-@click.option('--tmpdir-path', type=click.Path(resolve_path=True),
+@click.option('--tmpdir', type=click.Path(resolve_path=True),
               help='Path location of the .rambo-tmp directory for the virtual '
               'machine. Defaults to the current working directory')
 @click.version_option(prog_name=PROJECT_NAME.capitalize(), version=version)
 @click.pass_context
-def cli(ctx, cwd, tmpdir_path, vagrant_cwd, vagrant_dotfile_path):
-    '''The main cli entry point. Params can be passed as usual with
+def cli(ctx, cwd, tmpdir, vagrant_cwd, vagrant_dotfile_path):
+    """The main cli entry point. Params can be passed as usual with
     click (CLI or env var) and also with an INI config file.
     Precedence is CLI > Config > Env Var > defaults.
-    '''
-    # These need to be very early because they may change the cwd of this Python or of Vagrant
-    app.set_init_vars(cwd, tmpdir_path)
-    app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+    """
+    if ctx.invoked_subcommand not in ["createproject"]:
+        # These need to be very early because they may change the cwd of this Python or of Vagrant
+        app.set_init_vars(cwd, tmpdir)
+        app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
-    utils.write_to_log('\nNEW CMD')
-    utils.write_to_log(' '.join(sys.argv))
+        utils.write_to_log('\nNEW CMD')
+        utils.write_to_log(' '.join(sys.argv))
 
-    utils.write_to_log('\nNEW CMD', 'stderr')
-    utils.write_to_log(' '.join(sys.argv), 'stderr')
+        utils.write_to_log('\nNEW CMD', 'stderr')
+        utils.write_to_log(' '.join(sys.argv), 'stderr')
 
 
-### Subcommands
+# Subcommands
 @cli.command('createproject')
 @click.argument('project_name')
-def createproject_cmd(project_name):
+@click.option('-c', '--config-only', is_flag=True,
+              help='Only create project dir with config file.')
+@click.pass_context
+def createproject_cmd(ctx, project_name, config_only):
     '''Create project takes an arguement for the name to give to the project
     it creates. It will create a directory in the CWD for this project. Upon
     creation, this project directory will contain a rambo.conf file, an auth
@@ -119,17 +119,23 @@ def createproject_cmd(project_name):
     - saltstack is a basic set of SaltStack configuration code that Rambo offers.
         It can be modified for custom configuration.
     '''
-    app.createproject(project_name)
+    app.createproject(project_name, ctx.parent.params['cwd'], ctx.parent.params['tmpdir'], config_only, ctx)
 
 
-@cli.command('destroy', short_help='Destroy VM and metadata.')
+@cli.command(
+    'destroy',
+    context_settings=CONTEXT_SETTINGS,
+    short_help='Destroy VM and metadata.',
+)
+@click.option('--vm_name', type=str,
+              help='The name of the VirtualMachine / Container.')
 @click.pass_context
-def destroy_cmd(ctx):
+def destroy_cmd(ctx, vm_name, **params):
     '''Destroy a VM / container. This will tell vagrant to forcibly destroy
     a VM, and to also destroy its Rambo metadata (provider and random_tag),
     and Vagrant metadata (.vagrant dir).
     '''
-    app.destroy(ctx)
+    app.destroy(ctx, **ctx.params)
 
 
 @cli.command('export-vagrant-conf', short_help="Get Vagrant configuration")
@@ -164,7 +170,7 @@ def install_plugins(force, plugins):
     all default Vagrant plugins from host platform specific list.
     '''
     # If auth and plugins are both not specified, run both.
-    if not plugins: # No args means all default plugins.
+    if not plugins:  # No args means all default plugins.
         plugins = ('all',)
     app.install_plugins(force, plugins)
 
@@ -203,7 +209,7 @@ def ssh_cmd(ctx, command):
 
 
 @cli.command('up', context_settings=CONTEXT_SETTINGS,
-             short_help='Create or start VM.')
+             short_help='Create or start VM.', cls=CommandWithConfig)
 @click.option('-p', '--provider', type=str,
               help='Provider for the virtual machine. '
               'These providers are supported: %s. Default %s.'
@@ -215,11 +221,15 @@ def ssh_cmd(ctx, command):
                  SETTINGS['GUEST_OSES_DEFAULT']))
 @click.option('-b', '--box', type=str,
               help='Vagrant Box to use.')
+@click.option('--hostname', type=str,
+              help='Hostname to set.')
 @click.option('-r', '--ram-size', type=int,
               help='Amount of RAM of the virtual machine in MB. '
               'These RAM sizes are supported: %s. Default %s.'
               % (list(SETTINGS['SIZES'].keys()),
                  SETTINGS['RAMSIZE_DEFAULT']))
+@click.option('--cpus', type=int,
+              help='Number of CPUs in a virtualbox VM.')
 @click.option('-d', '--drive-size', type=int,
               help='The drive size of the virtual machine in GB. '
               'These drive sizes are supported: %s. Default %s.'
@@ -228,24 +238,56 @@ def ssh_cmd(ctx, command):
 @click.option('-m', '--machine-type', type=str,
               help='Machine type for cloud providers.\n'
               'E.g. m5.medium for ec2, or s-8vcpu-32gb for digitalocean.\n')
-@click.option('--sync-dir', type=click.Path(resolve_path=True),
-              help='Path to sync into VM')
+@click.option('--salt-bootstrap-args', type=str,
+              help='Args to pass to salt-bootstrap when provisioning with Salt.')
+@click.option('--sync-dirs', type=str,
+              help=(
+                  "Paths to sync into VM, passed as a Python list of lists of the form "
+                  """"[['guest_dir', 'host_dir'], ['guest_dir2', 'host_dir2']]"."""
+              )
+              )
+@click.option('--ec2-security-groups', type=str,
+              help=(
+                  "A list of security groups to add to the EC2 VM, passed as a Python list of the form "
+                  """"['salted_server', 'security_group_2]"."""
+              )
+              )
+@click.option('--sync-type', type=str,
+              help='Sync type')
+@click.option('--ports', type=str,
+              help=("Additional ports to sync into VM, passed as a Python list of lists of the form "
+                    """[['guest_port', 'host_port'], ['guest_port2', 'host_port2']]"."""
+                    )
+              )
+@click.option('--project-dir', type=click.Path(resolve_path=True),
+              help='List of path to sync into VM')
 @click.option('--provision/--no-provision', default=None,
               help='Enable or disable provisioning')
+@click.option('-c', '--provision-cmd', type=str,
+              help='Command to start provisioning with')
+@click.option('-s', '--provision-script', type=click.Path(resolve_path=True),
+              help='Path on host to script provision with')
+@click.option('--provision-with-salt', is_flag=True,
+              help='Provision with Salt')
+@click.option('--provision-with-salt-legacy', is_flag=True,
+              help='Provision with Salt (Legacy Style)')
 @click.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
+@click.option('--vm_name', type=str,
+              help='The name of the VirtualMachine / Container.')
 @click.pass_context
-def up_cmd(ctx, provider, box, guest_os, ram_size, drive_size, machine_type,
-           sync_dir, provision, destroy_on_error):
+def up_cmd(ctx, provider, box, hostname, guest_os, ram_size, cpus, drive_size, machine_type,
+           salt_bootstrap_args, sync_dirs, ec2_security_groups, sync_type, ports, project_dir, provision, provision_cmd, provision_script, provision_with_salt, provision_with_salt_legacy, destroy_on_error, vm_name):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.
     '''
-    if not os.path.isfile('%s.conf' % PROJECT_NAME):
-        utils.abort('Config file %s.conf must be present in working directory.\n'
-              'A config file is automatically created when you run \n'
-              'createproject. You can also make a config file manually.'
-              % PROJECT_NAME)
+    if not os.path.isfile(f'{PROJECT_NAME}.conf'):
+        utils.abort(
+            f'Config file {PROJECT_NAME}.conf must be present in working directory.\n'
+            'A config file is automatically created when you run \n'
+            'createproject. You can also make a config file manually.'
+        )
 
     app.up(ctx, **ctx.params)
 

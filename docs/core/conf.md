@@ -41,34 +41,91 @@ The options in the conf file are the same as the full option names in the CLI, w
 - `guest_os` in the conf, corresponds to `--guest-os` or `-o` in the CLI
 - `ram_size` in the conf, corresponds to `--ram-size` or `-r` in the CLI
 
+The full list is available with `rambo up --help`.
+
+## my_rambo.conf
+
+Rambo will also load configuration from a `my_rambo.conf` file. This file is optional, and configuration found here takes precedence over the main `rambo.conf` file.
+
+The intention is that a `rambo.conf` file is tracked (e.g. with git), but so that a shared project can have its configuration easily altered by individual users, values may be overridden by an untracked `my_rambo.conf`. For example, a project may use `provider = ec2`, but individual contributors may want to develop locally in Docker or VirtualBox instead.
+
 ## Option Precedence
 
-When an option is set in both places, the CLI takes precedence. For example, if the `provider` is set to `digitalocean` in the config:
+The precedence for options is:
+
+CLI > Environment Variable > `my_rambo.conf` > `rambo.conf` > defaults
+
+When an option is set in more than one place, the CLI takes precedence. Defaults are overridable by everything.
+
+### Example 1
 
 ```ini
+# rambo.conf
+
 [up]
 provider = digitalocean
 ```
-
-and `virtualbox` in the CLI
 
 ```bash
 rambo up -p virtualbox
 ```
 
-then `virtualbox` would take precedence and be the provider that is used. If instead, the config still read
+yields the provider `virtualbox`.
+
+### Example 2
+
+If instead, the config still read
 
 ```ini
+# rambo.conf
+
 [up]
 provider = digitalocean
 ```
-
-and no provider was specified in the CLI, as in
 
 ```bash
 rambo up
 ```
 
-then the provider `digitalocean` would be used, because the config file takes precedence over the default value `virtualbox`, but no explicit value is given in the CLI.
+yields the provider `digitalocean`.
 
-The precedence is CLI > Config > defaults.
+### Example 3
+
+```bash
+RAMBO_PROVIDER=digitalocean rambo up -p ec2
+```
+
+yields the provider `ec2`.
+
+### Example 4
+
+```ini
+# rambo.conf
+
+[up]
+provider = ec2
+```
+
+```bash
+RAMBO_PROVIDER=digitalocean rambo up
+```
+
+yields the provider `digitalocean`.
+
+### Example 4
+
+```ini
+# my_rambo.conf
+
+[up]
+provider = virtualbox
+```
+
+```ini
+# rambo.conf
+
+[up]
+provider = ec2
+```
+
+yields the provider `virtualbox`.
