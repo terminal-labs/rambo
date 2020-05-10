@@ -14,7 +14,6 @@ import click
 import rambo.options as options
 import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
-from rambo.routing import pure_providers
 from rambo.utils import get_env_var, set_env_var, set_env, set_tmpdir, set_cwd
 
 def install_auth(ctx=None, output_path=None, **kwargs):

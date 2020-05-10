@@ -1,12 +1,15 @@
 import os
 import sys
+import site
 from pathlib import Path
 from shutil import copyfile, move, rmtree
 
 import click
 
 from rambo.settings import PROJECT_NAME, CONF_FILES
-from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
+from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME, SITEPACKAGESPATH, EGG_NAME
+
+
 
 def dir_exists(path):
     return os.path.isdir(path)
@@ -45,6 +48,19 @@ def file_move(src, dst):
 
 def get_user_home():
     return str(Path.home())
+
+
+def _resolve_payload_path():
+    payload_name = "/payload"
+    possible_path = SITEPACKAGESPATH + "/" + EGG_NAME + ".egg-link"
+    if exists(possible_path):
+        egglink_file = open(possible_path, "r")
+        link_path = egglink_file.read().split("\n")[0]
+        possible_payload_path = link_path + "/" + PROJECT_NAME + payload_name
+    else:
+        possible_path = SITEPACKAGESPATH + "/" + PROJECT_NAME
+        possible_payload_path = possible_path + payload_name
+    return possible_payload_path
 
 
 ## Defs used by main cli cmd

@@ -14,7 +14,6 @@ import click
 import rambo.options as options
 import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
-from rambo.routing import pure_providers
 from rambo.ops.digitalocean import up as pure_up
 from rambo.ops.synthetic import up as synthetic_up
 
