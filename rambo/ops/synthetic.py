@@ -1,14 +1,14 @@
-def up(params, ctx):
-    print("stub")
+def up(cmd, params):
+    print("up in synthetic")
 
-def destroy(ctx=None, **params):
-    print("stub")
+def destroy(cmd, params):
+    print("destroy in synthetic")
 
-def halt(ctx, args, params):
-    print("stub")
+def halt(cmd, params):
+    print("halt in synthetic")
 
-def ssh():
-    print("stub")
+def ssh(cmd, params):
+    print("ssh in synthetic")
 
-def scp(ctx=None, **params):
-    print("stub")
+def scp(cmd, params):
+    print("scp in synthetic")

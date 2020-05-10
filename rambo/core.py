@@ -14,7 +14,7 @@ import click
 import rambo.options as options
 import rambo.utils as utils
 from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
-from rambo.utils import get_env_var, set_env_var, set_env, set_tmpdir, set_cwd
+from rambo.utils import get_env_var, set_env_var, set_env, set_tmpdir, set_cwd, set_init_vars
 
 def install_auth(ctx=None, output_path=None, **kwargs):
     '''Install auth directory.
