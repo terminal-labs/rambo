@@ -8,7 +8,12 @@ if sys.version_info < (3, 6, 0):
 with io.open("README.md", "rt", encoding="utf8") as f:
     readme = f.read()
 
-install_requires = ["black", "click", "python-digitalocean"]
+install_requires = [
+        "setuptools<=45",
+        "utilities-package@git+https://gitlab.com/terminallabs/utilitiespackage/utilities-package.git@master#egg=utilitiespackage&subdirectory=utilitiespackage",
+        "keyloader@git+https://gitlab.com/terminallabs/experimental-tools/python_key-loader.git@master#egg=keyloader&subdirectory=keyloader",
+        "python-digitalocean",
+]
 docs_require = [
     "recommonmark",  # Higher versions break relative paths in links.
     "sphinx-markdown-tables",

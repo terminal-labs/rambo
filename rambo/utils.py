@@ -6,7 +6,92 @@ from shutil import copyfile, move, rmtree
 import click
 
 from rambo.settings import PROJECT_NAME, CONF_FILES
+from rambo.settings import SETTINGS, PROJECT_LOCATION, PROJECT_NAME
 
+def dir_exists(path):
+    return os.path.isdir(path)
+
+
+def dir_create(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+def dir_delete(path):
+    try:
+        rmtree(path)
+    except FileNotFoundError:
+        pass
+
+
+def file_delete(path):
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
+
+
+def file_copy(src, dst):
+    copyfile(src, dst)
+
+
+def file_rename(src, dst):
+    os.rename(src, dst)
+
+
+def file_move(src, dst):
+    move(src, dst)
+
+
+def get_user_home():
+    return str(Path.home())
+
+
+## Defs used by main cli cmd
+def set_cwd(cwd=None):
+    """Set cwd environment variable and change the actual cwd to it.
+
+    Args:
+        cwd (path): Location of project (conf file, provisioning scripts, etc.).
+    """
+    pass
+
+def set_init_vars(cwd=None, tmpdir=None):
+    """Set env vars that are used throughout Ruby and Python. If Ruby weren't used
+    this would be managed very differently, as these are effectively project scoped
+    global variables.
+
+    These calls are split into separate functions because on occaision we need to call
+    them more carefully than with this function, as in createproject.
+    """
+    set_env()
+    set_cwd(cwd)
+    set_tmpdir(tmpdir)
+
+
+def set_env():
+    set_env_var('ENV', PROJECT_LOCATION) # installed location of this code
+
+
+def set_tmpdir(tmpdir=None):
+    '''Set tmpdir and log_path locations. This should defaut to be inside the cwd.
+    Args:
+        tmpdir (path): Location of project's tmp dir.
+    '''
+    # loc of tmpdir
+    if tmpdir: # cli / api
+        set_env_var('TMPDIR',
+                    os.path.join(tmpdir, '.%s-tmp' % PROJECT_NAME))
+    elif get_env_var('TMPDIR'): # Previously set env var
+        set_env_var('TMPDIR',
+                    os.path.join(get_env_var('TMPDIR'),
+                                 '.%s-tmp' % PROJECT_NAME))
+    else: # Not set, set to default loc
+        set_env_var('TMPDIR',
+                    os.path.join(os.getcwd(),
+                                 '.%s-tmp' % PROJECT_NAME)) # default (cwd)
+
+    set_env_var('LOG_PATH', os.path.join(get_env_var('TMPDIR'), 'logs'))
 
 def set_env_var(name, value):
     """Set an environment variable in all caps that is prefixed with the name of the project
@@ -78,42 +163,3 @@ def write_to_log(data=None, file_name=None):
         fd_custom = open(fd_custom_path, "a+")
         fd_custom.write(data)
         fd_custom.close()
-
-
-def dir_exists(path):
-    return os.path.isdir(path)
-
-
-def dir_create(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
-
-
-def dir_delete(path):
-    try:
-        rmtree(path)
-    except FileNotFoundError:
-        pass
-
-
-def file_delete(path):
-    try:
-        os.remove(path)
-    except FileNotFoundError:
-        pass
-
-
-def file_copy(src, dst):
-    copyfile(src, dst)
-
-
-def file_rename(src, dst):
-    os.rename(src, dst)
-
-
-def file_move(src, dst):
-    move(src, dst)
-
-
-def get_user_home():
-    return str(Path.home())
