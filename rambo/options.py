@@ -1,6 +1,5 @@
 import ast
 import os
-from pathlib import Path
 
 import rambo.utils as utils
 from rambo.settings import SETTINGS
@@ -170,71 +169,20 @@ def provider_option(provider=None):
         utils.abort(msg)
     return provider
 
-def provision_cmd_option(provision_cmd=None):
-    '''Load provision_cmd into env var.
+
+def command_option(command=None):
+    '''Load command into env var.
 
     Args:
-        provision_cmd (str): Command to run at the begginning of provisioning.
+        command (str): Command to run at the begginning of provisioning.
 
-    Return provision_cmd (str)
+    Return command (str)
     '''
-    if provision_cmd:
-        set_env_var('provision_cmd', provision_cmd)
+    if command:
+        set_env_var('command', command)
 
-    return provision_cmd
+    return command
 
-def provision_script_option(provision_script=None):
-    '''Load provision_script into env var.
-
-    Args:
-        provision_script (str): Path to file that will be ran at provisioning.
-
-    Return provision_script (str)
-    '''
-    if provision_script:
-        set_env_var('provision_script', str(Path(provision_script).resolve()))
-
-    return provision_script
-
-def provision_with_salt_option(provision_with_salt=None):
-    '''Set provision_with_salt env var.
-
-    Args:
-        provision_with_salt (bool): Flag to cause Salt provisioning.
-
-    Return provision_with_salt (bool)
-    '''
-    if provision_with_salt:
-        set_env_var('provision_with_salt', provision_with_salt)
-
-    return provision_with_salt
-
-def provision_with_salt_legacy_option(provision_with_salt_legacy=None):
-    '''Set provision_with_salt_legacy env var.
-
-    Args:
-        provision_with_salt_legacy (bool): Flag to cause Salt_Legacy provisioning.
-
-    Return provision_with_salt_legacy (bool)
-    '''
-    if provision_with_salt_legacy:
-        set_env_var('provision_with_salt_legacy', provision_with_salt_legacy)
-
-    return provision_with_salt_legacy
-
-def salt_bootstrap_args_option(salt_bootstrap_args=None):
-    '''Set salt_bootstrap_args env var.
-
-    Args:
-        salt_bootstrap_args (str): salt-bootstrap args
-
-    Return salt_bootstrap_args (str)
-    '''
-    if not salt_bootstrap_args:
-        salt_bootstrap_args =  ""
-    set_env_var('salt_bootstrap_args', salt_bootstrap_args)
-
-    return salt_bootstrap_args
 
 def size_option(ram_size=None, drive_size=None):
     '''Validate ram and drive sizes. Pair them if possible. If not

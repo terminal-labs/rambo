@@ -91,18 +91,6 @@ Vagrant.configure("2") do |config|
     # Sync rambo project dir to /vagrant
     config.vm.synced_folder sync_dir, "/vagrant", type: get_env_var_rb('sync_type')
 
-    # Sync saltstack/{etc,srv}
-    if get_env_var_rb('provision_with_salt') or get_env_var_rb('provision_with_salt_legacy')
-      if Dir.exist?(File.join(sync_dir, "saltstack/etc"))
-         config.vm.synced_folder File.join(sync_dir, "saltstack/etc"),
-           "/etc/salt", type: get_env_var_rb('sync_type')
-      end
-      if Dir.exist?(File.join(sync_dir, "saltstack/srv"))
-        config.vm.synced_folder File.join(sync_dir, "saltstack/srv"),
-          "/srv", type: get_env_var_rb('sync_type')
-      end
-    end
-
     # Sync custom dirs
     if get_env_var_rb('sync_dirs')
       sync_dirs = eval(get_env_var_rb('sync_dirs'))
@@ -116,44 +104,10 @@ Vagrant.configure("2") do |config|
   end
 
   # Custom Provisioning
-  if get_env_var_rb('provision_cmd')
-    puts get_env_var_rb('provision_cmd')
+  if get_env_var_rb('command')
+    puts get_env_var_rb('command')
     config.vm.provision "shell",
-      inline: get_env_var_rb('provision_cmd'), keep_color: true
-  end
-  if get_env_var_rb('provision_script')
-    config.vm.provision "shell",
-      path: get_env_var_rb('provision_script'), keep_color: true
-  end
-  if get_env_var_rb('provision_with_salt') and Dir.exist?(File.join(sync_dir, 'saltstack'))
-    config.vm.provision :salt do |salt|
-      salt.bootstrap_options = get_env_var_rb('salt_bootstrap_args')
-      salt.verbose = true
-      salt.colorize = true
-      salt.run_highstate = true
-    end
-  # Bash to set, prepare, and initiate Legacy Salt provisioning.
-  elsif get_env_var_rb('provision_with_salt_legacy') and Dir.exist?(File.join(sync_dir, 'saltstack'))
-    config.vm.provision :salt do |salt|
-      salt.bootstrap_options = get_env_var_rb('salt_bootstrap_args')
-      salt.verbose = true
-      salt.colorize = true
-    end
-    $salt = <<-EOS
-      cp /vagrant/saltstack/minions/minion.#{provider}  /etc/salt/minion
-      cp /vagrant/saltstack/grains/grains /etc/salt/grains
-      mkdir -p /vagrant/saltstack/srv/salt/files/licenses
-      if [ -d "/vagrant/auth/licenses/" ]; then
-          cp -a /vagrant/auth/licenses/. /vagrant/saltstack/srv/salt/files/licenses/
-      fi
-      if [ #{ENV["WEBSITE_BRANCH"]} ]; then
-          sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval WEBSITE_BRANCH #{ENV["WEBSITE_BRANCH"]}
-      fi
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval id #{config.vm.hostname}
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local grains.setval randomtag #{RANDOMTAG}
-      sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK salt-call --local state.highstate --log-file-level info
-      EOS
-    config.vm.provision "shell", inline: $salt, keep_color: true
+      inline: get_env_var_rb('command'), keep_color: true
   end
 end
 

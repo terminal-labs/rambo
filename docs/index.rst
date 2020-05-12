@@ -26,13 +26,6 @@ To get started fast, see `Quickstart <docs/Quickstart>`__.
    providers/*
 
 .. toctree::
-   :caption: Provisioner Specific Documentation
-   :maxdepth: 2
-   :glob:
-
-   provisioners/*
-
-.. toctree::
    :caption: Changelog:
    :maxdepth: 1
    :glob:

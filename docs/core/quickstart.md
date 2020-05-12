@@ -62,10 +62,8 @@ If you never specify any provider, Rambo will use the VirtualBox as its default 
 
 `rambo up`
 
-## Provisioners / Configuration Management
+## Provisioning
 
-Rambo does some [basic provisioning](../../provisioners/basic) for you when it creates your instance. After that, Rambo can run the following optional custom provisioners:
+Rambo does very little provisioning on its own. It can set a hostname, set up some synced directories, and allow a command to be run. That command is your entry point to doing anything else.
 
-- [A command](../../provisioners/command)
-- [A script](../../provisioners/script)
-- [Salt](../../provisioners/salt)
+See [provisioning](provisioning) for some examples.

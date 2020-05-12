@@ -62,7 +62,8 @@ def _invoke_vagrant(cmd=None):
         os.close(fd)
     return p.returncode
 
-def set_init_vars(cwd=None, tmpdir=None):
+
+def _set_init_vars(cwd=None, tmpdir=None):
     """Set env vars that are used throughout Ruby and Python. If Ruby weren't used
     this would be managed very differently, as these are effectively project scoped
     global variables.
@@ -70,27 +71,27 @@ def set_init_vars(cwd=None, tmpdir=None):
     These calls are split into separate functions because on occaision we need to call
     them more carefully than with this function, as in createproject.
     """
-    set_env()
-    set_cwd(cwd)
-    set_tmpdir(tmpdir)
+    _set_env()
+    _set_cwd(cwd)
+    _set_tmpdir(tmpdir)
 
 
-def set_env():
-    set_env_var('ENV', PROJECT_LOCATION) # installed location of this code
+def _set_env():
+    set_env_var('ENV', PROJECT_LOCATION)  # installed location of this code
 
 
-## Defs used by main cli cmd
-def set_cwd(cwd=None):
+# Defs used by main cli cmd
+def _set_cwd(cwd=None):
     '''Set cwd environment variable and change the actual cwd to it.
 
     Args:
-        cwd (path): Location of project (conf file, provisioning scripts, etc.).
+        cwd (path): Location of project (conf file, provisioning scripts, etc.)
     '''
     # effective CWD (likely real CWD, but may be changed by user.
-    if cwd: # cli / api
+    if cwd:  # cli / api
         set_env_var('cwd', cwd)
     elif get_env_var('cwd'):
-        pass # Already set - keep it.
+        pass  # Already set - keep it.
     else:
         found_project = utils.find_conf(os.getcwd())
         if found_project:
@@ -101,28 +102,30 @@ def set_cwd(cwd=None):
     os.chdir(get_env_var('cwd'))
     return get_env_var('cwd')
 
-def set_tmpdir(tmpdir=None):
+
+def _set_tmpdir(tmpdir=None):
     '''Set tmpdir and log_path locations. This should defaut to be inside the cwd.
 
     Args:
         tmpdir (path): Location of project's tmp dir.
     '''
     # loc of tmpdir
-    if tmpdir: # cli / api
+    if tmpdir:  # cli / api
         set_env_var('TMPDIR',
                     os.path.join(tmpdir, '.%s-tmp' % PROJECT_NAME))
-    elif get_env_var('TMPDIR'): # Previously set env var
+    elif get_env_var('TMPDIR'):  # Previously set env var
         set_env_var('TMPDIR',
                     os.path.join(get_env_var('TMPDIR'),
                                  '.%s-tmp' % PROJECT_NAME))
-    else: # Not set, set to default loc
+    else:  # Not set, set to default loc
         set_env_var('TMPDIR',
                     os.path.join(os.getcwd(),
-                                 '.%s-tmp' % PROJECT_NAME)) # default (cwd)
+                                 '.%s-tmp' % PROJECT_NAME))  # default (cwd)
 
     set_env_var('LOG_PATH', os.path.join(get_env_var('TMPDIR'), 'logs'))
 
-def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
+
+def _set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
     '''Set the environment varialbes prefixed with `VAGRANT_` that vagrant
     expects, and that we use, to modify some use paths.
 
@@ -131,21 +134,22 @@ def set_vagrant_vars(vagrant_cwd=None, vagrant_dotfile_path=None):
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     # loc of Vagrantfile
-    if vagrant_cwd: # cli / api
+    if vagrant_cwd:  # cli / api
         os.environ["VAGRANT_CWD"] = vagrant_cwd
-    elif 'VAGRANT_CWD' not in os.environ: # Not set in env var
+    elif 'VAGRANT_CWD' not in os.environ:  # Not set in env var
         # if custom Vagrantfile exists in the default location.
         if os.path.isfile(os.path.join(os.getcwd(), 'Vagrantfile')):
             os.environ['VAGRANT_CWD'] = os.getcwd()
-        else: # use default (installed) path
+        else:  # use default (installed) path
             os.environ['VAGRANT_CWD'] = PROJECT_LOCATION
     # loc of .vagrant dir
-    if vagrant_dotfile_path: # cli / api
+    if vagrant_dotfile_path:  # cli / api
         os.environ['VAGRANT_DOTFILE_PATH'] = vagrant_dotfile_path
-    elif 'VAGRANT_DOTFILE_PATH' not in os.environ: # Not set in env var
-        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd(), '.vagrant')) # default (cwd)
+    elif 'VAGRANT_DOTFILE_PATH' not in os.environ:  # Not set in env var
+        os.environ['VAGRANT_DOTFILE_PATH'] = os.path.normpath(os.path.join(os.getcwd(), '.vagrant'))  # default (cwd)
 
-## Defs for cli subcommands
+
+# Defs for cli subcommands
 def createproject(project_name, cwd, tmpdir, config_only=None, ctx=None):
     '''Create project with basic configuration files.
 
@@ -154,14 +158,14 @@ def createproject(project_name, cwd, tmpdir, config_only=None, ctx=None):
         config_only (bool): Determins if we should only place a conf file in the new project.
     '''
     # initialize paths
-    set_env()
-    cwd = set_cwd(cwd)
+    _set_env()
+    cwd = _set_cwd(cwd)
     path = os.path.join(cwd, project_name)
-    set_tmpdir(path)
+    _set_tmpdir(path)
 
     # create new project dir
     try:
-        os.makedirs(path) # Make parent dirs if needed.
+        os.makedirs(path)  # Make parent dirs if needed.
     except FileExistsError:
         utils.abort('Directory already exists.')
     utils.echo('Created %s project "%s" in %s.'
@@ -172,6 +176,7 @@ def createproject(project_name, cwd, tmpdir, config_only=None, ctx=None):
     if not config_only:
         export('saltstack', path)
         install_auth(ctx, output_path=path)
+
 
 def destroy(ctx=None, **params):
     '''Destroy a VM / container and all its metadata. Default leaves logs.
@@ -186,9 +191,9 @@ def destroy(ctx=None, **params):
     # TODO (optional) add finding and deleting of all VMs across all installations.
     # TODO add an --all flag to delete the whole .rambo-tmp dir. Default leaves logs.
 
-    if not ctx: # Using API. Else handled by cli.
-        set_init_vars(params.get('cwd'), params.get('tmpdir'))
-        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
+    if not ctx:  # Using API. Else handled by cli.
+        _set_init_vars(params.get('cwd'), params.get('tmpdir'))
+        _set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
     destroy_cmd = vagrant_general_command('destroy --force')
 
@@ -256,14 +261,16 @@ def export(resource=None, export_path=None, force=None):
 
     utils.echo('Done exporting %s code.' % resource)
 
+
 def halt(ctx=None, *args, **params):
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars(params.get('cwd'), params.get('tmpdir'))
-        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
+        _set_init_vars(params.get('cwd'), params.get('tmpdir'))
+        _set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
     else:
         args = ctx.args + list(args)
 
     vagrant_general_command('{} {}'.format('halt', ' '.join(args)))
+
 
 def install_auth(ctx=None, output_path=None, **kwargs):
     '''Install auth directory.
@@ -273,7 +280,7 @@ def install_auth(ctx=None, output_path=None, **kwargs):
         output_path (path): Path to place auth dir.
     '''
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars(params.get('cwd'), params.get('tmpdir'))
+        _set_init_vars(kwargs.get('cwd'), kwargs.get('tmpdir'))
 
     if not output_path:
         output_path = get_env_var('cwd')
@@ -301,6 +308,7 @@ def install_auth(ctx=None, output_path=None, **kwargs):
     # and not needing the auth key scripts.
     # load_provider_keys()
 
+
 def install_config(ctx=None, output_path=None, **kwargs):
     '''Install config file.
 
@@ -309,7 +317,7 @@ def install_config(ctx=None, output_path=None, **kwargs):
         output_path (path): Path to place conf file.
     '''
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars(params.get('cwd'), params.get('tmpdir'))
+        _set_init_vars(kwargs.get('cwd'), kwargs.get('tmpdir'))
 
     if not output_path:
         output_path = get_env_var('cwd')
@@ -319,9 +327,14 @@ def install_config(ctx=None, output_path=None, **kwargs):
         utils.abort('%s.conf already esists.' % PROJECT_NAME)
     else:
         with open(path, 'w') as f:
-            f.write('[up]\nprovider = %s\nguest_os = %s\n'
-                    % (SETTINGS['PROVIDERS_DEFAULT'], SETTINGS['GUEST_OSES_DEFAULT']))
+            f.write("""\
+[up]
+provider = virtualbox
+box = ubuntu/bionic64
+sync_dirs = [["saltstack/etc", "/etc/salt"], ["saltstack/srv", "/srv"]]
+""")
         utils.echo('Created config at %s' % path)
+
 
 def install_plugins(force=None, plugins=('all',)):
     '''Install all of the vagrant plugins needed for all plugins
@@ -344,13 +357,14 @@ def install_plugins(force=None, plugins=('all',)):
                           'to install anyway?' % plugin, abort=True)
             vagrant_general_command('plugin install %s' % plugin)
 
+
 def scp(ctx=None, locations=None, **params):
     '''Transfer file or dir with scp. This makes use of the vagrant-scp plugin,
     which allows for simplified args.
     '''
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars(params.get('cwd'), params.get('tmpdir'))
-        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
+        _set_init_vars(params.get('cwd'), params.get('tmpdir'))
+        _set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
     if len(locations)!=2:
         utils.abort("There needs to be exactly two arguments for scp, a 'from' location "
@@ -368,6 +382,7 @@ def scp(ctx=None, locations=None, **params):
 
     vagrant_general_command('{} {}'.format('scp', ' '.join(locations)))
 
+
 def ssh(ctx=None, command=None, **params):
     '''Connect to an running VM / container over ssh.
     All str args can also be set as an environment variable; arg takes precedence.
@@ -379,8 +394,8 @@ def ssh(ctx=None, command=None, **params):
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
     '''
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars(params.get('cwd'), params.get('tmpdir'))
-        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
+        _set_init_vars(params.get('cwd'), params.get('tmpdir'))
+        _set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
     ## Add pass-through 'command' option.
     cmd = 'vagrant ssh'
@@ -389,6 +404,7 @@ def ssh(ctx=None, command=None, **params):
 
     # do not use _invoke_vagrant, that will give a persistent ssh session regardless.
     os.system(cmd)
+
 
 def up(ctx=None, **params):
     '''Start a VM / container with `vagrant up`.
@@ -410,10 +426,7 @@ def up(ctx=None, **params):
         sync_type (str): Type of syncing to use.
         ports (str): Ports to forward.
         provision (bool): vagrant provisioning flag.
-        provision_cmd (str): Command used at beginning of provisioning.
-        provision_script (path): Path to script to use for provisioning.
-        provision_with_salt (bool): Flag to indicate provisioning with salt.
-        provision_with_salt_legacy (bool): Flag to indicate provisioning with salt using the legacy style.
+        command (str): Command used at beginning of provisioning.
         destroy_on_error (bool): vagrant destroy-on-error flag.
         vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
@@ -421,8 +434,8 @@ def up(ctx=None, **params):
     '''
     # TODO: Add registering of VM for all of this installation to see
     if not ctx: # Using API. Else handled by cli.
-        set_init_vars(params.get('cwd'), params.get('tmpdir'))
-        set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
+        _set_init_vars(params.get('cwd'), params.get('tmpdir'))
+        _set_vagrant_vars(params.get('vagrant_cwd'), params.get('vagrant_dotfile_path'))
 
     ## Option Handling - These might modify the params dict and/or set env vars.
     params['guest_os'] = options.guest_os_option(params.get('guest_os'))
@@ -432,13 +445,9 @@ def up(ctx=None, **params):
     params['machine_type'] = options.machine_type_option(params.get('machine_type'), params.get('provider'))
     params['project_dir'] = options.project_dir_option(params.get('project_dir'))
     params['provider'] = options.provider_option(params.get('provider'))
-    params['provision_cmd'] = options.provision_cmd_option(params.get('provision_cmd'))
-    params['provision_script'] = options.provision_script_option(params.get('provision_script'))
-    params['provision_with_salt'] = options.provision_with_salt_option(params.get('provision_with_salt'))
-    params['provision_with_salt_legacy'] = options.provision_with_salt_legacy_option(params.get('provision_with_salt_legacy'))
+    params['command'] = options.command_option(params.get('command'))
     params['ram_size'], params['drive_size'] = options.size_option(
         params.get('ram_size'), params.get('drive_size')) # both ram and drive size
-    params['salt_bootstrap_args'] = options.salt_bootstrap_args_option(params.get('salt_bootstrap_args'))
     params['sync_dirs'] = options.sync_dirs_option(params.get('sync_dirs'))
     params['sync_type'] = options.sync_type_option(params.get('sync_type'))
     params['ports'] = options.ports_option(params.get('ports'))
@@ -470,6 +479,7 @@ def up(ctx=None, **params):
 
     vagrant_general_command(cmd)
 
+
 def vagrant_general_command(cmd):
     '''Invoke vagrant with custom command.
 
@@ -478,8 +488,3 @@ def vagrant_general_command(cmd):
     '''
     # Modify cmd in private function to keep enforcement of being a vagrant cmd there.
     return _invoke_vagrant(cmd)
-
-
-class Run_app():
-    def __init__(self):
-        print("in Run_app __init__")
