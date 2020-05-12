@@ -12,3 +12,6 @@ def ssh(cmd, params):
 
 def scp(cmd, params):
     print("scp in synthetic")
+
+def extra(cmd, params):
+    pass
