@@ -35,10 +35,11 @@ These can be specified with `--sync-type`.
 
 Rambo will sync your project directory and any custom directories. The following mappings are synced in the order listed.
 
-| Host (source)                   | VM (target)           |
-|---------------------------------|-----------------------|
-| [ project dir]                  | /vagrant              |
-| custom dirs on host             | custom dirs on VM     |
+Host (source)                   VM (target)
+=============                   ===========
+
+[ project dir]                  /vagrant
+custom dirs on host             custom dirs on VM
 
 
 Custom dirs can be passed to `--sync-dirs` as a list of lists of the form
