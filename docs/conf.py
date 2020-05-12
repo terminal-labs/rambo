@@ -43,7 +43,6 @@ release = version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'recommonmark',
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
 ]
@@ -172,10 +171,8 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+source_parsers = {
+    '.md': CommonMarkParser,
+}
 
-
-# source_parsers = {
-#     '.md': CommonMarkParser,
-# }
-
-# source_suffix = ['.rst', '.md']
+source_suffix = ['.rst', '.md']
