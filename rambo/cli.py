@@ -89,8 +89,8 @@ def cli(ctx, cwd, tmpdir, vagrant_cwd, vagrant_dotfile_path):
     """
     if ctx.invoked_subcommand not in ["createproject"]:
         # These need to be very early because they may change the cwd of this Python or of Vagrant
-        app.set_init_vars(cwd, tmpdir)
-        app.set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
+        app._set_init_vars(cwd, tmpdir)
+        app._set_vagrant_vars(vagrant_cwd, vagrant_dotfile_path)
 
         utils.write_to_log('\nNEW CMD')
         utils.write_to_log(' '.join(sys.argv))
