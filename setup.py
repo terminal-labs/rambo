@@ -10,8 +10,7 @@ with io.open('README.md', 'rt', encoding='utf8') as f:
 
 install_requires = ["click"]
 docs_require = [
-    "recommonmark",  # Higher versions break relative paths in links.
-    "sphinx-markdown-tables",
+    "recommonmark",
     "sphinx_rtd_theme",
 ]
 dev_require = docs_require + ["black", "ipdb"]
