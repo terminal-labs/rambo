@@ -238,8 +238,6 @@ def ssh_cmd(ctx, command):
 @click.option('-m', '--machine-type', type=str,
               help='Machine type for cloud providers.\n'
               'E.g. m5.medium for ec2, or s-8vcpu-32gb for digitalocean.\n')
-@click.option('--salt-bootstrap-args', type=str,
-              help='Args to pass to salt-bootstrap when provisioning with Salt.')
 @click.option('--sync-dirs', type=str,
               help=(
                   "Paths to sync into VM, passed as a Python list of lists of the form "
@@ -263,21 +261,15 @@ def ssh_cmd(ctx, command):
               help='List of path to sync into VM')
 @click.option('--provision/--no-provision', default=None,
               help='Enable or disable provisioning')
-@click.option('-c', '--provision-cmd', type=str,
+@click.option('-c', '--command', type=str,
               help='Command to start provisioning with')
-@click.option('-s', '--provision-script', type=click.Path(resolve_path=True),
-              help='Path on host to script provision with')
-@click.option('--provision-with-salt', is_flag=True,
-              help='Provision with Salt')
-@click.option('--provision-with-salt-legacy', is_flag=True,
-              help='Provision with Salt (Legacy Style)')
 @click.option('--destroy-on-error/--no-destroy-on-error', default=None,
               help='Destroy machine if any fatal error happens (default to true)')
 @click.option('--vm_name', type=str,
               help='The name of the VirtualMachine / Container.')
 @click.pass_context
 def up_cmd(ctx, provider, box, hostname, guest_os, ram_size, cpus, drive_size, machine_type,
-           salt_bootstrap_args, sync_dirs, ec2_security_groups, sync_type, ports, project_dir, provision, provision_cmd, provision_script, provision_with_salt, provision_with_salt_legacy, destroy_on_error, vm_name):
+           sync_dirs, ec2_security_groups, sync_type, ports, project_dir, provision, command, destroy_on_error, vm_name):
     '''Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.
     Precedence is CLI > Config > Env Var > defaults.

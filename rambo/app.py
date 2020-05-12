@@ -319,8 +319,12 @@ def install_config(ctx=None, output_path=None, **kwargs):
         utils.abort('%s.conf already esists.' % PROJECT_NAME)
     else:
         with open(path, 'w') as f:
-            f.write('[up]\nprovider = %s\nguest_os = %s\n'
-                    % (SETTINGS['PROVIDERS_DEFAULT'], SETTINGS['GUEST_OSES_DEFAULT']))
+            f.write("""\
+[up]
+provider = virtualbox
+box = ubuntu/bionic64
+sync_dirs = [["saltstack/etc", "/etc/salt"], ["saltstack/srv", "/srv"]]
+""")
         utils.echo('Created config at %s' % path)
 
 def install_plugins(force=None, plugins=('all',)):
@@ -410,10 +414,7 @@ def up(ctx=None, **params):
         sync_type (str): Type of syncing to use.
         ports (str): Ports to forward.
         provision (bool): vagrant provisioning flag.
-        provision_cmd (str): Command used at beginning of provisioning.
-        provision_script (path): Path to script to use for provisioning.
-        provision_with_salt (bool): Flag to indicate provisioning with salt.
-        provision_with_salt_legacy (bool): Flag to indicate provisioning with salt using the legacy style.
+        command (str): Command used at beginning of provisioning.
         destroy_on_error (bool): vagrant destroy-on-error flag.
         vagrant_cwd (path): Location of `Vagrantfile`. Used if invoked with API only.
         vagrant_dotfile_path (path): Location of `.vagrant` metadata directory. Used if invoked with API only.
@@ -432,13 +433,9 @@ def up(ctx=None, **params):
     params['machine_type'] = options.machine_type_option(params.get('machine_type'), params.get('provider'))
     params['project_dir'] = options.project_dir_option(params.get('project_dir'))
     params['provider'] = options.provider_option(params.get('provider'))
-    params['provision_cmd'] = options.provision_cmd_option(params.get('provision_cmd'))
-    params['provision_script'] = options.provision_script_option(params.get('provision_script'))
-    params['provision_with_salt'] = options.provision_with_salt_option(params.get('provision_with_salt'))
-    params['provision_with_salt_legacy'] = options.provision_with_salt_legacy_option(params.get('provision_with_salt_legacy'))
+    params['command'] = options.command_option(params.get('command'))
     params['ram_size'], params['drive_size'] = options.size_option(
         params.get('ram_size'), params.get('drive_size')) # both ram and drive size
-    params['salt_bootstrap_args'] = options.salt_bootstrap_args_option(params.get('salt_bootstrap_args'))
     params['sync_dirs'] = options.sync_dirs_option(params.get('sync_dirs'))
     params['sync_type'] = options.sync_type_option(params.get('sync_type'))
     params['ports'] = options.ports_option(params.get('ports'))
