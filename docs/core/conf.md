@@ -74,7 +74,6 @@ yields the provider `virtualbox`.
 
 ### Example 2
 
-If instead, the config still read
 
 ```ini
 # rambo.conf
