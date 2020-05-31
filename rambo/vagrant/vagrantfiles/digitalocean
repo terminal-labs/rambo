@@ -13,6 +13,7 @@ Vagrant.configure('2') do |config|
     provider.image = get_env_var_rb('do_image') ? get_env_var_rb('do_image') :
                        SETTINGS['GUEST_OSES'][SETTINGS['GUEST_OSES_DEFAULT']]['do']
     provider.region = 'nyc1'
+    config.vm.allowed_synced_folder_types = :rsync
 
     if get_env_var_rb('machinetype')
       provider.size = get_env_var_rb('machinetype')
