@@ -179,6 +179,7 @@ def createproject(project_name, cwd, tmpdir, config_only=None, ctx=None):
 
     # Fill project dir with basic configs.
     install_config(ctx, output_path=path)
+    install_gitignore(ctx, output_path=path)
     if not config_only:
         export("saltstack", path)
         install_auth(ctx, output_path=path)
@@ -350,6 +351,35 @@ sync_dirs = [["saltstack/etc", "/etc/salt"], ["saltstack/srv", "/srv"]]
 """
             )
         utils.echo("Created config at %s" % path)
+
+
+def install_gitignore(ctx=None, output_path=None, **kwargs):
+    """Install config file.
+
+    Agrs:
+        ctx (object): Click Context object.
+        output_path (path): Path to place conf file.
+    """
+    if not ctx:  # Using API. Else handled by cli.
+        _set_init_vars(kwargs.get("cwd"), kwargs.get("tmpdir"))
+
+    if not output_path:
+        output_path = get_env_var("cwd")
+    path = os.path.join(output_path, ".gitignore")
+
+    if os.path.exists(path):
+        pass
+    else:
+        with open(path, "w") as f:
+            f.write(
+                """\
+.rambo-tmp/
+.vagrant/
+my_rambo.conf
+auth/
+"""
+            )
+        utils.echo("Created .gitignore")
 
 
 def install_plugins(force=None, plugins=("all",)):
