@@ -1,6 +1,7 @@
 # README
 
-[![Join the chat at https://gitter.im/terminal-labs/rambo](https://badges.gitter.im/terminal-labs/rambo.svg)](https://gitter.im/terminal-labs/rambo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![PyPI version](https://badge.fury.io/py/rambo-vagrant.svg)](https://pypi.org/project/rambo-vagrant/)
+<a href="https://github.com/ambv/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 
 ## Quickstart
 To get started fast, see: [Quickstart](http://terminallabs-rambo.readthedocs.io/en/latest/core/quickstart/), or go to our [docs homepage](http://terminallabs-rambo.readthedocs.io/en/latest/)
