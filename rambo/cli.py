@@ -28,16 +28,6 @@ CONTEXT_SETTINGS = {
 }
 
 
-def load_config_section(section):
-    """Generic section load
-    """
-    parser = configparser.ConfigParser()
-    parser.read("rambo.conf")
-
-    if section in parser:
-        return dict(parser[section])
-
-
 # Support for injecting config vars into click context
 # https://stackoverflow.com/questions/46358797/python-click-supply-arguments-and-options-from-a-configuration-file
 def load_config_for_command(ctx, section):
