@@ -138,7 +138,9 @@ def createproject_cmd(ctx, project_name, config_only):
 @cli.command(
     "destroy", context_settings=CONTEXT_SETTINGS, short_help="Destroy VM and metadata.",
 )
-@click.option("--vm_name", type=str, help="The name of the VirtualMachine / Container.")
+@click.option(
+    "-v", "--vm_name", type=str, help="The name of the VirtualMachine / Container."
+)
 @click.pass_context
 def destroy_cmd(ctx, vm_name, **params):
     """Destroy a VM / container. This will tell vagrant to forcibly destroy
