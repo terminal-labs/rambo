@@ -6,6 +6,7 @@ import shutil
 import sys
 from distutils.dir_util import copy_tree
 from distutils.errors import DistutilsFileError
+from pathlib import Path
 from select import select
 from subprocess import Popen
 
@@ -17,6 +18,7 @@ import rambo.vagrant_providers as vagrant_providers
 from rambo.settings import PROJECT_LOCATION
 from rambo.settings import PROJECT_NAME
 from rambo.settings import SETTINGS
+from rambo.utils import abort
 from rambo.utils import get_env_var
 from rambo.utils import set_env_var
 
@@ -531,7 +533,16 @@ def up(ctx=None, **params):
     elif params.get("destroy_on_error") is False:
         cmd = "{} {}".format(cmd, "--no-destroy-on-error")
 
-    vagrant_general_command(cmd)
+    exit_code = vagrant_general_command(cmd)
+
+    if exit_code:
+        with open(Path(get_env_var("LOG_PATH")) / "stderr.log") as fp:
+            stderr = fp.readlines()
+        if any("Unknown configuration section 'disksize'" in line for line in stderr):
+            abort(
+                "You probably don't have plugins installed.\nRun:\n"
+                "\trambo install-plugins"
+            )
 
 
 def vagrant_general_command(cmd):
