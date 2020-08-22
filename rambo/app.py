@@ -538,11 +538,15 @@ def up(ctx=None, **params):
     if exit_code:
         with open(Path(get_env_var("LOG_PATH")) / "stderr.log") as fp:
             stderr = fp.readlines()
-        if any("Unknown configuration section 'disksize'" in line for line in stderr):
-            abort(
-                "You probably don't have plugins installed.\nRun:\n"
-                "\trambo install-plugins"
-            )
+        for idx, line in enumerate(reversed(stderr)):
+            if "Unknown configuration section 'disksize'" in line:
+                abort(
+                    "You probably don't have plugins installed.\nRun:\n"
+                    "\trambo install-plugins"
+                )
+            elif idx > 5:
+                # Only look through the recent stderr.
+                break
 
 
 def vagrant_general_command(cmd):
