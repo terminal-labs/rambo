@@ -1,3 +1,4 @@
+import ast
 import configparser
 import os
 import sys
@@ -38,9 +39,10 @@ def load_config_for_command(ctx, section):
         section = "base"
     if section in parser:
         for param, value in ctx.params.items():
-            if value is None:
+            if not value:
                 if param in parser[section]:
-                    ctx.params[param] = parser[section][param]
+                    native_val = ast.literal_eval(parser[section][param])
+                    ctx.params[param] = type(ctx.params[param])(native_val)
     return ctx
 
 
@@ -222,14 +224,20 @@ def scp_cmd(ctx):
     app.scp(ctx, ctx.args)
 
 
-@cli.command("ssh", short_help="Connect with ssh.")
+@cli.command("ssh", short_help="Connect with ssh.", cls=CommandWithConfig)
 @click.option("-c", "--command", type=str, help="Execute an SSH command directly.")
+@click.argument('ssh_args', nargs=-1, type=str)
 @click.pass_context
-def ssh_cmd(ctx, command):
+def ssh_cmd(ctx, command, ssh_args):
     """Connect to an running VM / container over ssh. With `-c` / `--command`,
-    will executed an SSH command directly.
+    execute an SSH command directly.
+
+    Supply a final `-- [args]` to pass additional arguments directly to ssh.
     """
-    app.ssh(ctx, command)
+    if not ssh_args:
+        ssh_args=ctx.params.get('ssh_args')
+
+    app.ssh(ctx, command, ssh_args)
 
 
 @cli.command(

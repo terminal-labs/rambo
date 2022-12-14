@@ -437,7 +437,7 @@ def scp(ctx=None, locations=None, **params):
     vagrant_general_command("{} {}".format("scp", " ".join(locations)))
 
 
-def ssh(ctx=None, command=None, **params):
+def ssh(ctx=None, command=None, ssh_args=None, **params):
     """Connect to an running VM / container over ssh.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -455,6 +455,9 @@ def ssh(ctx=None, command=None, **params):
     cmd = f"{VAGRANT_EXE} ssh"
     if command:
         cmd = " ".join([cmd, "--command", command])
+
+    if ssh_args:
+        cmd = f"{cmd} -- {' '.join(ssh_args)}"
 
     # do not use _invoke_vagrant, that will give a persistent ssh session regardless.
     os.system(cmd)
