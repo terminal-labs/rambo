@@ -105,7 +105,6 @@ Vagrant.configure("2") do |config|
 
   # Custom Provisioning
   if get_env_var_rb('command')
-    puts get_env_var_rb('command')
     config.vm.provision "shell",
       inline: get_env_var_rb('command'), keep_color: true
   end

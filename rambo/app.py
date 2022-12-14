@@ -22,6 +22,7 @@ from rambo.utils import abort
 from rambo.utils import get_env_var
 from rambo.utils import set_env_var
 
+VAGRANT_EXE = os.getenv("VAGRANT_EXE", "vagrant")
 
 def _invoke_vagrant(cmd=None):
     """Pass a command to vagrant. This outputs in near real-time,
@@ -35,7 +36,7 @@ def _invoke_vagrant(cmd=None):
                    passed to the shell and executed.
     """
     masters, slaves = zip(pty.openpty(), pty.openpty())
-    cmd = " ".join(["vagrant", cmd]).split()
+    cmd = " ".join([VAGRANT_EXE, cmd]).split()
 
     with Popen(cmd, stdin=slaves[0], stdout=slaves[0], stderr=slaves[1]) as p:
         for fd in slaves:
@@ -451,7 +452,7 @@ def ssh(ctx=None, command=None, **params):
         _set_vagrant_vars(params.get("vagrant_cwd"), params.get("vagrant_dotfile_path"))
 
     # Add pass-through 'command' option.
-    cmd = "vagrant ssh"
+    cmd = f"{VAGRANT_EXE} ssh"
     if command:
         cmd = " ".join([cmd, "--command", command])
 
