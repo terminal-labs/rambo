@@ -4,13 +4,13 @@ import platform
 import pty
 import shutil
 import sys
-from distutils.dir_util import copy_tree
-from distutils.errors import DistutilsFileError
 from pathlib import Path
 from select import select
 from subprocess import Popen
 
 import click
+from distutils.dir_util import copy_tree
+from distutils.errors import DistutilsFileError
 
 import rambo.options as options
 import rambo.utils as utils
