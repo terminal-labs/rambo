@@ -31,7 +31,7 @@ setup(
     extras_require={"dev": dev_require, "docs": docs_require},
     include_package_data=True,
     install_requires=install_requires,
-    license='BSD-3-Clause',
+    license="BSD-3-Clause",
     long_description=readme,
     long_description_content_type="text/markdown",
     name="Rambo-vagrant",

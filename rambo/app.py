@@ -24,6 +24,7 @@ from rambo.utils import set_env_var
 
 VAGRANT_EXE = os.getenv("VAGRANT_EXE", "vagrant")
 
+
 def _invoke_vagrant(cmd=None):
     """Pass a command to vagrant. This outputs in near real-time,
     logs both stderr and stdout in a combined file, and detects stderr for

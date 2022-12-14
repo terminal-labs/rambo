@@ -138,7 +138,9 @@ def createproject_cmd(ctx, project_name, config_only):
 
 
 @cli.command(
-    "destroy", context_settings=CONTEXT_SETTINGS, short_help="Destroy VM and metadata.",
+    "destroy",
+    context_settings=CONTEXT_SETTINGS,
+    short_help="Destroy VM and metadata.",
 )
 @click.option(
     "-v", "--vm_name", type=str, help="The name of the VirtualMachine / Container."
@@ -226,7 +228,7 @@ def scp_cmd(ctx):
 
 @cli.command("ssh", short_help="Connect with ssh.", cls=CommandWithConfig)
 @click.option("-c", "--command", type=str, help="Execute an SSH command directly.")
-@click.argument('ssh_args', nargs=-1, type=str)
+@click.argument("ssh_args", nargs=-1, type=str)
 @click.pass_context
 def ssh_cmd(ctx, command, ssh_args):
     """Connect to an running VM / container over ssh. With `-c` / `--command`,
@@ -235,7 +237,7 @@ def ssh_cmd(ctx, command, ssh_args):
     Supply a final `-- [args]` to pass additional arguments directly to ssh.
     """
     if not ssh_args:
-        ssh_args=ctx.params.get('ssh_args')
+        ssh_args = ctx.params.get("ssh_args")
 
     app.ssh(ctx, command, ssh_args)
 
