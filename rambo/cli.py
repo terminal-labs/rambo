@@ -1,4 +1,3 @@
-import ast
 import configparser
 import os
 import sys
@@ -41,8 +40,23 @@ def load_config_for_command(ctx, section):
         for param, value in ctx.params.items():
             if not value:
                 if param in parser[section]:
-                    native_val = ast.literal_eval(parser[section][param])
-                    ctx.params[param] = type(ctx.params[param])(native_val)
+                    ctx.params[param] = parser[section][param]
+
+                    # native_val = parser[section][param]
+                    # try:
+                    #     native_val = ast.literal_eval(native_val)
+                    # except ValueError:
+                    #     pass
+                    # #     ctx.params[param] = native_val
+                    # # else:
+                    # #     breakpoint()
+                    # #     ctx.params[param] = type(ctx.params[param])(native_val)
+
+                    # ctx_param = ctx.params[param]
+                    # if ctx_param is not None:
+                    #     ctx.params[param] = type(ctx.params[param])(native_val)
+                    # else:
+                    #     ctx.params[param] = native_val
     return ctx
 
 
@@ -330,6 +344,7 @@ def ssh_cmd(ctx, command, ssh_args):
     help="Destroy machine if any fatal error happens (default to true)",
 )
 @click.option("--vm_name", type=str, help="The name of the VirtualMachine / Container.")
+@click.argument("up_args", nargs=-1, type=str)
 @click.pass_context
 def up_cmd(
     ctx,
@@ -350,6 +365,7 @@ def up_cmd(
     command,
     destroy_on_error,
     vm_name,
+    up_args,
 ):
     """Start a VM or container. Will create one and begin provisioning it if
     it did not already exist. Accepts many options to set aspects of your VM.

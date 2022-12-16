@@ -1,3 +1,4 @@
+import ast
 import errno
 import os
 import platform
@@ -458,13 +459,18 @@ def ssh(ctx=None, command=None, ssh_args=None, **params):
         cmd = " ".join([cmd, "--command", command])
 
     if ssh_args:
-        cmd = f"{cmd} -- {' '.join(ssh_args)}"
+        if isinstance(ssh_args, tuple):
+            ssh_args = " ".join(ssh_args)
+        else:
+            ssh_args = ast.literal_eval(ssh_args)
+
+        cmd = f"{cmd} -- {ssh_args}"
 
     # do not use _invoke_vagrant, that will give a persistent ssh session regardless.
     os.system(cmd)
 
 
-def up(ctx=None, **params):
+def up(ctx=None, up_args=None, **params):
     """Start a VM / container with `vagrant up`.
     All str args can also be set as an environment variable; arg takes precedence.
 
@@ -515,6 +521,13 @@ def up(ctx=None, **params):
     params["vm_name"] = options.vm_name_option(params.get("vm_name"))
 
     cmd = "up"
+
+    if up_args:
+        if isinstance(up_args, tuple):
+            up_args = " ".join(up_args)
+        else:
+            up_args = ast.literal_eval(up_args)
+        cmd = f"{cmd} {up_args}"
 
     # Provider specific handling.
     # Must come after all else, because logic may be done on params above.
