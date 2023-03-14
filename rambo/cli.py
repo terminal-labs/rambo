@@ -330,6 +330,11 @@ def ssh_cmd(ctx, command, ssh_args):
     ),
 )
 @click.option(
+    "--ip_address",
+    type=str,
+    help=("IP address to assign the VM"),
+)
+@click.option(
     "--project-dir",
     type=click.Path(resolve_path=True),
     help="List of path to sync into VM",
@@ -360,6 +365,7 @@ def up_cmd(
     ec2_security_groups,
     sync_type,
     ports,
+    ip_address,
     project_dir,
     provision,
     command,

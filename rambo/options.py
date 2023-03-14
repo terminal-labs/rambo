@@ -141,6 +141,12 @@ def ports_option(ports=None):
     return ports
 
 
+def ip_address_option(ip_address="192.168.56.10"):
+    """Set IP address."""
+    set_env_var("ip", ip_address)
+    return ip_address
+
+
 def project_dir_option(project_dir=None):
     """Validate project_dir. If not supplied, set to default. Set as env var.
 

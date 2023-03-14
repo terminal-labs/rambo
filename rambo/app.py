@@ -489,6 +489,7 @@ def up(ctx=None, up_args=None, **params):
         sync_dirs (path): Paths to sync into VM.
         sync_type (str): Type of syncing to use.
         ports (str): Ports to forward.
+        ip_address (str): IP address to assign.
         provision (bool): vagrant provisioning flag.
         command (str): Command used at beginning of provisioning.
         destroy_on_error (bool): vagrant destroy-on-error flag.
@@ -518,6 +519,7 @@ def up(ctx=None, up_args=None, **params):
     params["sync_dirs"] = options.sync_dirs_option(params.get("sync_dirs"))
     params["sync_type"] = options.sync_type_option(params.get("sync_type"))
     params["ports"] = options.ports_option(params.get("ports"))
+    params["ip_address"] = options.ip_address_option(params.get("ip_address"))
     params["vm_name"] = options.vm_name_option(params.get("vm_name"))
 
     cmd = "up"
