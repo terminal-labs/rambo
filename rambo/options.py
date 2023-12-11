@@ -141,9 +141,11 @@ def ports_option(ports=None):
     return ports
 
 
-def ip_address_option(ip_address="192.168.56.10"):
+def ip_address_option(ip_address=None):
     """Set IP address."""
-    set_env_var("ip", ip_address)
+    if not ip_address:
+        return None
+    set_env_var("ip_address", ip_address)
     return ip_address
 
 

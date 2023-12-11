@@ -501,6 +501,10 @@ def up(ctx=None, up_args=None, **params):
     if not ctx:  # Using API. Else handled by cli.
         _set_init_vars(params.get("cwd"), params.get("tmpdir"))
         _set_vagrant_vars(params.get("vagrant_cwd"), params.get("vagrant_dotfile_path"))
+        
+    print("888888888888888888888")
+    print(params.get("ip_address"))
+    print("99999")
 
     # Option Handling - These might modify the params dict and/or set env vars.
     params["guest_os"] = options.guest_os_option(params.get("guest_os"))
