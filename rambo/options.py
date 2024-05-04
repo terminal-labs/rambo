@@ -19,6 +19,21 @@ def box_option(box=None):
     return box
 
 
+def gui_option(gui=None):
+    """Set GUI flag
+
+    Args:
+        gui (bool): GUI flag, defaults to False.
+
+    Return gui (bool)
+    """
+    if not gui:
+        set_env_var("gui", False)
+    else:
+        set_env_var("gui", True)
+    return gui
+
+
 def cpus_option(cpus=None):
     """Set cpus
 

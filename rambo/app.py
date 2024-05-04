@@ -481,6 +481,7 @@ def up(ctx=None, up_args=None, **params):
     In params, this looks for:
         provider (str): Provider to use.
         box (str): Vagrant box to use.
+        gui (bool): vagrant gui flag. Defaults to False.
         cpus (int): Number of CPUs to give VirtualBox VM.
         guest_os (str): Guest OS to use.
         ram_size (int): RAM in MB to use.
@@ -505,6 +506,7 @@ def up(ctx=None, up_args=None, **params):
     # Option Handling - These might modify the params dict and/or set env vars.
     params["guest_os"] = options.guest_os_option(params.get("guest_os"))
     params["box"] = options.box_option(params.get("box"))
+    params["gui"] = options.gui_option(params.get("gui"))
     params["cpus"] = options.cpus_option(params.get("cpus"))
     params["hostname"] = options.hostname_option(params.get("hostname"))
     params["machine_type"] = options.machine_type_option(

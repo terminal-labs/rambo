@@ -5,6 +5,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |provider|
     # set unique vm name
     provider.name = VM_NAME
+    provider.gui = get_env_var_rb("GUI") || false
     provider.memory = get_env_var_rb("RAMSIZE")
     provider.cpus = get_env_var_rb("CPUS")
     if get_env_var_rb("BOX")

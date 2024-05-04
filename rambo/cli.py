@@ -37,10 +37,14 @@ def load_config_for_command(ctx, section):
     if section == "cli":
         section = "base"
     if section in parser:
+        section = parser[section]
         for param, value in ctx.params.items():
             if not value:
-                if param in parser[section]:
-                    ctx.params[param] = parser[section][param]
+                if param in section:
+                    if param == "gui":
+                        ctx.params[param] = section.getboolean(param)
+                    else:
+                        ctx.params[param] = section[param]
 
                     # native_val = parser[section][param]
                     # try:
@@ -270,6 +274,7 @@ def ssh_cmd(ctx, command, ssh_args):
     "These providers are supported: %s. Default %s."
     % (SETTINGS["PROVIDERS"], SETTINGS["PROVIDERS_DEFAULT"]),
 )
+@click.option("--gui", is_flag=True)
 @click.option(
     "-o",
     "--guest-os",
@@ -355,6 +360,7 @@ def up_cmd(
     ctx,
     provider,
     box,
+    gui,
     hostname,
     guest_os,
     ram_size,
