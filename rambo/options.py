@@ -136,12 +136,12 @@ def ports_option(ports=None):
         ports = ast.literal_eval(ports)
     except SyntaxError:
         utils.abort("ports cannot be evaluated as valid Python.")
-    if type(ports) is not list:
+    if not isinstance(ports, list):
         utils.abort(
             f"`ports` was not evaluated as a Python list, but as '{type(ports)}'."
         )
     for port_pair in ports:
-        if type(port_pair) is not list:
+        if not isinstance(port_pair, list):
             utils.abort(
                 f"`ports` element {port_pair} was not evaluated as a Python list, but as "
                 f"'{type(port_pair)}'."
@@ -149,7 +149,7 @@ def ports_option(ports=None):
         if len(port_pair) != 2:
             utils.abort(f"Not the right number of ports to forward in {port_pair}.")
         for port in port_pair:
-            if type(port_pair) != int and not 0 < port < 65535:
+            if not isinstance(port_pair, int) and not 0 < port < 65535:
                 utils.abort(f"{port} in `ports` is not an int in a valid port range.")
 
     set_env_var("ports", ports)
@@ -321,12 +321,12 @@ def sync_dirs_option(sync_dirs=None):
         sync_dirs = ast.literal_eval(sync_dirs)
     except SyntaxError:
         utils.abort("sync_dirs cannot be evaluated as valid Python.")
-    if type(sync_dirs) is not list:
+    if not isinstance(sync_dirs, list):
         utils.abort(
             f"sync_dirs was not evaluated as a Python list, but as '{type(sync_dirs)}'"
         )
     for sd in sync_dirs:
-        if type(sd) is not list:
+        if not isinstance(sd, list):
             utils.abort(
                 f"sync_dirs element {sd} was not evaluated as a Python list, but as "
                 f"'{type(sd)}'"
