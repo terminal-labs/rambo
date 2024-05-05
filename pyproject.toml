@@ -1,0 +1,45 @@
+[project]
+authors = [
+    { name = "Joseph Nix", email = "nixjdm@terminallabs.com" },
+    { name = "Terminal Labs", email = "solutions@terminallabs.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+dependencies = [
+    "click",
+    "setuptools"
+]
+description = "A Provider Agnostic Provioning Framework"
+license = "BSD-3-Clause"
+name = "Rambo-vagrant"
+readme = "README.md"
+requires-python = ">= 3.7"
+url="https://github.com/terminal-labs/rambo"
+version = "0.4.5.dev0"
+
+[project.scripts]
+rambo = "rambo.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "ipdb",
+    "pre-commit",
+    "recommonmark",
+    "sphinx_rtd_theme",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["rambo"]
