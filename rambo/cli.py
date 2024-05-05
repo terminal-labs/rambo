@@ -276,6 +276,12 @@ def ssh_cmd(ctx, command, ssh_args):
 )
 @click.option("--gui", is_flag=True)
 @click.option(
+    "--res",
+    type=str,
+    help="Screen resolution if using a gui, of the format '1920x1080'. "
+    "Default determined by magic. Ignored if no gui."
+)
+@click.option(
     "-o",
     "--guest-os",
     type=str,
@@ -353,7 +359,11 @@ def ssh_cmd(ctx, command, ssh_args):
     default=None,
     help="Destroy machine if any fatal error happens (default to true)",
 )
-@click.option("--vm_name", type=str, help="The name of the VirtualMachine / Container.")
+@click.option("--vm_name", type=str, help=(
+    "The name of the VirtualMachine / Container. "
+    "This is also the hostname if that wasn't explicitly set."
+    )
+)
 @click.argument("up_args", nargs=-1, type=str)
 @click.pass_context
 def up_cmd(
@@ -361,6 +371,7 @@ def up_cmd(
     provider,
     box,
     gui,
+    res,
     hostname,
     guest_os,
     ram_size,

@@ -80,6 +80,25 @@ Vagrant.configure("2") do |config|
     config.vm.hostname = VM_NAME
   end
 
+  # Experiments to fix WinRM
+  # config.vm.boot_timeout = 60
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   netsh interface ip set address "Ethernet" static 192.168.56.11 255.255.255.0
+  # SHELL
+
+  # config.vm.provision "shell", path: "provision.ps1"
+
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   echo "Hello, World! - inline"
+  #   winrm quickconfig -q
+  #   winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="512"}'
+  #   winrm set winrm/config '@{MaxTimeoutms="1800000"}'
+  #   winrm set winrm/config/service '@{AllowUnencrypted="true"; MaxConcurrentOperationsPerUser="120"}'
+  #   winrm set winrm/config/service/auth '@{Basic="true"}'
+  #   winrm set winrm/config/client/auth '@{Basic="true"}'
+  #   netsh advfirewall firewall add rule name="WinRM 5985" protocol=TCP dir=in localport=5985 action=allow
+  # SHELL
+
   # Syncing / Shared folders
   if get_env_var_rb('project_dir')
     sync_dir = get_env_var_rb('project_dir')

@@ -3,11 +3,6 @@
 
 Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |provider|
-    # set unique vm name
-    provider.name = VM_NAME
-    provider.gui = get_env_var_rb("GUI") || false
-    provider.memory = get_env_var_rb("RAMSIZE")
-    provider.cpus = get_env_var_rb("CPUS")
     if get_env_var_rb("BOX")
       box = get_env_var_rb("BOX")
       config.disksize.size = get_env_var_rb("DRIVESIZE") + "GB"
@@ -16,21 +11,35 @@ Vagrant.configure("2") do |config|
     end
     config.vm.box = box
     config.vm.box_url = box
+    config.vm.network :private_network,
+                      ip: get_env_var_rb("IP")
 
-    provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
-    provider.customize ['modifyvm', :id, '--nictype2', 'virtio']
-  end
-  config.ssh.username = "vagrant"
-  config.ssh.forward_agent = FORWARD_SSH
-  if get_env_var_rb('ports')
-    ports = eval(get_env_var_rb('ports'))
-    for port_pair in ports
-      config.vm.network :forwarded_port,
-                        :guest => port_pair[0],
-                        :host => port_pair[1],
-                        auto_correct: true
+    provider.name = VM_NAME  # unique
+    provider.gui = get_env_var_rb("GUI") || false
+    provider.memory = get_env_var_rb("RAMSIZE")
+    provider.cpus = get_env_var_rb("CPUS")
+
+    # OS specific settings
+    if config.vm.box.include? "windows"
+      # Configuration specific to Windows
+      if provider.gui
+        provider.customize ['setextradata', :id, 'GUI/LastGuestSizeHint', get_env_var_rb("RESOLUTION")]
+        puts "res:"
+        puts get_env_var_rb("RESOLUTION")
+      end
+      provider.customize ["modifyvm", :id, "--nic-type1", "82540EM"]
+      provider.customize ["modifyvm", :id, "--nic-type2", "82540EM"]
+      config.vm.communicator = "winrm"
+      config.winrm.host = get_env_var_rb("IP")
+      config.winrm.username = "vagrant"
+      config.winrm.password = "vagrant"
+    else
+      # Configuration specific to Unix/Linux
+      provider.customize ['modifyvm', :id, '--nictype1', 'virtio']
+      provider.customize ['modifyvm', :id, '--nictype2', 'virtio']
+      config.vm.communicator = "ssh"
+      config.ssh.username = "vagrant"
+      config.ssh.forward_agent = FORWARD_SSH
     end
   end
-  config.vm.network :private_network,
-    ip: get_env_var_rb("IP")
 end

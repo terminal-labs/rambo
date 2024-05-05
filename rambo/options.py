@@ -215,6 +215,34 @@ def command_option(command=None):
     return command
 
 
+def res_option(res=None):
+    """Validate screen resolution. If not supplied, don't set it.
+
+    res must be a string that is two ints joined by an `x`, like:
+    `1920x1080`
+
+    Args:
+        res: screen resolution like `1920x1080`
+
+    Return resolution (str)
+    """
+    if not res:
+        return
+
+    try:
+        dimensions = res.split('x')
+        dimensions = (int(dimensions[0]), int(dimensions[1]),)
+    except (IndexError, TypeError):
+        utils.abort(
+            f"`res` is not two ints joined by an `x`, but is {res}."
+        )
+
+    res = f"{dimensions[0]},{dimensions[1]}"
+    set_env_var("resolution", res)
+
+    return res
+
+
 def size_option(ram_size=None, drive_size=None):
     """Validate ram and drive sizes. Pair them if possible. If not
     supplied, set to default. Set as env var. Reset in params as strings.

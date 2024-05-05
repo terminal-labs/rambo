@@ -482,6 +482,7 @@ def up(ctx=None, up_args=None, **params):
         provider (str): Provider to use.
         box (str): Vagrant box to use.
         gui (bool): vagrant gui flag. Defaults to False.
+        res (str): Screen resolution like `1920x1080`.
         cpus (int): Number of CPUs to give VirtualBox VM.
         guest_os (str): Guest OS to use.
         ram_size (int): RAM in MB to use.
@@ -518,6 +519,7 @@ def up(ctx=None, up_args=None, **params):
     params["ram_size"], params["drive_size"] = options.size_option(
         params.get("ram_size"), params.get("drive_size")
     )  # both ram and drive size
+    params["res"] = options.res_option(params.get("res"))
     params["sync_dirs"] = options.sync_dirs_option(params.get("sync_dirs"))
     params["sync_type"] = options.sync_type_option(params.get("sync_type"))
     params["ports"] = options.ports_option(params.get("ports"))
