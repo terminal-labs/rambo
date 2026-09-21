@@ -1,14 +1,11 @@
 import os
 import sys
 from pathlib import Path
-from shutil import copyfile
-from shutil import move
-from shutil import rmtree
+from shutil import copyfile, move, rmtree
 
 import click
 
-from rambo.settings import CONF_FILES
-from rambo.settings import PROJECT_NAME
+from rambo.settings import CONF_FILES, PROJECT_NAME
 
 
 def set_env_var(name, value):

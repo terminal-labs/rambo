@@ -5,23 +5,17 @@ import platform
 import pty
 import shutil
 import sys
+from distutils.dir_util import copy_tree
+from distutils.errors import DistutilsFileError
 from pathlib import Path
 from select import select
 from subprocess import Popen
 
 import click
-from distutils.dir_util import copy_tree
-from distutils.errors import DistutilsFileError
 
-import rambo.options as options
-import rambo.utils as utils
-import rambo.vagrant_providers as vagrant_providers
-from rambo.settings import PROJECT_LOCATION
-from rambo.settings import PROJECT_NAME
-from rambo.settings import SETTINGS
-from rambo.utils import abort
-from rambo.utils import get_env_var
-from rambo.utils import set_env_var
+from rambo import options, utils, vagrant_providers
+from rambo.settings import PROJECT_LOCATION, PROJECT_NAME, SETTINGS
+from rambo.utils import abort, get_env_var, set_env_var
 
 VAGRANT_EXE = os.getenv("VAGRANT_EXE", "vagrant")
 
