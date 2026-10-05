@@ -1,7 +1,5 @@
 from rambo.settings import SETTINGS
-from rambo.utils import abort
-from rambo.utils import get_env_var
-from rambo.utils import set_env_var
+from rambo.utils import abort, get_env_var, set_env_var
 
 
 def digitalocean():
