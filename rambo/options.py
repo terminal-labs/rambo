@@ -1,7 +1,7 @@
 import ast
 import os
 
-import rambo.utils as utils
+from rambo import utils
 from rambo.settings import SETTINGS
 from rambo.utils import set_env_var
 

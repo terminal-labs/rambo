@@ -5,12 +5,8 @@ import sys
 import click
 import pkg_resources
 
-import rambo.app as app
-import rambo.utils as utils
-from rambo.settings import CONF_FILES
-from rambo.settings import PROJECT_NAME
-from rambo.settings import SETTINGS
-
+from rambo import app, utils
+from rambo.settings import CONF_FILES, PROJECT_NAME, SETTINGS
 
 version = pkg_resources.get_distribution("rambo-vagrant").version
 
